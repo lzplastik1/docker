@@ -1,0 +1,38 @@
+# Flexisip push gateway in front of a Yeastar S50.
+#   redis  : stores phone registrations (push tokens) across restarts
+#   proxy  : phones register here; sends the FCM push when a call arrives
+#   b2bua  : registers the S50 extensions and bridges calls to/from the proxy
+# Host networking: SIP and RTP ports are used directly on the host (no NAT inside Docker).
+services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--bind", "127.0.0.1", "--port", "6379", "--appendonly", "yes"]
+    network_mode: host
+    volumes:
+      - ./data/redis:/data
+    restart: always
+
+  proxy:
+    build: .
+    image: flexisip-s50:2.6.2
+    command: ["proxy"]
+    network_mode: host
+    env_file: .env
+    volumes:
+      - ./config:/config:ro
+      - ./secrets/firebase-service-account.json:/etc/flexisip/firebase/service-account.json:ro
+    depends_on:
+      - redis
+    restart: always
+
+  b2bua:
+    image: flexisip-s50:2.6.2
+    command: ["b2bua"]
+    network_mode: host
+    env_file: .env
+    volumes:
+      - ./config:/config:ro
+      - ./data/b2bua:/var/opt/belledonne-communications/flexisip/b2bua
+    depends_on:
+      - proxy
+    restart: always

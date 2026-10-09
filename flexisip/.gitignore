@@ -1,0 +1,5 @@
+.env
+config/accounts.conf
+secrets/*
+!secrets/.gitkeep
+data/

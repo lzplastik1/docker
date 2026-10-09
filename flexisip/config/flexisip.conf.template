@@ -1,0 +1,68 @@
+# Flexisip configuration template (Flexisip 2.6.x).
+# Variables like $${FLEXISIP_IP} are filled from .env by render-config.py at container start.
+# Full reference: flexisip --dump-default all
+
+[global]
+log-level=${LOG_LEVEL}
+# Phones register here (account A in the Linphone app).
+transports=sip:${FLEXISIP_IP}:5060;transport=udp sip:${FLEXISIP_IP}:5060;transport=tcp
+aliases=localhost ${FLEXISIP_IP}
+
+##
+## Proxy
+##
+
+[module::Registrar]
+enabled=true
+reg-domains=${FLEXISIP_IP}
+# Keep registrations (and their push tokens) in Redis so they survive a restart.
+db-implementation=redis
+redis-server-domain=127.0.0.1
+redis-server-port=6379
+# Linphone registers push-enabled accounts for up to 7 days.
+max-expires=604800
+
+[module::Authentication]
+enabled=true
+auth-domains=${FLEXISIP_IP}
+db-implementation=file
+file-path=/etc/flexisip/users.auth
+# The b2bua runs on this host: do not challenge it.
+trusted-hosts=127.0.0.1 ${FLEXISIP_IP}
+
+[module::PushNotification]
+enabled=true
+firebase=true
+firebase-service-accounts=${FIREBASE_PROJECT_NUMBER}:/etc/flexisip/firebase/service-account.json
+# Wake up devices whose registration is about to expire so they register again.
+register-wakeup-interval=30
+
+[module::Router]
+# Hold the call until the phone woken up by the push registers again.
+fork-late=true
+call-fork-timeout=60
+
+[module::MediaRelay]
+# LAN only: phones and the b2bua exchange RTP directly.
+enabled=false
+
+[module::B2bua]
+enabled=true
+b2bua-server=sip:${FLEXISIP_IP}:6067;transport=udp
+
+##
+## B2BUA (sip-bridge to the S50)
+##
+
+[b2bua-server]
+application=sip-bridge
+transport=sip:${FLEXISIP_IP}:6067;transport=udp
+# Each S50 extension gets its own local port, like a separate phone.
+one-connection-per-account=true
+enable-ice=false
+# Same codec on both legs: no transcoding. Must be enabled on the S50 extensions.
+audio-codec=${AUDIO_CODEC}
+data-directory=/var/opt/belledonne-communications/flexisip/b2bua
+
+[b2bua-server::sip-bridge]
+providers=/etc/flexisip/providers.json

@@ -1,0 +1,13 @@
+# Copy to accounts.conf. One line per S50 extension used through Flexisip:
+#
+#   extension   s50_password   app_password   [s50_auth_name]
+#
+# extension      : S50 extension number (also the username in the Linphone app)
+# s50_password   : SIP password of the extension on the S50 (used by the b2bua)
+# app_password   : password the Linphone app uses to log in to Flexisip
+#                  (letters, digits and - . ! % * _ + ` ' ~ : only)
+# s50_auth_name  : only if the S50 "Register Name" differs from the extension number
+#
+# Fields are separated by spaces, so passwords cannot contain spaces.
+
+801  S50-secret-801  App-secret-801
