@@ -5,8 +5,18 @@ FROM debian:12
 
 ARG FLEXISIP_VERSION=2.6.2
 ARG NJOBS=4
+# Optional Debian mirror replacing deb.debian.org, e.g. https://mirrors.ustc.edu.cn
+# (must serve both /debian and /debian-security).
+ARG DEBIAN_MIRROR=
 
-RUN apt-get -y update \
+# The base image has no CA certificates yet: fetch them without TLS peer checks
+# (packages are still verified by apt's GPG signatures), then use TLS normally.
+RUN if [ -n "${DEBIAN_MIRROR}" ]; then \
+      sed -i "s|http://deb.debian.org|${DEBIAN_MIRROR}|g" /etc/apt/sources.list.d/debian.sources; \
+    fi \
+ && apt-get -o Acquire::https::Verify-Peer=false -y update \
+ && apt-get -o Acquire::https::Verify-Peer=false -y install --no-install-recommends ca-certificates \
+ && apt-get -y update \
  && apt-get -y install --no-install-recommends \
       ca-certificates git cmake make ninja-build g++ python3 python3-pystache python3-six yasm doxygen \
       libsystemd-dev libssl-dev libboost-dev libboost-system-dev libboost-thread-dev libcpp-jwt-dev \
