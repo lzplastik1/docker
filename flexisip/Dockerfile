@@ -25,9 +25,21 @@ RUN if [ -n "${DEBIAN_MIRROR}" ]; then \
       libopus-dev libmbedtls-dev libspeex-dev libspeexdsp-dev libxml2-dev libvpx-dev \
  && rm -rf /var/lib/apt/lists/*
 
-RUN git clone --branch ${FLEXISIP_VERSION} --recurse-submodules \
-      https://gitlab.linphone.org/BC/public/flexisip.git /src/flexisip \
- && cmake -S /src/flexisip -B /src/build -G Ninja \
+# Fetch sources in their own layer, retrying: a flaky proxy can drop TLS connections, and a
+# failed build below then reuses this layer instead of downloading everything again.
+RUN git config --global http.version HTTP/1.1 \
+ && ok=; for i in 1 2 3 4 5; do \
+      git clone --branch ${FLEXISIP_VERSION} https://gitlab.linphone.org/BC/public/flexisip.git /src/flexisip \
+        && ok=1 && break; \
+      rm -rf /src/flexisip; echo "clone failed, retry $i"; sleep 15; \
+    done; [ -n "$ok" ] \
+ && cd /src/flexisip \
+ && ok=; for i in 1 2 3 4 5 6 7 8 9 10; do \
+      git submodule update --init --recursive --jobs 4 && ok=1 && break; \
+      echo "submodule update failed, retry $i"; sleep 15; \
+    done; [ -n "$ok" ]
+
+RUN cmake -S /src/flexisip -B /src/build -G Ninja \
       -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_PREFIX=/opt/belledonne-communications \
       -DSYSCONF_INSTALL_DIR=/etc \
