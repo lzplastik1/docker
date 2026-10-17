@@ -42,6 +42,10 @@ register-wakeup-interval=30
 fork-late=true
 call-fork-timeout=60
 
+[module::DoSProtection]
+# Needs iptables inside the container; LAN only, so leave it off.
+enabled=false
+
 [module::MediaRelay]
 # LAN only: phones and the b2bua exchange RTP directly.
 enabled=false

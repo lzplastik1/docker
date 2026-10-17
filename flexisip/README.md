@@ -57,6 +57,7 @@
 cd flexisip
 cp .env.example .env                              # 填写 IP、项目编号
 cp config/accounts.conf.example config/accounts.conf   # 每个分机一行
+mkdir -p data/redis data/b2bua                    # 群晖不会自动创建挂载目录
 ```
 
 ### 4. 构建和启动
