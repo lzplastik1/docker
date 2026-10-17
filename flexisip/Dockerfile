@@ -39,7 +39,15 @@ RUN git config --global http.version HTTP/1.1 \
       echo "submodule update failed, retry $i"; sleep 15; \
     done; [ -n "$ok" ]
 
+# Flexisip needs gcc >= 13 or clang >= 19; Debian 12 ships gcc 12, so build with clang-19 like
+# the upstream bc-dev-debian12 image. Installed after the sources layer to keep it cached.
+RUN apt-get -y update \
+ && apt-get -y install --no-install-recommends clang-19 \
+ && rm -rf /var/lib/apt/lists/*
+
 RUN cmake -S /src/flexisip -B /src/build -G Ninja \
+      -DCMAKE_C_COMPILER=clang-19 \
+      -DCMAKE_CXX_COMPILER=clang++-19 \
       -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_PREFIX=/opt/belledonne-communications \
       -DSYSCONF_INSTALL_DIR=/etc \
