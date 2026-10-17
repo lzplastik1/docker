@@ -45,6 +45,16 @@ RUN apt-get -y update \
  && apt-get -y install --no-install-recommends clang-19 \
  && rm -rf /var/lib/apt/lists/*
 
+# An interrupted submodule checkout can leave a directory empty, which a plain update then skips.
+# Force the checkout and retry until no submodule is left empty.
+RUN cd /src/flexisip \
+ && ok=; for i in 1 2 3 4 5; do \
+      git submodule update --init --recursive --force --jobs 4 \
+        && empty=$(git submodule foreach --quiet --recursive '[ -n "$(ls -A | grep -vx .git)" ] || echo "$displaypath"') \
+        && [ -z "$empty" ] && ok=1 && break; \
+      echo "empty submodules: $empty, retry $i"; sleep 15; \
+    done; [ -n "$ok" ]
+
 RUN cmake -S /src/flexisip -B /src/build -G Ninja \
       -DCMAKE_C_COMPILER=clang-19 \
       -DCMAKE_CXX_COMPILER=clang++-19 \
