@@ -54,6 +54,15 @@ def main():
         "AUDIO_CODEC": env("AUDIO_CODEC", "PCMU/8000"),
         "LOG_LEVEL": env("LOG_LEVEL", "message"),
     }
+    # Optional HTTP proxy (http://host:port) for reaching Google push servers.
+    push_proxy = os.environ.get("PUSH_PROXY", "").strip()
+    if push_proxy:
+        m = re.match(r"^(?:https?://)?([^:/]+):(\d+)/?$", push_proxy)
+        if not m:
+            fail(f"PUSH_PROXY must look like http://host:port, not '{push_proxy}'")
+        values["PUSH_PROXY_CONFIG"] = f"https-proxy-host={m.group(1)}\nhttps-proxy-port={m.group(2)}"
+    else:
+        values["PUSH_PROXY_CONFIG"] = "# no PUSH_PROXY: push servers reached directly"
     accounts = read_accounts(os.path.join(CONFIG_DIR, "accounts.conf"))
 
     with open(os.path.join(CONFIG_DIR, "flexisip.conf.template"), encoding="utf-8") as f:

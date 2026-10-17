@@ -32,10 +32,12 @@ trusted-hosts=127.0.0.1 ${FLEXISIP_IP}
 
 [module::PushNotification]
 enabled=true
+apple=false
 firebase=true
 firebase-service-accounts=${FIREBASE_PROJECT_NUMBER}:/etc/flexisip/firebase/service-account.json
 # Wake up devices whose registration is about to expire so they register again.
 register-wakeup-interval=30
+${PUSH_PROXY_CONFIG}
 
 [module::Router]
 # Hold the call until the phone woken up by the push registers again.

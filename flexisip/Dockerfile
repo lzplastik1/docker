@@ -72,6 +72,11 @@ RUN cmake -S /src/flexisip -B /src/build -G Ninja \
 
 ENV PATH=/opt/belledonne-communications/bin:$PATH
 
+# Flexisip fetches FCM access tokens with a Python script that needs google-auth.
+RUN apt-get -y update \
+ && apt-get -y install --no-install-recommends python3-google-auth python3-requests \
+ && rm -rf /var/lib/apt/lists/*
+
 RUN mkdir -p /etc/flexisip /var/opt/belledonne-communications/flexisip/b2bua
 
 COPY render-config.py entrypoint.sh /usr/local/bin/
