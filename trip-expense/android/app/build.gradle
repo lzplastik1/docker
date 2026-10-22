@@ -10,7 +10,7 @@ def copyWeb = tasks.register('copyWeb', Copy) {
     }
     into new File(webOut, 'www')
 }
-preBuild.dependsOn copyWeb
+tasks.matching { it.name == 'preBuild' }.configureEach { dependsOn copyWeb }
 
 android {
     namespace 'com.lzplastik.tripwallet'
@@ -20,7 +20,7 @@ android {
         applicationId 'com.lzplastik.tripwallet'
         minSdk 24
         targetSdk 34
-        versionCode((System.getenv('VERSION_CODE') ?: '1') as int)
+        versionCode Integer.parseInt(System.getenv('VERSION_CODE') ?: '1')
         versionName "1.0.${System.getenv('VERSION_CODE') ?: '1'}"
     }
 

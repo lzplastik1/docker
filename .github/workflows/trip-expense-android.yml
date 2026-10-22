@@ -25,7 +25,14 @@ jobs:
         working-directory: trip-expense/android
         env:
           VERSION_CODE: ${{ github.run_number }}
-        run: gradle assembleRelease --no-daemon
+        run: |
+          set -o pipefail
+          gradle assembleRelease --no-daemon --stacktrace 2>&1 | tee build.log || {
+            # 把出错原因写成注释，方便在 GitHub 页面上直接看到
+            grep -A 25 -E "What went wrong|error:|FAILURE" build.log | head -60 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}' > err.txt
+            echo "::error title=打包失败::$(cat err.txt)"
+            exit 1
+          }
       - name: 改名
         run: cp trip-expense/android/app/build/outputs/apk/release/app-release.apk TripWallet.apk
       - uses: actions/upload-artifact@v4
