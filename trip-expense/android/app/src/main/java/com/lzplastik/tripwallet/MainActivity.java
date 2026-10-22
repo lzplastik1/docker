@@ -22,10 +22,9 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import androidx.webkit.WebViewAssetLoader;
-
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -48,10 +47,6 @@ public class MainActivity extends Activity {
         web = new WebView(this);
         setContentView(web);
 
-        final WebViewAssetLoader loader = new WebViewAssetLoader.Builder()
-                .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
-                .build();
-
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);
@@ -62,7 +57,7 @@ public class MainActivity extends Activity {
         web.setWebViewClient(new WebViewClient() {
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                return loader.shouldInterceptRequest(request.getUrl());
+                return serveAsset(request.getUrl());
             }
 
             @Override
@@ -104,6 +99,24 @@ public class MainActivity extends Activity {
 
         if (savedInstanceState != null) web.restoreState(savedInstanceState);
         else web.loadUrl(START_URL);
+    }
+
+    /** 用 https://appassets.androidplatform.net/assets/... 提供安装包里的网页文件，网页存储才能正常保存。 */
+    private WebResourceResponse serveAsset(Uri u) {
+        String path = u.getPath();
+        if (!HOST.equals(u.getHost()) || path == null || !path.startsWith("/assets/")) return null;
+        String name = path.substring("/assets/".length());
+        try {
+            InputStream in = getAssets().open(name);
+            String mime = name.endsWith(".html") ? "text/html"
+                    : name.endsWith(".png") ? "image/png"
+                    : name.endsWith(".js") ? "application/javascript"
+                    : name.endsWith(".webmanifest") ? "application/manifest+json"
+                    : "application/octet-stream";
+            return new WebResourceResponse(mime, "UTF-8", in);
+        } catch (Exception e) {
+            return new WebResourceResponse("text/plain", "UTF-8", 404, "Not Found", null, null);
+        }
     }
 
     @Override

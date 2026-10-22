@@ -1,0 +1,5 @@
+-d
+/tmp/jc
+-cp
+/dev/null
+app/src/main/java/com/lzplastik/tripwallet/MainActivity.java
