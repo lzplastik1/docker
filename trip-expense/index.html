@@ -1,0 +1,790 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0C6A56"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<title>出差钱袋</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap">
+<style>
+/* Layout: one phone-width column; sticky trip header, bottom tab bar, bottom sheets for entry and detail. Jade ink on cool paper. */
+:root{
+  --bg:#EBF0EE; --surface:#FFFFFF; --surface2:#F4F7F6; --ink:#13201C; --muted:#5A6964; --line:#D3DCD8;
+  --accent:#0C6A56; --accent-soft:#D5EAE3; --on-accent:#FFFFFF;
+  --pos:#1B7A45; --neg:#B23636; --warn:#9E5617; --warn-soft:#F6E7D6;
+  --scrim:rgba(10,22,18,.45); --shadow:0 1px 2px rgba(12,40,30,.06),0 6px 18px rgba(12,40,30,.07);
+  --f-display:"Sora",-apple-system,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+  --f-body:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei","Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1412; --surface:#16201D; --surface2:#1C2824; --ink:#E4EDE9; --muted:#93A49E; --line:#2A3833;
+  --accent:#3DB894; --accent-soft:#1D3A31; --on-accent:#06140F;
+  --pos:#4CC27F; --neg:#F07070; --warn:#E9A15C; --warn-soft:#3A2A1A;
+  --scrim:rgba(0,0,0,.6); --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1412; --surface:#16201D; --surface2:#1C2824; --ink:#E4EDE9; --muted:#93A49E; --line:#2A3833;
+  --accent:#3DB894; --accent-soft:#1D3A31; --on-accent:#06140F;
+  --pos:#4CC27F; --neg:#F07070; --warn:#E9A15C; --warn-soft:#3A2A1A;
+  --scrim:rgba(0,0,0,.6); --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25); color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-family:var(--f-display);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.muted{color:var(--muted)} .pos{color:var(--pos)} .neg{color:var(--neg)}
+.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg)}
+header.top .wrap{display:flex;align-items:center;gap:10px;padding-block:12px 10px}
+.trip-btn{flex:1;min-width:0;text-align:left;background:none;border:0;padding:0}
+.trip-btn b{display:block;font-family:var(--f-display);font-size:19px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trip-btn span{font-size:12px;color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;letter-spacing:.04em;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.grey{background:var(--surface2);color:var(--muted)}
+main.wrap{padding-block:4px 140px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border-radius:16px;box-shadow:var(--shadow);padding:16px}
+.sec-t{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:6px 2px -4px}
+.sec-t h3{margin:0;font-size:13px;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.link{background:none;border:0;color:var(--accent);font-weight:600;font-size:13px;padding:4px}
+.hero{background:var(--accent);color:var(--on-accent);border-radius:20px;padding:18px 18px 16px;display:flex;flex-direction:column;gap:12px}
+.hero .lbl{font-size:12px;opacity:.85;letter-spacing:.05em}
+.hero .big{font-size:34px;font-weight:700;line-height:1.1}
+.hero .row{display:flex;gap:18px;flex-wrap:wrap;font-size:13px}
+.hero .row b{font-family:var(--f-display);font-weight:600}
+.bar{height:6px;border-radius:9px;background:rgba(255,255,255,.25);overflow:hidden}
+.bar i{display:block;height:100%;background:currentColor;border-radius:9px}
+.accts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.acct{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);padding:12px 14px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.acct .c{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:6px}
+.acct .v{font-size:19px;font-weight:600;overflow-wrap:anywhere}
+.acct .r{font-size:11px;color:var(--muted)}
+.acct.neg-b{outline:1.5px solid var(--neg)}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.quick button{background:var(--surface);border:0;border-radius:14px;box-shadow:var(--shadow);padding:12px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:600}
+.quick .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-family:var(--f-display);font-weight:700;font-size:16px}
+.rows{display:flex;flex-direction:column}
+.txr{display:flex;align-items:center;gap:12px;padding:11px 0;border:0;background:none;text-align:left;width:100%;border-bottom:1px solid var(--line)}
+.rows .txr:last-child{border-bottom:0}
+.ic-sq{flex:none;width:38px;height:38px;border-radius:11px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:15px}
+.txr .mid{flex:1;min-width:0}
+.txr .t1{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;gap:6px;align-items:center}
+.txr .t1 span.n{overflow:hidden;text-overflow:ellipsis}
+.txr .t2{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.txr .rt{text-align:right;flex:none;max-width:48%}
+.txr .a1{font-weight:600;font-size:15px;overflow-wrap:anywhere}
+.txr .a2{font-size:11px;color:var(--muted)}
+.day-h{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-weight:600;padding:14px 2px 4px;letter-spacing:.03em}
+.av{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:13px;font-weight:700}
+.mrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);width:100%;background:none;border-left:0;border-right:0;border-top:0;text-align:left}
+.rows .mrow:last-child{border-bottom:0}
+.mrow .nm{flex:1;min-width:0;font-weight:600}
+.mrow .sub{font-size:12px;color:var(--muted);font-weight:400}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabbar .wrap{display:grid;grid-template-columns:repeat(5,1fr)}
+.tabbar button{background:none;border:0;padding:9px 0 8px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px}
+.tabbar button svg{width:22px;height:22px}
+.tabbar button.on{color:var(--accent);font-weight:600}
+.fab{position:fixed;z-index:7;right:max(18px,calc(50% - 262px),env(safe-area-inset-right,0px));bottom:calc(72px + env(safe-area-inset-bottom,0px));height:54px;padding:0 20px 0 16px;border-radius:27px;border:0;background:var(--accent);color:var(--on-accent);font-weight:700;font-size:15px;display:flex;align-items:center;gap:6px;box-shadow:0 6px 20px rgba(12,106,86,.35)}
+.fab b{font-size:24px;line-height:1;font-weight:400}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:14px;display:inline-flex;align-items:center;gap:6px}
+.chip.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:600}
+.chip .av{width:22px;height:22px;font-size:11px}
+.chip.off .av{filter:grayscale(1);opacity:.5}
+.seg{display:flex;background:var(--surface2);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:none;border-radius:9px;padding:8px 4px;font-size:14px;color:var(--muted);white-space:nowrap}
+.seg button.on{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:var(--shadow)}
+.filters{display:flex;flex-direction:column;gap:10px}
+.frow{display:flex;gap:8px;flex-wrap:wrap}
+.frow>*{flex:1;min-width:120px}
+input.in,select.in,textarea.in{width:100%;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px;font-size:15px;min-width:0}
+input.in:focus,select.in:focus,textarea.in:focus{border-color:var(--accent);outline:none}
+label.fl{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);font-weight:600}
+.empty{text-align:center;color:var(--muted);padding:28px 8px;font-size:14px}
+.ov{position:fixed;inset:0;z-index:20;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .18s}
+.ov.in{opacity:1}
+.sheet{background:var(--bg);width:100%;max-width:560px;max-height:94%;overflow-y:auto;border-radius:20px 20px 0 0;padding:0 max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));transform:translateY(24px);transition:transform .2s;display:flex;flex-direction:column;gap:14px;overscroll-behavior:contain}
+.ov.in .sheet{transform:none}
+@media (prefers-reduced-motion:reduce){.ov,.sheet{transition:none}}
+.sh-head{position:sticky;top:0;z-index:2;background:var(--bg);display:flex;align-items:center;gap:10px;padding:16px 0 8px}
+.sh-head h2{flex:1;margin:0;font-family:var(--f-display);font-size:18px;text-wrap:balance}
+.x{border:0;background:var(--surface2);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600}
+.amt{display:flex;gap:8px;align-items:stretch}
+.amt select{flex:none;width:auto;font-weight:600}
+.amt input{flex:1;font-family:var(--f-display);font-size:26px;font-weight:600;padding:8px 12px}
+.hint{font-size:12px;color:var(--muted);font-weight:400}
+.prev{background:var(--surface);border-radius:14px;padding:4px 14px}
+.prev .pr{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.prev .pr:last-child{border-bottom:0}
+.prev .pr .nm{flex:1}
+.prev .pr input{width:110px;text-align:right}
+.err{color:var(--neg);font-size:13px;font-weight:600}
+.btn{border:0;border-radius:14px;padding:13px 16px;font-weight:700;font-size:16px;background:var(--accent);color:var(--on-accent);width:100%}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn2{border:1.5px solid var(--line);border-radius:12px;padding:9px 14px;font-weight:600;font-size:14px;background:var(--surface);color:var(--ink)}
+.btn2.danger{color:var(--neg)}
+.btn2.armed{background:var(--neg);color:#fff;border-color:var(--neg)}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btns>*{flex:1}
+.photos{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.ph{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--surface2);border:0;padding:0;max-width:100%}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph .rm{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:14px;line-height:1}
+.ph.add{display:grid;place-items:center;border:1.5px dashed var(--line);background:var(--surface);color:var(--muted);font-size:13px;cursor:pointer;text-align:center}
+.ph.add input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.kv{display:flex;flex-direction:column}
+.kv>div{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+.kv>div:last-child{border-bottom:0}
+.kv>div>span:first-child{color:var(--muted);flex:none}
+.kv>div>span:last-child{text-align:right;min-width:0;overflow-wrap:anywhere}
+.d-amt{text-align:center;padding:8px 0 2px}
+.d-amt .v{font-size:34px;font-weight:700}
+.statbar{display:flex;flex-direction:column;gap:10px}
+.sb{display:grid;grid-template-columns:64px 1fr auto;gap:10px;align-items:center;font-size:13px}
+.sb .tr{height:10px;background:var(--surface2);border-radius:9px;overflow:hidden}
+.sb .tr i{display:block;height:100%;border-radius:9px;background:var(--accent)}
+.sb .lb{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th,.tbl td{padding:7px 4px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl th{color:var(--muted);font-weight:600;font-size:12px}
+.scroll-x{overflow-x:auto}
+.xfer{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.xfer:last-child{border-bottom:0}
+.xfer .ar{color:var(--muted)}
+.xfer .v{margin-left:auto;font-weight:700}
+.viewer{position:fixed;inset:0;z-index:40;background:#000;display:flex;flex-direction:column}
+.viewer .vt{display:flex;justify-content:space-between;align-items:center;color:#fff;padding:calc(10px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px))}
+.viewer .vt button{background:rgba(255,255,255,.15);color:#fff;border:0;border-radius:999px;padding:6px 14px;font-weight:600}
+.viewer .vs{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;touch-action:pan-x pan-y pinch-zoom}
+.viewer .vs img{max-width:100%;max-height:100%;object-fit:contain}
+.viewer.zoom .vs{display:block}
+.viewer.zoom .vs img{max-width:none;max-height:none;width:200%}
+.viewer .nav{display:flex;justify-content:space-between;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.viewer .nav button{background:rgba(255,255,255,.15);color:#fff;border:0;border-radius:999px;padding:9px 18px;font-weight:600}
+.viewer .nav button:disabled{opacity:.3}
+.toast{position:fixed;left:50%;bottom:calc(140px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:12px;font-size:14px;z-index:60;max-width:88vw;text-align:center}
+.banner{display:flex;gap:10px;align-items:center;background:var(--warn-soft);color:var(--warn);border-radius:14px;padding:10px 14px;font-size:13px}
+.banner b{flex:1}
+.banner button{border:0;background:var(--warn);color:var(--surface);border-radius:10px;padding:6px 10px;font-weight:600;font-size:13px;flex:none}
+textarea.mono{font-family:ui-monospace,Menlo,monospace;font-size:12px;height:140px}
+.set-row{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.set-row:last-child{border-bottom:0}
+.set-row input.in{padding:8px 10px}
+.set-row .grow{flex:1;min-width:0}
+.mini{border:0;background:var(--surface2);border-radius:9px;padding:7px 10px;font-size:13px;font-weight:600;color:var(--muted);flex:none}
+.mini.armed{background:var(--neg);color:#fff}
+h4{margin:0 0 8px;font-size:15px}
+.note{font-size:12px;color:var(--muted);margin:6px 0 0}
+.tag{font-size:11px;padding:1px 6px;border-radius:6px;background:var(--surface2);color:var(--muted);font-weight:600;flex:none}
+.tag.adv{background:var(--warn-soft);color:var(--warn)}
+.tag.ph{background:var(--accent-soft);color:var(--accent)}
+.sw{display:flex;align-items:center;gap:10px;font-size:14px}
+.sw input{width:20px;height:20px;accent-color:var(--accent)}
+</style>
+
+<header class="top"><div class="wrap" id="hdr"></div></header>
+<main class="wrap" id="view"></main>
+<button class="fab" data-a="add" data-v="shared" aria-label="记一笔"><b>+</b>记一笔</button>
+<nav class="tabbar"><div class="wrap" id="tabs"></div></nav>
+<div id="sheets"></div>
+
+<script>
+(()=>{
+/* ---------- 基础 ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const sum=a=>a.reduce((x,y)=>x+y,0);
+const pad=n=>String(n).padStart(2,'0');
+const PAL=['#2F7BD6','#D2721C','#8A57D6','#1F9A5E','#D0425A','#1593A6','#9A7B22','#5562C4'];
+const CATS=['餐饮','交通','住宿','门票','通讯','购物','杂费'];
+const CUR={CNY:['¥',2,'人民币'],USD:['$',2,'美元'],EUR:['€',2,'欧元'],GBP:['£',2,'英镑'],JPY:['JP¥',0,'日元'],KRW:['₩',0,'韩元'],THB:['฿',2,'泰铢'],HKD:['HK$',2,'港币'],MOP:['MOP$',2,'澳门元'],TWD:['NT$',0,'新台币'],SGD:['S$',2,'新加坡元'],MYR:['RM',2,'马币'],VND:['₫',0,'越南盾'],IDR:['Rp',0,'印尼盾'],PHP:['₱',2,'比索'],LAK:['₭',0,'老挝基普'],KHR:['៛',0,'柬埔寨瑞尔'],MMK:['K',0,'缅元'],AUD:['A$',2,'澳元'],CAD:['C$',2,'加元'],AED:['AED',2,'迪拉姆'],RUB:['₽',2,'卢布']};
+const sym=c=>CUR[c]?.[0]??(c+' ');
+const dec=c=>CUR[c]?.[1]??2;
+const cname=c=>CUR[c]?.[2]??c;
+const fmtN=(cents,c)=>{const d=dec(c);return (Math.abs(cents)/100).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})};
+const money=(cents,c,sign)=>(cents<0?'−':(sign&&cents>0?'+':''))+sym(c)+fmtN(Math.round(cents),c);
+const toCents=str=>{
+  if(str==null) return NaN; let s=String(str).replace(/[,，\s]/g,'').replace(/[×xX]/g,'*').replace(/÷/g,'/').replace(/＋/g,'+').replace(/－/g,'-');
+  if(!s) return NaN; if(!/^[\d+\-*/().]+$/.test(s)) return NaN;
+  try{const v=Function('"use strict";return ('+s+')')(); return Number.isFinite(v)?Math.round(v*100):NaN}catch(e){return NaN}
+};
+const nowLocal=()=>{const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`};
+const WK='日一二三四五六';
+const dayLabel=day=>{const [y,m,d]=day.split('-').map(Number);const w=new Date(y,m-1,d).getDay();return `${m}月${d}日 周${WK[w]}`};
+const hm=t=>t.slice(11,16);
+const catColor=c=>{let h=0;for(const ch of String(c))h=(h*31+ch.charCodeAt(0))>>>0;return PAL[h%PAL.length]};
+
+/* ---------- 存储 ---------- */
+const KEY='tripwallet.v1';
+let S=null, persistOK=true;
+function load(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):null}catch(e){persistOK=false;return null}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){persistOK=false;toast('保存失败：浏览器存储不可用或已满，请导出备份')}}
+const pmem=new Map(); let dbp=null;
+function idb(){if(dbp)return dbp;dbp=new Promise(res=>{try{const r=indexedDB.open('tripwallet-photos',1);r.onupgradeneeded=()=>r.result.createObjectStore('p');r.onsuccess=()=>res(r.result);r.onerror=()=>res(null)}catch(e){res(null)}});return dbp}
+async function putPhoto(id,data){pmem.set(id,data);const db=await idb();if(!db)return;try{db.transaction('p','readwrite').objectStore('p').put(data,id)}catch(e){}}
+async function getPhoto(id){if(pmem.has(id))return pmem.get(id);const db=await idb();if(!db)return null;return new Promise(res=>{try{const q=db.transaction('p').objectStore('p').get(id);q.onsuccess=()=>{if(q.result)pmem.set(id,q.result);res(q.result||null)};q.onerror=()=>res(null)}catch(e){res(null)}})}
+async function delPhoto(id){pmem.delete(id);const db=await idb();try{db&&db.transaction('p','readwrite').objectStore('p').delete(id)}catch(e){}}
+async function allPhotoIds(){const db=await idb();if(!db)return [...pmem.keys()];return new Promise(res=>{try{const q=db.transaction('p').objectStore('p').getAllKeys();q.onsuccess=()=>res([...new Set([...q.result,...pmem.keys()])]);q.onerror=()=>res([...pmem.keys()])}catch(e){res([...pmem.keys()])}})}
+function hydrate(root){root.querySelectorAll('img[data-photo]').forEach(async img=>{const d=await getPhoto(img.dataset.photo);if(d)img.src=d;else img.alt='照片丢失'})}
+function compress(file){return new Promise(res=>{const fr=new FileReader();fr.onload=()=>{const img=new Image();img.onload=()=>{const M=1600;const k=Math.min(1,M/Math.max(img.naturalWidth,img.naturalHeight));const c=document.createElement('canvas');c.width=Math.round(img.naturalWidth*k);c.height=Math.round(img.naturalHeight*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.82))};img.onerror=()=>res(null);img.src=fr.result};fr.onerror=()=>res(null);fr.readAsDataURL(file)})}
+
+/* ---------- 分摊 ---------- */
+function splitAmounts(total,ids,shares,cur){
+  const unit=dec(cur)===0?100:1; const T=Math.round(total/unit);
+  const w=ids.map(id=>shares?Math.max(0,Number(shares[id]??1)||0):1); const W=sum(w);
+  if(!ids.length||W<=0) return ids.map(m=>({m,amt:0}));
+  const res=ids.map((m,i)=>({m,u:Math.floor(T*w[i]/W)})); let rem=T-sum(res.map(r=>r.u));
+  for(let i=0;rem>0;i=(i+1)%res.length){if(w[i]>0){res[i].u++;rem--}}
+  return res.map(r=>({m:r.m,amt:r.u*unit}));
+}
+
+/* ---------- 计算（按时间顺序，外币按加权平均成本折算） ---------- */
+const T=()=>S.trips.find(t=>t.id===S.cur)||S.trips[0];
+const live=t=>t.txs.filter(x=>!x.deleted);
+const byTime=(a,b)=>a.time<b.time?-1:a.time>b.time?1:(a.created||0)-(b.created||0);
+const rateOf=(t,c)=>c===t.base?1:(Number(t.currencies.find(x=>x.code===c)?.rate)||1);
+const mOf=(t,id)=>t.members.find(m=>m.id===id);
+const mName=(t,id)=>mOf(t,id)?.name??'(已删除)';
+const mColor=(t,id)=>PAL[(mOf(t,id)?.color??0)%PAL.length];
+let C=null;
+function compute(t){
+  const acc={},mem={},info={};
+  t.members.forEach(m=>mem[m.id]={in:0,out:0,inC:{},outC:{}});
+  const A=c=>acc[c]||(acc[c]={bal:0,cost:0});
+  const avg=c=>{if(c===t.base)return 1;const a=A(c);return a.bal>0?a.cost/a.bal:rateOf(t,c)};
+  const M=id=>mem[id]||(mem[id]={in:0,out:0,inC:{},outC:{}});
+  t.currencies.forEach(c=>A(c.code));
+  for(const x of live(t).sort(byTime)){
+    if(x.type==='deposit'){
+      const r=x.cur===t.base?1:(Number(x.rate)||rateOf(t,x.cur)); const a=A(x.cur);
+      a.bal+=x.amount;a.cost+=x.amount*r;
+      x.splits.forEach(s=>{const m=M(s.m);m.in+=s.amt*r;m.inC[x.cur]=(m.inC[x.cur]||0)+s.amt});
+      info[x.id]={rate:r,base:x.amount*r};
+    }else if(x.type==='expense'){
+      const a=A(x.cur);
+      if(x.advBy){const r0=avg(x.cur);a.bal+=x.amount;a.cost+=x.amount*r0;const m=M(x.advBy);m.in+=x.amount*r0;m.inC[x.cur]=(m.inC[x.cur]||0)+x.amount}
+      const r=avg(x.cur); a.bal-=x.amount;a.cost-=x.amount*r;
+      x.splits.forEach(s=>{const m=M(s.m);m.out+=s.amt*r;m.outC[x.cur]=(m.outC[x.cur]||0)+s.amt});
+      info[x.id]={rate:r,base:x.amount*r};
+    }else if(x.type==='exchange'){
+      const r=avg(x.fromCur),v=x.fromAmt*r; const f=A(x.fromCur),to=A(x.toCur);
+      f.bal-=x.fromAmt;f.cost-=v;to.bal+=x.toAmt;to.cost+=v;
+      info[x.id]={rate:x.toAmt/x.fromAmt,base:v};
+    }
+  }
+  const pool=sum(Object.values(acc).map(a=>a.cost));
+  const spent=sum(live(t).filter(x=>x.type==='expense').map(x=>info[x.id].base));
+  const deposited=sum(Object.values(mem).map(m=>m.in));
+  return {acc,mem,info,pool,spent,deposited,avg:c=>c===t.base?1:(acc[c]&&acc[c].bal>0?acc[c].cost/acc[c].bal:rateOf(t,c))};
+}
+function settle(t){
+  const ppl=t.members.map(m=>({name:m.name,id:m.id,b:Math.round(C.mem[m.id].in-C.mem[m.id].out)}));
+  const debt=ppl.filter(p=>p.b<0).map(p=>({name:p.name,id:p.id,v:-p.b}));
+  const cred=ppl.filter(p=>p.b>0).map(p=>({name:p.name,id:p.id,v:p.b}));
+  const pool=Math.round(C.pool);
+  if(pool>0)debt.unshift({name:'钱袋剩余',pool:true,v:pool}); else if(pool<0)cred.push({name:'钱袋（透支）',pool:true,v:-pool});
+  debt.sort((a,b)=>b.v-a.v);cred.sort((a,b)=>b.v-a.v);
+  const out=[];let i=0,j=0;
+  while(i<debt.length&&j<cred.length){const v=Math.min(debt[i].v,cred[j].v);if(v>=1)out.push({from:debt[i],to:cred[j],v});debt[i].v-=v;cred[j].v-=v;if(debt[i].v<1)i++;if(cred[j].v<1)j++}
+  return {ppl,out,pool};
+}
+
+/* ---------- 示例数据 ---------- */
+function seed(){
+  const ms=['阿强','小美','老陈','阿杰','小林'].map((n,i)=>({id:'m'+(i+1),name:n,color:i}));
+  const all=ms.map(m=>m.id);
+  const t={id:'demo',name:'曼谷出差',demo:true,base:'CNY',members:ms,
+    currencies:[{code:'CNY',rate:1},{code:'THB',rate:0.2},{code:'USD',rate:7.1}],categories:[...CATS],budget:2000000,txs:[]};
+  let n=0;const add=o=>t.txs.push(Object.assign({id:'d'+(++n),created:n,photos:[],place:'',note:''},o));
+  const eq=(v,ids,c)=>splitAmounts(v,ids,null,c);
+  add({type:'deposit',kind:'deposit',time:'2026-10-20T08:30',cur:'CNY',amount:1000000,splits:all.map(m=>({m,amt:200000})),per:true,note:'出发前每人 2000 入袋'});
+  add({type:'exchange',time:'2026-10-20T10:10',fromCur:'CNY',fromAmt:400000,toCur:'THB',toAmt:1960000,place:'素万那普机场 SuperRich',note:'机场换汇'});
+  add({type:'deposit',kind:'deposit',time:'2026-10-20T10:20',cur:'USD',amount:20000,rate:7.1,splits:[{m:'m1',amt:20000}],note:'阿强带的美元现金'});
+  add({type:'expense',kind:'shared',time:'2026-10-20T12:40',cur:'THB',amount:125000,splits:eq(125000,all,'THB'),mode:'equal',category:'餐饮',place:'Terminal 21 美食广场',note:'午饭'});
+  add({type:'expense',kind:'shared',time:'2026-10-20T15:05',cur:'THB',amount:90000,splits:eq(90000,['m1','m2','m3','m4'],'THB'),mode:'equal',category:'交通',place:'Grab',note:'去客户公司打车（4人）'});
+  add({type:'expense',kind:'personal',time:'2026-10-20T18:30',cur:'THB',amount:29900,splits:[{m:'m5',amt:29900}],category:'通讯',place:'7-Eleven',note:'小林买电话卡'});
+  add({type:'expense',kind:'shared',time:'2026-10-21T13:00',cur:'USD',amount:6000,splits:eq(6000,all,'USD'),mode:'equal',category:'门票',place:'大皇宫',note:'门票'});
+  add({type:'expense',kind:'shared',time:'2026-10-21T19:45',cur:'THB',amount:100000,splits:eq(100000,['m1','m2','m3'],'THB'),mode:'equal',category:'餐饮',place:'Som Tam Nua',note:'晚饭（3人）',photos:['demo-receipt']});
+  add({type:'expense',kind:'shared',time:'2026-10-21T21:00',cur:'CNY',amount:360000,splits:eq(360000,all,'CNY'),mode:'equal',category:'住宿',place:'酒店前台',note:'两晚房费，老陈刷卡垫付',advBy:'m3'});
+  const sh={m1:1,m2:1,m3:2,m4:1,m5:1};
+  add({type:'expense',kind:'shared',time:'2026-10-22T09:15',cur:'THB',amount:48000,splits:splitAmounts(48000,all,sh,'THB'),mode:'shares',shares:sh,category:'餐饮',place:'酒店餐厅',note:'早餐，老陈带同事算 2 份'});
+  return {v:1,cur:'demo',trips:[t],last:{}};
+}
+function demoReceipt(){
+  const c=document.createElement('canvas');c.width=600;c.height=860;const g=c.getContext('2d');
+  g.fillStyle='#f3efe6';g.fillRect(0,0,600,860);g.fillStyle='#fffdf8';g.fillRect(40,30,520,800);
+  g.fillStyle='#222';g.textAlign='center';g.font='bold 34px sans-serif';g.fillText('SOM TAM NUA',300,100);
+  g.font='20px sans-serif';g.fillText('Siam Square Soi 5, Bangkok',300,136);g.fillText('21/10/2026  19:41   Table 7',300,166);
+  g.textAlign='left';g.font='22px monospace';
+  const items=[['Som Tam Thai',' 120.00'],['Fried Chicken',' 220.00'],['Larb Moo',' 160.00'],['Sticky Rice x3',' 60.00'],['Tom Yum Goong',' 280.00'],['Thai Iced Tea x3',' 160.00']];
+  let y=230;g.fillText('-'.repeat(36),70,y-30);
+  items.forEach(([a,b])=>{g.fillText(a,70,y);g.textAlign='right';g.fillText(b,530,y);g.textAlign='left';y+=44});
+  g.fillText('-'.repeat(36),70,y);y+=50;g.font='bold 28px monospace';g.fillText('TOTAL',70,y);g.textAlign='right';g.fillText('THB 1,000.00',530,y);
+  g.textAlign='center';g.font='20px sans-serif';g.fillText('ขอบคุณค่ะ  Thank you',300,y+90);g.fillText('（示例小票）',300,y+124);
+  return c.toDataURL('image/jpeg',.85);
+}
+
+/* ---------- 视图 ---------- */
+let tab='home'; const filt={type:'all',m:'',cur:'',q:'',day:''};
+const ICON={
+ home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8.5h16v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 8.5 7 4h10l3 4.5"/><path d="M15 13.5h5"/></svg>',
+ list:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>',
+ members:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.2 3-5 6-5s5.4 1.8 6 5"/><path d="M16 5.2a3 3 0 0 1 0 5.6M18 14.3c1.6.7 2.6 2.4 3 4.7"/></svg>',
+ stats:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg>',
+ settings:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/></svg>'
+};
+const TABS=[['home','钱袋'],['list','流水'],['members','成员'],['stats','统计'],['settings','设置']];
+const av=(t,id,sz)=>`<span class="av" style="background:${mColor(t,id)}${sz?`;width:${sz}px;height:${sz}px`:''}">${esc((mName(t,id)||'?').slice(0,1))}</span>`;
+
+function txTitle(t,x){
+  if(x.type==='deposit')return x.note||((x.splits.length===t.members.length&&x.splits.length>1)?'全员入袋':x.splits.map(s=>mName(t,s.m)).join('、')+' 入袋');
+  if(x.type==='exchange')return x.note||`${cname(x.fromCur)}换${cname(x.toCur)}`;
+  return x.note||x.category||'支出';
+}
+function txIcon(x){
+  if(x.type==='deposit')return `<span class="ic-sq" style="background:var(--pos)">入</span>`;
+  if(x.type==='exchange')return `<span class="ic-sq" style="background:#6B7C76">换</span>`;
+  return `<span class="ic-sq" style="background:${catColor(x.category)}">${esc((x.category||'支').slice(0,1))}</span>`;
+}
+function txRow(t,x){
+  const t2=[];t2.push(hm(x.time));
+  if(x.type==='expense')t2.push(x.kind==='personal'?mName(t,x.splits[0]?.m):(x.splits.length===t.members.length?'全员':x.splits.length+'人'));
+  if(x.type==='deposit')t2.push(x.splits.map(s=>mName(t,s.m)).join('、'));
+  if(x.place)t2.push(x.place);
+  let a1,a2='';
+  if(x.type==='exchange'){a1=`<span class="num">${money(x.fromAmt,x.fromCur)} → ${money(x.toAmt,x.toCur)}</span>`;a2='钱袋内换汇'}
+  else{const neg=x.type==='expense';a1=`<span class="num ${neg?'':'pos'}">${neg?'−':'+'}${money(x.amount,x.cur)}</span>`;if(x.cur!==t.base&&C.info[x.id])a2='≈'+money(C.info[x.id].base,t.base)}
+  const tags=[];if(x.kind==='personal')tags.push('<span class="tag">个人</span>');if(x.advBy)tags.push('<span class="tag adv">垫付</span>');if(x.photos?.length)tags.push(`<span class="tag ph">图${x.photos.length}</span>`);
+  return `<button class="txr" data-a="tx" data-id="${x.id}">${txIcon(x)}<span class="mid"><span class="t1"><span class="n">${esc(txTitle(t,x))}</span>${tags.join('')}</span><span class="t2">${esc(t2.join(' · '))}</span></span><span class="rt"><div class="a1">${a1}</div><div class="a2 num">${a2}</div></span></button>`;
+}
+function dateRange(t){const ds=live(t).map(x=>x.time.slice(0,10)).sort();if(!ds.length)return '还没有记录';const a=ds[0],b=ds[ds.length-1];const f=d=>{const[,m,dd]=d.split('-');return `${+m}月${+dd}日`};return a===b?f(a):`${f(a)} – ${f(b)}`}
+
+function vHeader(t){
+  return `<button class="trip-btn" data-a="trips"><b>${esc(t.name)} ▾</b><span>${esc(dateRange(t))} · ${t.members.length}人 · 本位币 ${t.base}</span></button>${t.demo?'<span class="pill warn">示例</span>':''}`;
+}
+function vHome(t){
+  let h='';
+  if(t.demo)h+=`<div class="banner"><b>这是示例行程，随便点、随便改。准备好后新建你自己的行程。</b><button data-a="trips">新建行程</button></div>`;
+  if(!persistOK)h+=`<div class="banner"><b>此浏览器无法保存数据，关闭后会丢失。请定期导出备份。</b></div>`;
+  const pct=t.budget?Math.min(100,C.spent/t.budget*100):0;
+  h+=`<section class="hero"><div><div class="lbl">钱袋余额（折合${cname(t.base)}）</div><div class="big num">${money(C.pool,t.base)}</div></div>
+  <div class="row"><span>累计入袋 <b>${money(C.deposited,t.base)}</b></span><span>累计支出 <b>${money(C.spent,t.base)}</b></span></div>
+  ${t.budget?`<div><div class="row" style="justify-content:space-between;margin-bottom:6px"><span>预算 ${money(t.budget,t.base)}</span><span>已用 ${pct.toFixed(0)}%</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>`:''}</section>`;
+  const codes=t.currencies.map(c=>c.code).filter(c=>c===t.base||Math.abs(C.acc[c]?.bal||0)>0||live(t).some(x=>x.cur===c||x.fromCur===c||x.toCur===c));
+  h+=`<div class="sec-t"><h3>币种账户</h3><button class="link" data-a="add" data-v="exchange">换汇</button></div><div class="accts">${codes.map(c=>{const a=C.acc[c]||{bal:0,cost:0};return `<div class="acct ${a.bal<0?'neg-b':''}"><div class="c"><span>${cname(c)}</span><span>${c}</span></div><div class="v num ${a.bal<0?'neg':''}">${money(a.bal,c)}</div><div class="r num">${c===t.base?'本位币':`成本 1${c} ≈ ${sym(t.base)}${C.avg(c).toFixed(4)}`}</div></div>`}).join('')}</div>`;
+  if(codes.some(c=>(C.acc[c]?.bal||0)<0))h+=`<div class="banner"><b>有币种账户是负数：钱不够了，请补记入袋或换汇。</b></div>`;
+  h+=`<div class="quick">${[['shared','分','公共支出'],['personal','个','个人支出'],['deposit','入','入袋'],['exchange','换','换汇']].map(([k,i,l])=>`<button data-a="add" data-v="${k}"><span class="ic">${i}</span>${l}</button>`).join('')}</div>`;
+  const today=nowLocal().slice(0,10);const td=live(t).filter(x=>x.type==='expense'&&x.time.startsWith(today));
+  h+=`<div class="sec-t"><h3>成员余额</h3><button class="link" data-a="settle">结算</button></div><div class="card rows" style="padding-block:4px">${t.members.map(m=>{const b=C.mem[m.id].in-C.mem[m.id].out;return `<button class="mrow" data-a="member" data-id="${m.id}">${av(t,m.id)}<span class="nm">${esc(m.name)}<div class="sub">已用 ${money(C.mem[m.id].out,t.base)}</div></span><span class="num ${b<0?'neg':'pos'}">${money(b,t.base,true)}</span></button>`}).join('')}</div>`;
+  const rec=live(t).sort(byTime).reverse().slice(0,6);
+  h+=`<div class="sec-t"><h3>最近流水${td.length?` · 今天已花 ${money(sum(td.map(x=>C.info[x.id].base)),t.base)}`:''}</h3><button class="link" data-a="tab" data-v="list">全部</button></div><div class="card rows" style="padding-block:2px">${rec.length?rec.map(x=>txRow(t,x)).join(''):'<div class="empty">还没有记录。点右下角「记一笔」开始。</div>'}</div>`;
+  return h;
+}
+function filtered(t){
+  const q=filt.q.trim().toLowerCase();
+  return live(t).filter(x=>{
+    if(filt.type==='expense'&&x.type!=='expense')return false;
+    if(filt.type==='personal'&&x.kind!=='personal')return false;
+    if(filt.type==='deposit'&&x.type!=='deposit')return false;
+    if(filt.type==='exchange'&&x.type!=='exchange')return false;
+    if(filt.m&&!(x.splits||[]).some(s=>s.m===filt.m)&&x.advBy!==filt.m)return false;
+    if(filt.cur&&x.cur!==filt.cur&&x.fromCur!==filt.cur&&x.toCur!==filt.cur)return false;
+    if(filt.day&&!x.time.startsWith(filt.day))return false;
+    if(q){const hay=[x.note,x.place,x.category,'#'+x.id,txTitle(t,x)].join(' ').toLowerCase();if(!hay.includes(q))return false}
+    return true}).sort(byTime).reverse();
+}
+function listRes(t){
+  const xs=filtered(t);if(!xs.length)return '<div class="card empty">没有符合条件的记录</div>';
+  const g={};xs.forEach(x=>(g[x.time.slice(0,10)]??=[]).push(x));
+  const tot=sum(xs.filter(x=>x.type==='expense').map(x=>C.info[x.id].base));
+  return `<div class="muted" style="font-size:13px;padding:0 2px">共 ${xs.length} 笔 · 支出合计 <span class="num">${money(tot,t.base)}</span></div>`+Object.entries(g).map(([d,arr])=>{const ds=sum(arr.filter(x=>x.type==='expense').map(x=>C.info[x.id].base));return `<div><div class="day-h"><span>${dayLabel(d)}</span><span class="num">${ds?'支出 '+money(ds,t.base):''}</span></div><div class="card rows" style="padding-block:2px">${arr.map(x=>txRow(t,x)).join('')}</div></div>`}).join('');
+}
+function vList(t){
+  const types=[['all','全部'],['expense','支出'],['personal','个人'],['deposit','入袋'],['exchange','换汇']];
+  return `<div class="filters"><div class="seg">${types.map(([k,l])=>`<button data-a="ftype-l" data-v="${k}" class="${filt.type===k?'on':''}">${l}</button>`).join('')}</div>
+  <div class="frow"><select class="in" data-q="m" id="q-m"><option value="">所有成员</option>${t.members.map(m=>`<option value="${m.id}" ${filt.m===m.id?'selected':''}>${esc(m.name)}</option>`).join('')}</select>
+  <select class="in" data-q="cur" id="q-cur"><option value="">所有币种</option>${t.currencies.map(c=>`<option value="${c.code}" ${filt.cur===c.code?'selected':''}>${c.code} ${cname(c.code)}</option>`).join('')}</select></div>
+  <div class="frow"><input class="in" type="date" data-q="day" id="q-day" value="${filt.day}" aria-label="只看这一天"><input class="in" type="search" data-q="q" id="q-q" value="${esc(filt.q)}" placeholder="搜索备注、地点、类别、编号"></div>
+  ${filt.day?`<button class="link" data-a="clear-day" style="align-self:flex-start">× 取消日期（正在看 ${dayLabel(filt.day)}）</button>`:''}</div><div id="list-res" style="display:flex;flex-direction:column;gap:6px">${listRes(t)}</div>`;
+}
+function vMembers(t){
+  return `<div class="card rows" style="padding-block:4px">${t.members.map(m=>{const s=C.mem[m.id],b=s.in-s.out;return `<button class="mrow" data-a="member" data-id="${m.id}">${av(t,m.id,36)}<span class="nm">${esc(m.name)}<div class="sub num">投入 ${money(s.in,t.base)} · 已用 ${money(s.out,t.base)}</div></span><span style="text-align:right"><div class="num ${b<0?'neg':'pos'}" style="font-weight:700">${money(b,t.base,true)}</div><div class="sub">${b<0?'欠钱袋':'钱袋欠他'}</div></span></button>`}).join('')}</div>
+  <p class="note">余额 = 投入 − 已用（全部折合${cname(t.base)}）。外币按换汇实际成本折算。</p>
+  <button class="btn" data-a="settle">查看结算方案</button>`;
+}
+function bars(rows,t){const mx=Math.max(1,...rows.map(r=>r[1]));return `<div class="statbar">${rows.map(([l,v,c])=>`<div class="sb"><span class="lb">${esc(l)}</span><span class="tr"><i style="width:${(v/mx*100).toFixed(1)}%;${c?`background:${c}`:''}"></i></span><span class="num">${money(v,t.base)}</span></div>`).join('')}</div>`}
+function vStats(t){
+  const ex=live(t).filter(x=>x.type==='expense');
+  if(!ex.length)return '<div class="card empty">还没有支出记录</div>';
+  const cat={},day={};ex.forEach(x=>{const v=C.info[x.id].base;cat[x.category||'其他']=(cat[x.category||'其他']||0)+v;const d=x.time.slice(0,10);day[d]=(day[d]||0)+v});
+  const days=Object.keys(day).length;
+  return `<div class="card"><div class="kv">
+   <div><span>总支出</span><span class="num">${money(C.spent,t.base)}</span></div>
+   <div><span>天数</span><span class="num">${days} 天</span></div>
+   <div><span>日均</span><span class="num">${money(C.spent/days,t.base)}</span></div>
+   <div><span>人均</span><span class="num">${money(C.spent/Math.max(1,t.members.length),t.base)}</span></div>
+   ${t.budget?`<div><span>预算剩余</span><span class="num ${t.budget-C.spent<0?'neg':''}">${money(t.budget-C.spent,t.base)}</span></div>`:''}</div></div>
+  <div class="sec-t"><h3>按类别</h3></div><div class="card">${bars(Object.entries(cat).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[k,v,catColor(k)]),t)}</div>
+  <div class="sec-t"><h3>按人（各自分摊到的）</h3></div><div class="card">${bars(t.members.map(m=>[m.name,C.mem[m.id].out,mColor(t,m.id)]).sort((a,b)=>b[1]-a[1]),t)}</div>
+  <div class="sec-t"><h3>按天（点击查看当天流水）</h3></div><div class="card"><div class="statbar">${Object.entries(day).sort().map(([d,v])=>{const mx=Math.max(...Object.values(day));return `<button class="sb" data-a="goday" data-v="${d}" style="border:0;background:none;padding:0;text-align:left"><span class="lb">${d.slice(5).replace('-','/')}</span><span class="tr"><i style="width:${(v/mx*100).toFixed(1)}%"></i></span><span class="num">${money(v,t.base)}</span></button>`}).join('')}</div></div>`;
+}
+function vSettings(t){
+  const used=id=>t.txs.some(x=>(x.splits||[]).some(s=>s.m===id)||x.advBy===id);
+  const curUsed=c=>t.txs.some(x=>x.cur===c||x.fromCur===c||x.toCur===c);
+  return `<div class="card"><h4>行程</h4><div style="display:flex;flex-direction:column;gap:10px">
+   <label class="fl">行程名称<input class="in" id="s-name" data-s="name" value="${esc(t.name)}"></label>
+   <label class="fl">预算（${t.base}，可不填）<input class="in" id="s-budget" data-s="budget" inputmode="decimal" value="${t.budget?t.budget/100:''}" placeholder="例如 20000"></label>
+   <div class="hint">本位币：${t.base} ${cname(t.base)}（新建行程时选择）</div></div></div>
+  <div class="card"><h4>成员</h4>${t.members.map(m=>`<div class="set-row">${av(t,m.id)}<input class="in grow" id="s-m-${m.id}" data-s="member" data-id="${m.id}" value="${esc(m.name)}" aria-label="成员名称"><button class="mini" data-a="m-del" data-id="${m.id}" ${used(m.id)?'disabled title="已有记账，不能删除"':''}>${used(m.id)?'已记账':'删除'}</button></div>`).join('')}
+   <div class="set-row"><input class="in grow" id="s-m-new" placeholder="新成员名字"><button class="mini" data-a="m-add">添加</button></div></div>
+  <div class="card"><h4>币种与参考汇率</h4><p class="note" style="margin:0 0 6px">参考汇率用于外币直接入袋、或账户没有成本时的折算。换汇后会自动用实际成本。</p>
+   ${t.currencies.map(c=>`<div class="set-row"><span class="grow"><b>${c.code}</b> <span class="muted">${cname(c.code)}</span></span>${c.code===t.base?'<span class="muted" style="font-size:13px">本位币</span>':`<span class="muted" style="font-size:13px">1${c.code}=</span><input class="in" style="width:96px" id="s-r-${c.code}" data-s="rate" data-id="${c.code}" inputmode="decimal" value="${c.rate}"><span class="muted" style="font-size:13px">${t.base}</span><button class="mini" data-a="c-del" data-id="${c.code}" ${curUsed(c.code)?'disabled':''}>${curUsed(c.code)?'已用':'删除'}</button>`}</div>`).join('')}
+   <div class="set-row"><select class="in grow" id="s-c-new"><option value="">添加币种…</option>${Object.keys(CUR).filter(c=>!t.currencies.some(x=>x.code===c)).map(c=>`<option value="${c}">${c} ${cname(c)}</option>`).join('')}</select><button class="mini" data-a="c-add">添加</button></div></div>
+  <div class="card"><h4>费用类别</h4><div class="chips">${t.categories.map(c=>`<span class="chip">${esc(c)}<button class="mini" style="padding:0 6px;background:none" data-a="cat-del" data-v="${esc(c)}" aria-label="删除类别${esc(c)}">×</button></span>`).join('')}</div>
+   <div class="set-row" style="margin-top:8px"><input class="in grow" id="s-cat-new" placeholder="新类别，如 洗衣"><button class="mini" data-a="cat-add">添加</button></div></div>
+  <div class="card"><h4>数据（只保存在本机）</h4><div class="btns" style="flex-direction:column">
+   <button class="btn2" data-a="backup">备份 / 恢复全部数据</button>
+   <button class="btn2" data-a="csv">导出本行程表格（CSV，可用 Excel 打开）</button>
+   <button class="btn2" data-a="trash">回收站（${t.txs.filter(x=>x.deleted).length} 笔）</button>
+   <button class="btn2 danger" data-a="trip-del" data-confirm="再点一次：永久删除此行程">删除此行程</button></div>
+   <p class="note">数据存在这台手机的浏览器里，不上传任何服务器。清理浏览器数据会丢失，请定期备份。</p></div>`;
+}
+const VIEWS={home:vHome,list:vList,members:vMembers,stats:vStats,settings:vSettings};
+function render(){
+  const t=T();C=compute(t);
+  $('#hdr').innerHTML=vHeader(t);
+  $('#view').innerHTML=VIEWS[tab](t);
+  $('#tabs').innerHTML=TABS.map(([k,l])=>`<button data-a="tab" data-v="${k}" class="${tab===k?'on':''}" aria-label="${l}">${ICON[k]}${l}</button>`).join('');
+  $('.fab').hidden=tab==='settings';
+  hydrate($('#view'));
+}
+
+/* ---------- 底部弹层 ---------- */
+const sheets=[];
+function openSheet(kind,data){
+  const ov=document.createElement('div');ov.className='ov';ov.innerHTML='<div class="sheet" role="dialog" aria-modal="true"></div>';
+  $('#sheets').appendChild(ov);const s={kind,data,ov,body:ov.firstChild};sheets.push(s);renderSheet(s);
+  requestAnimationFrame(()=>ov.classList.add('in'));return s;
+}
+function closeSheet(){const s=sheets.pop();if(s)s.ov.remove()}
+function renderSheet(s){const st=s.body.scrollTop;s.body.innerHTML=SHEETS[s.kind](s.data,s);s.body.scrollTop=st;hydrate(s.body)}
+function refresh(){render();sheets.forEach(s=>{if(s.kind!=='form')renderSheet(s)})}
+const topForm=()=>[...sheets].reverse().find(s=>s.kind==='form');
+const head=(title,extra='')=>`<div class="sh-head"><h2>${title}</h2>${extra}<button class="x" data-a="close">关闭</button></div>`;
+
+/* ----- 记一笔 ----- */
+function newDraft(type){
+  const t=T();const last=S.last?.[t.id]||{};
+  const cur=last.cur&&t.currencies.some(c=>c.code===last.cur)?last.cur:t.base;
+  const other=t.currencies.find(c=>c.code!==t.base)?.code||t.base;
+  return {type,cur,amountStr:'',ids:new Set(type==='personal'?[]:t.members.map(m=>m.id)),mode:'equal',shares:{},custom:{},per:type==='deposit',rate:'',
+    category:t.categories[0]||'',advOn:false,advBy:t.members[0]?.id,time:nowLocal(),place:'',note:'',photos:[],
+    fromCur:t.base,toCur:other,fromStr:'',toStr:''};
+}
+function draftFromTx(x,copy){
+  const d=newDraft(x.type==='deposit'?'deposit':x.type==='exchange'?'exchange':(x.kind||'shared'));
+  if(x.type==='exchange')Object.assign(d,{fromCur:x.fromCur,toCur:x.toCur,fromStr:String(x.fromAmt/100),toStr:String(x.toAmt/100)});
+  else{
+    d.cur=x.cur;d.ids=new Set(x.splits.map(s=>s.m));d.mode=x.mode||'equal';d.shares={...(x.shares||{})};
+    d.per=!!x.per;d.amountStr=String((x.per?x.splits[0].amt:x.amount)/100);
+    if(d.mode==='custom')x.splits.forEach(s=>d.custom[s.m]=String(s.amt/100));
+    d.rate=x.rate?String(x.rate):'';d.category=x.category||d.category;d.advOn=!!x.advBy;if(x.advBy)d.advBy=x.advBy;
+  }
+  d.place=x.place||'';d.note=x.note||'';
+  if(!copy){d.editId=x.id;d.time=x.time;d.photos=[...(x.photos||[])]}
+  return d;
+}
+function orderedIds(t,d){return t.members.map(m=>m.id).filter(id=>d.ids.has(id))}
+function draftCalc(d){
+  const t=T();
+  if(d.type==='exchange'){const f=toCents(d.fromStr),to=toCents(d.toStr);let err='';if(!(f>0)||!(to>0))err='请填写两边金额';else if(d.fromCur===d.toCur)err='请选择不同的币种';return {f,to,err}}
+  const ids=orderedIds(t,d);const v=toCents(d.amountStr);let splits=[],total=v,err='';
+  if(!ids.length)err=d.type==='personal'?'请选择是谁的支出':d.type==='deposit'?'请选择谁存入':'请至少选择一个人';
+  else if(d.type==='deposit'&&d.per){splits=ids.map(m=>({m,amt:v}));total=v*ids.length;if(!(v>0))err='请填写每人金额'}
+  else if(d.mode==='custom'&&d.type!=='personal'){splits=ids.map(m=>({m,amt:toCents(d.custom[m])||0}));const s=sum(splits.map(x=>x.amt));if(!(v>0))err='请填写总金额';else if(s!==v)err=`各人合计 ${money(s,d.cur)}，与总额相差 ${money(v-s,d.cur)}`}
+  else{if(!(v>0))err='请填写金额';else splits=splitAmounts(v,ids,d.mode==='shares'&&d.type!=='personal'?d.shares:null,d.cur);
+    if(!err&&d.mode==='shares'&&!splits.some(s=>s.amt>0))err='份数不能全为 0'}
+  return {ids,splits,total,err};
+}
+function previewHTML(d){
+  const t=T();const r=draftCalc(d);
+  if(d.type==='exchange'){
+    if(r.err)return `<div class="hint" style="padding:10px 0">${r.err}</div>`;
+    const rate=r.to/r.f;const cost=C.avg(d.fromCur);
+    return `<div class="kv"><div><span>汇率</span><span class="num">1 ${d.fromCur} = ${rate.toFixed(4)} ${d.toCur}</span></div><div><span>反向</span><span class="num">1 ${d.toCur} = ${(1/rate).toFixed(4)} ${d.fromCur}</span></div><div><span>折合成本</span><span class="num">${money(r.f*cost,t.base)}</span></div></div>`;
+  }
+  if(!r.ids.length)return `<div class="hint" style="padding:10px 0">${r.err}</div>`;
+  const rate=d.type==='deposit'?(d.cur===t.base?1:(Number(d.rate)||rateOf(t,d.cur))):C.avg(d.cur);
+  const rows=r.ids.map(id=>{const s=r.splits.find(x=>x.m===id);const amt=s?s.amt:0;
+    let ctl='';
+    if(d.type!=='personal'&&!(d.type==='deposit'&&d.per)){
+      if(d.mode==='shares')ctl=`<input class="in num" id="sh-${id}" data-f="shares.${id}" inputmode="decimal" style="width:64px;text-align:center" value="${esc(d.shares[id]??1)}" aria-label="${esc(mName(t,id))}的份数"><span class="hint">份</span>`;
+      if(d.mode==='custom')ctl=`<input class="in num" id="cu-${id}" data-f="custom.${id}" inputmode="decimal" value="${esc(d.custom[id]??'')}" placeholder="0" aria-label="${esc(mName(t,id))}的金额">`;
+    }
+    return `<div class="pr">${av(t,id)}<span class="nm">${esc(mName(t,id))}</span>${ctl}<span class="num" style="min-width:90px;text-align:right" data-pv="${id}">${d.mode==='custom'&&d.type!=='personal'&&!(d.type==='deposit'&&d.per)?'':money(amt,d.cur)}</span></div>`}).join('');
+  const totalLine=r.total>0?`<div class="pr"><span class="nm muted">合计</span><span class="num" style="font-weight:700">${money(r.total,d.cur)}${d.cur!==t.base?` <span class="hint">≈${money(r.total*rate,t.base)}</span>`:''}</span></div>`:'';
+  return rows+totalLine+(r.err&&r.ids.length?`<div class="pr err">${r.err}</div>`:'');
+}
+function photosHTML(d){
+  return `<div class="photos">${d.photos.map((p,i)=>`<div class="ph"><button style="all:unset;display:block;width:100%;height:100%;cursor:pointer" data-a="view" data-i="${i}" data-src="form"><img data-photo="${p}" alt="照片${i+1}"></button><button class="rm" data-a="ph-rm" data-i="${i}" aria-label="删除照片">×</button></div>`).join('')}
+  <label class="ph add">＋ 照片<input type="file" accept="image/*" multiple data-file="1" id="f-file"></label></div>`;
+}
+const SHEETS={};
+SHEETS.form=d=>{
+  const t=T();
+  const types=[['shared','公共支出'],['personal','个人支出'],['deposit','入袋'],['exchange','换汇']];
+  const curOpts=sel=>t.currencies.map(c=>`<option value="${c.code}" ${sel===c.code?'selected':''}>${c.code}</option>`).join('');
+  let h=head(d.editId?'编辑记录':'记一笔')+`<div class="seg">${types.map(([k,l])=>`<button data-a="ftype" data-v="${k}" class="${d.type===k?'on':''}">${l}</button>`).join('')}</div>`;
+  if(d.type==='exchange'){
+    h+=`<label class="fl">付出（从钱袋拿出）<div class="amt"><select class="in" id="f-fc" data-f="fromCur">${curOpts(d.fromCur)}</select><input class="in" id="f-fa" data-f="fromStr" inputmode="decimal" placeholder="0.00" value="${esc(d.fromStr)}"></div></label>
+    <div class="hint">钱袋 ${d.fromCur} 余额 ${money(C.acc[d.fromCur]?.bal||0,d.fromCur)}</div>
+    <label class="fl">得到（放回钱袋）<div class="amt"><select class="in" id="f-tc" data-f="toCur">${curOpts(d.toCur)}</select><input class="in" id="f-ta" data-f="toStr" inputmode="decimal" placeholder="0.00" value="${esc(d.toStr)}"></div></label>
+    <div class="prev" id="preview">${previewHTML(d)}</div>`;
+  }else{
+    const perLbl=d.type==='deposit'&&d.per?'每人存入':d.type==='deposit'?'总共存入':'总金额';
+    h+=`<label class="fl">${perLbl} <span class="hint">可直接输入算式，如 120+35×2</span><div class="amt"><select class="in" id="f-cur" data-f="cur">${curOpts(d.cur)}</select><input class="in" id="f-amt" data-f="amountStr" inputmode="decimal" placeholder="0.00" value="${esc(d.amountStr)}" autocomplete="off"></div></label>`;
+    if(d.type==='deposit'){
+      h+=`<label class="sw"><input type="checkbox" id="f-per" data-f="per" ${d.per?'checked':''}>按每人金额输入（每个被选的人存同样多）</label>`;
+      if(d.cur!==t.base)h+=`<label class="fl">汇率 1 ${d.cur} = ? ${t.base}<input class="in" id="f-rate" data-f="rate" inputmode="decimal" value="${esc(d.rate)}" placeholder="${rateOf(t,d.cur)}（参考汇率）"></label>`;
+    }
+    const lbl={shared:'谁一起用（点头像取消，不一定 5 人）',personal:'是谁的支出',deposit:'谁存入'}[d.type];
+    h+=`<div class="fl">${lbl}${d.type!=='personal'?` <span><button class="link" data-a="f-all">全选</button><button class="link" data-a="f-none">全不选</button></span>`:''}</div>
+    <div class="chips">${t.members.map(m=>`<button class="chip ${d.ids.has(m.id)?'on':'off'}" data-a="f-chip" data-id="${m.id}">${av(t,m.id)}${esc(m.name)}</button>`).join('')}</div>`;
+    if(d.type!=='personal'&&!(d.type==='deposit'&&d.per))h+=`<div class="seg">${[['equal','平分'],['shares','按份数'],['custom','各填金额']].map(([k,l])=>`<button data-a="f-mode" data-v="${k}" class="${d.mode===k?'on':''}">${l}</button>`).join('')}</div>`;
+    h+=`<div class="prev" id="preview">${previewHTML(d)}</div>`;
+    if(d.type!=='deposit'){
+      h+=`<div class="fl">类别</div><div class="chips">${t.categories.map(c=>`<button class="chip ${d.category===c?'on':''}" data-a="f-cat" data-v="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+      <label class="sw"><input type="checkbox" id="f-adv" data-f="advOn" ${d.advOn?'checked':''}>有人自掏腰包垫付（钱没从钱袋出）</label>
+      ${d.advOn?`<label class="fl">垫付人（金额记为他的投入）<select class="in" id="f-advby" data-f="advBy">${t.members.map(m=>`<option value="${m.id}" ${d.advBy===m.id?'selected':''}>${esc(m.name)}</option>`).join('')}</select></label>`:''}`;
+    }
+  }
+  h+=`<div class="frow"><label class="fl">时间<input class="in" type="datetime-local" id="f-time" data-f="time" value="${esc(d.time)}"></label>
+  <label class="fl">地点<input class="in" id="f-place" data-f="place" value="${esc(d.place)}" placeholder="如 酒店前台"></label></div>
+  <label class="fl">备注<input class="in" id="f-note" data-f="note" value="${esc(d.note)}" placeholder="如 晚饭、打车去机场"></label>
+  <div class="fl">照片（小票、发票）</div><div id="f-photos">${photosHTML(d)}</div>
+  <button class="btn" data-a="save" id="f-save" ${draftCalc(d).err?'disabled':''}>${d.editId?'保存修改':'保存'}</button>`;
+  return h;
+};
+function updatePreview(s){
+  const p=$('#preview',s.body);
+  const ae=document.activeElement;const aid=ae&&ae.id;const pos=ae&&ae.selectionStart;
+  if(p&&!(aid&&p.contains(ae))){p.innerHTML=previewHTML(s.data);hydrate(p)}
+  else if(p){ // 正在预览区里输入：只刷新数值，不打断输入
+    const r=draftCalc(s.data);r.splits?.forEach(x=>{const el=p.querySelector(`[data-pv="${x.m}"]`);if(el&&s.data.mode!=='custom')el.textContent=money(x.amt,s.data.cur)});
+    let e=p.querySelector('.err');const msg=r.err&&r.ids?.length?r.err:'';
+    if(msg){if(!e){e=document.createElement('div');e.className='pr err';p.appendChild(e)}e.textContent=msg}else if(e)e.remove();
+    if(aid){const n=document.getElementById(aid);if(n&&n!==ae){n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}}}
+  }
+  const b=$('#f-save',s.body);if(b)b.disabled=!!draftCalc(s.data).err;
+}
+function saveDraft(s){
+  const d=s.data,t=T();const r=draftCalc(d);if(r.err){toast(r.err);return}
+  const old=d.editId?t.txs.find(x=>x.id===d.editId):null;
+  const base={id:old?.id||uid(),created:old?.created||Date.now(),time:d.time||nowLocal(),place:d.place.trim(),note:d.note.trim(),photos:[...d.photos]};
+  let x;
+  if(d.type==='exchange')x={...base,type:'exchange',fromCur:d.fromCur,toCur:d.toCur,fromAmt:r.f,toAmt:r.to};
+  else if(d.type==='deposit')x={...base,type:'deposit',kind:'deposit',cur:d.cur,amount:r.total,splits:r.splits,per:d.per,mode:d.per?'equal':d.mode,shares:d.mode==='shares'?{...d.shares}:undefined,rate:d.cur!==t.base?(Number(d.rate)||rateOf(t,d.cur)):undefined};
+  else x={...base,type:'expense',kind:d.type,cur:d.cur,amount:r.total,splits:r.splits,mode:d.type==='personal'?'equal':d.mode,shares:d.mode==='shares'?{...d.shares}:undefined,category:d.category,advBy:d.advOn?d.advBy:undefined};
+  if(old){old.photos.filter(p=>!x.photos.includes(p)).forEach(delPhoto);Object.keys(old).forEach(k=>delete old[k]);Object.assign(old,x)}else t.txs.push(x);
+  S.last=S.last||{};S.last[t.id]={cur:x.cur||S.last[t.id]?.cur};
+  save();closeSheet();refresh();toast(old?'已保存修改':'已记一笔');
+}
+
+/* ----- 详情 ----- */
+SHEETS.tx=({id})=>{
+  const t=T();const x=t.txs.find(y=>y.id===id);if(!x)return head('记录不存在')+'<div class="empty">这笔记录已被彻底删除。</div>';
+  const i=C.info[x.id]||{};const typeL=x.type==='deposit'?'入袋':x.type==='exchange'?'换汇':x.kind==='personal'?'个人支出':'公共支出';
+  let h=head(esc(txTitle(t,x)),`<span class="pill ${x.deleted?'grey':''}">${x.deleted?'已删除':typeL}</span>`);
+  if(x.type==='exchange'){
+    h+=`<div class="d-amt"><div class="v num">${money(x.fromAmt,x.fromCur)}</div><div class="muted">↓</div><div class="v num">${money(x.toAmt,x.toCur)}</div></div>
+    <div class="card kv"><div><span>实际汇率</span><span class="num">1 ${x.fromCur} = ${(x.toAmt/x.fromAmt).toFixed(4)} ${x.toCur}</span></div><div><span>反向</span><span class="num">1 ${x.toCur} = ${(x.fromAmt/x.toAmt).toFixed(4)} ${x.fromCur}</span></div><div><span>成本转移</span><span class="num">${money(i.base||0,t.base)}</span></div></div>`;
+  }else{
+    h+=`<div class="d-amt"><div class="v num ${x.type==='deposit'?'pos':''}">${x.type==='deposit'?'+':'−'}${money(x.amount,x.cur)}</div>${x.cur!==t.base&&i.base!=null?`<div class="muted num">≈ ${money(i.base,t.base)} · 按 1${x.cur}=${i.rate.toFixed(4)}${t.base}</div>`:''}</div>
+    <div class="card"><h4>${x.type==='deposit'?'谁存入':'分摊明细'}${x.mode==='shares'?'（按份数）':x.mode==='custom'?'（各填金额）':x.splits.length>1&&x.type!=='deposit'?'（平分）':''}</h4><div class="rows">${x.splits.map(s=>`<button class="mrow" data-a="member" data-id="${s.m}">${av(t,s.m)}<span class="nm">${esc(mName(t,s.m))}${x.mode==='shares'?`<span class="sub"> · ${x.shares?.[s.m]??1}份</span>`:''}</span><span style="text-align:right"><div class="num">${money(s.amt,x.cur)}</div>${x.cur!==t.base&&i.rate?`<div class="sub num">≈${money(s.amt*i.rate,t.base)}</div>`:''}</span></button>`).join('')}</div>
+    ${x.advBy?`<p class="note" style="color:var(--warn)">${esc(mName(t,x.advBy))} 自掏腰包垫付，这 ${money(x.amount,x.cur)} 记为他的投入。</p>`:''}</div>`;
+  }
+  h+=`<div class="card kv"><div><span>时间</span><span>${dayLabel(x.time.slice(0,10))} ${hm(x.time)}</span></div>${x.category&&x.type==='expense'?`<div><span>类别</span><span>${esc(x.category)}</span></div>`:''}${x.place?`<div><span>地点</span><span>${esc(x.place)}</span></div>`:''}${x.note?`<div><span>备注</span><span>${esc(x.note)}</span></div>`:''}<div><span>编号</span><span class="num">#${x.id} <button class="link" data-a="copy" data-v="#${x.id}">复制</button></span></div></div>`;
+  if(x.photos?.length)h+=`<div class="card"><h4>照片（${x.photos.length}）</h4><div class="photos">${x.photos.map((p,k)=>`<button class="ph" data-a="view" data-i="${k}" data-src="tx" data-id="${x.id}"><img data-photo="${p}" alt="照片${k+1}"></button>`).join('')}</div></div>`;
+  h+=x.deleted?`<div class="btns"><button class="btn2" data-a="restore" data-id="${x.id}">恢复这笔</button></div>`:`<div class="btns"><button class="btn2" data-a="edit" data-id="${x.id}">编辑</button><button class="btn2" data-a="dup" data-id="${x.id}">再记一笔同样的</button><button class="btn2 danger" data-a="del" data-id="${x.id}" data-confirm="再点一次删除">删除</button></div>`;
+  return h;
+};
+
+/* ----- 成员详情 ----- */
+SHEETS.member=({id})=>{
+  const t=T();const m=mOf(t,id);if(!m)return head('成员不存在');
+  const s=C.mem[id];const b=s.in-s.out;
+  const xs=live(t).filter(x=>(x.splits||[]).some(y=>y.m===id)||x.advBy===id).sort(byTime).reverse();
+  const curs=[...new Set([...Object.keys(s.inC),...Object.keys(s.outC)])];
+  let h=head(`${av(t,id)} ${esc(m.name)} 的账`);
+  h+=`<div class="hero"><div><div class="lbl">余额（${b<0?'欠钱袋':'钱袋欠他'}）</div><div class="big num">${money(b,t.base,true)}</div></div><div class="row"><span>投入 <b>${money(s.in,t.base)}</b></span><span>已用 <b>${money(s.out,t.base)}</b></span><span>${xs.length} 笔相关</span></div></div>`;
+  if(curs.length)h+=`<div class="card scroll-x"><table class="tbl"><thead><tr><th>币种</th><th>投入</th><th>用掉</th></tr></thead><tbody>${curs.map(c=>`<tr><td>${c}</td><td class="num">${money(s.inC[c]||0,c)}</td><td class="num">${money(s.outC[c]||0,c)}</td></tr>`).join('')}</tbody></table></div>`;
+  h+=`<div class="card rows" style="padding-block:2px">${xs.map(x=>{const mine=(x.splits||[]).find(y=>y.m===id);const i=C.info[x.id];const parts=[];
+    if(x.type==='deposit')parts.push(`<span class="pos">+${money(mine.amt,x.cur)}</span>`);
+    else{if(x.advBy===id)parts.push(`<span class="pos">垫付 +${money(x.amount,x.cur)}</span>`);if(mine)parts.push(`<span>占 −${money(mine.amt,x.cur)}</span>`)}
+    return `<button class="txr" data-a="tx" data-id="${x.id}">${txIcon(x)}<span class="mid"><span class="t1"><span class="n">${esc(txTitle(t,x))}</span></span><span class="t2">${dayLabel(x.time.slice(0,10))} ${hm(x.time)} · 总 ${money(x.amount,x.cur)}${x.type==='expense'?` / ${x.splits.length}人`:''}</span></span><span class="rt"><div class="a1 num">${parts.join('<br>')}</div>${mine&&x.cur!==t.base?`<div class="a2 num">≈${money(mine.amt*i.rate,t.base)}</div>`:''}</span></button>`}).join('')||'<div class="empty">暂无相关记录</div>'}</div>`;
+  return h;
+};
+
+/* ----- 结算 ----- */
+SHEETS.settle=()=>{
+  const t=T();const r=settle(t);
+  const left=Object.entries(C.acc).filter(([,a])=>a.bal!==0);
+  let txt=`【${t.name}】结算（${cname(t.base)}）\n`+r.ppl.map(p=>`${p.name}：投入 ${money(C.mem[p.id].in,t.base)}，已用 ${money(C.mem[p.id].out,t.base)}，余额 ${money(p.b,t.base,true)}`).join('\n')+'\n转账：\n'+(r.out.map(o=>`${o.from.name} → ${o.to.name}  ${money(o.v,t.base)}`).join('\n')||'无需转账');
+  return head('结算方案')+`<div class="card"><h4>每人余额</h4><div class="rows">${r.ppl.map(p=>`<div class="mrow">${av(t,p.id)}<span class="nm">${esc(p.name)}</span><span class="num ${p.b<0?'neg':'pos'}">${money(p.b,t.base,true)}</span></div>`).join('')}</div></div>
+  <div class="card"><h4>最少转账</h4>${r.out.length?r.out.map(o=>`<div class="xfer"><b>${esc(o.from.name)}</b><span class="ar">→</span><b>${esc(o.to.name)}</b><span class="v num">${money(o.v,t.base)}</span></div>`).join(''):'<div class="empty">账已平，无需转账</div>'}
+  ${r.pool>0?`<p class="note">「钱袋剩余」= 钱袋里还剩的钱（按成本价折合 ${money(r.pool,t.base)}）。直接从钱袋拿出来给对应的人即可。</p>`:''}</div>
+  ${left.length?`<div class="card"><h4>钱袋里剩的钱</h4><div class="kv">${left.map(([c,a])=>`<div><span>${c} ${cname(c)}</span><span class="num">${money(a.bal,c)}${c!==t.base?` <span class="hint">≈${money(a.cost,t.base)}</span>`:''}</span></div>`).join('')}</div><p class="note">外币可以先换回${cname(t.base)}（记一笔换汇）再结算，结果会按实际换回的钱更新。</p></div>`:''}
+  <button class="btn2" data-a="copy" data-v="${esc(txt)}">复制结算文字（发群里）</button>`;
+};
+
+/* ----- 行程 ----- */
+SHEETS.trips=(d)=>{
+  d.rows??=['','','','',''];d.base??='CNY';
+  return head('行程')+`<div class="card rows" style="padding-block:4px">${S.trips.map(t=>`<button class="mrow" data-a="trip-sw" data-id="${t.id}"><span class="nm">${esc(t.name)}${t.demo?' <span class="pill warn">示例</span>':''}<div class="sub">${t.members.length}人 · ${live(t).length}笔 · ${t.base}</div></span>${t.id===S.cur?'<span class="pill">当前</span>':''}</button>`).join('')}</div>
+  <div class="card" style="display:flex;flex-direction:column;gap:10px"><h4 style="margin:0">新建行程</h4>
+   <label class="fl">名称<input class="in" id="nt-name" placeholder="如 2026 胡志明出差" value="${esc(d.name||'')}"></label>
+   <label class="fl">本位币（最后按它结算）<select class="in" id="nt-base">${Object.keys(CUR).map(c=>`<option value="${c}" ${d.base===c?'selected':''}>${c} ${cname(c)}</option>`).join('')}</select></label>
+   <div class="fl">成员</div>${d.rows.map((v,i)=>`<input class="in" id="nt-m${i}" data-nt="${i}" value="${esc(v)}" placeholder="成员 ${i+1}">`).join('')}
+   <div class="btns"><button class="btn2" data-a="nt-more">＋ 多一个人</button></div>
+   <button class="btn" data-a="trip-create">创建并切换</button></div>`;
+};
+
+/* ----- 回收站 ----- */
+SHEETS.trash=()=>{const t=T();const xs=t.txs.filter(x=>x.deleted);
+  return head('回收站')+`<div class="card rows" style="padding-block:2px">${xs.map(x=>`<div style="display:flex;align-items:center;gap:8px"><div style="flex:1;min-width:0">${txRow(t,x)}</div><button class="mini" data-a="restore" data-id="${x.id}">恢复</button><button class="mini" data-a="purge" data-id="${x.id}" data-confirm="确认">彻底删</button></div>`).join('')||'<div class="empty">回收站是空的</div>'}</div><p class="note">删除的记录先放这里，不参与计算，随时可恢复。</p>`};
+
+/* ----- 备份 ----- */
+SHEETS.backup=(d)=>head('备份 / 恢复')+`<div class="card" style="display:flex;flex-direction:column;gap:10px"><h4 style="margin:0">导出备份</h4>
+  <label class="sw"><input type="checkbox" id="bk-ph" data-a="bk-ph" ${d.withPhotos!==false?'checked':''}>包含照片（文件会大一些）</label>
+  <div class="btns"><button class="btn2" data-a="bk-make">生成备份</button></div>
+  ${d.json!=null?`<textarea class="in mono" id="bk-out" readonly>${esc(d.json)}</textarea><div class="hint">${(d.json.length/1024).toFixed(0)} KB</div><div class="btns"><button class="btn2" data-a="bk-copy">复制</button><button class="btn2" data-a="bk-dl">下载文件</button></div><p class="note">若「下载文件」没反应，用「复制」后粘贴到备忘录或发给自己保存。</p>`:''}</div>
+  <div class="card" style="display:flex;flex-direction:column;gap:10px"><h4 style="margin:0">从备份恢复</h4>
+  <input type="file" accept=".json,application/json,text/plain" class="in" id="bk-file" data-file="bk">
+  <textarea class="in mono" id="bk-in" placeholder="或把备份内容粘贴到这里"></textarea>
+  <button class="btn2 danger" data-a="bk-import" data-confirm="再点一次：用备份覆盖本机全部数据">恢复（会覆盖本机现有数据）</button></div>`;
+SHEETS.csv=()=>{const t=T();const txt=csvOf(t);return head('导出表格')+`<div class="card" style="display:flex;flex-direction:column;gap:10px"><textarea class="in mono" id="csv-out" readonly>${esc(txt)}</textarea><div class="btns"><button class="btn2" data-a="csv-copy">复制</button><button class="btn2" data-a="csv-dl">下载 CSV</button></div><p class="note">每笔一行，包含分摊明细，可直接用 Excel / Numbers 打开。</p></div>`};
+function csvOf(t){
+  const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+  const rows=[['编号','时间','类型','类别','币种','金额','折合'+t.base,'参与人/分摊','垫付人','地点','备注','照片数']];
+  live(t).sort(byTime).forEach(x=>{const i=C.info[x.id]||{};
+    if(x.type==='exchange')rows.push([x.id,x.time.replace('T',' '),'换汇','',`${x.fromCur}→${x.toCur}`,`${x.fromAmt/100}→${x.toAmt/100}`,((i.base||0)/100).toFixed(2),'','',x.place,x.note,x.photos?.length||0]);
+    else rows.push([x.id,x.time.replace('T',' '),x.type==='deposit'?'入袋':x.kind==='personal'?'个人支出':'公共支出',x.category||'',x.cur,x.amount/100,((i.base||0)/100).toFixed(2),x.splits.map(s=>`${mName(t,s.m)}:${s.amt/100}`).join(' / '),x.advBy?mName(t,x.advBy):'',x.place,x.note,x.photos?.length||0])});
+  return '﻿'+rows.map(r=>r.map(q).join(',')).join('\n');
+}
+function tryDownload(name,text,type){try{const b=new Blob([text],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);toast('已尝试下载；没反应请用「复制」')}catch(e){toast('此环境不能下载，请用「复制」')}}
+async function copyText(v){try{await navigator.clipboard.writeText(v);toast('已复制')}catch(e){toast('复制失败，请长按文本框手动复制')}}
+
+/* ----- 照片查看 ----- */
+let viewer=null;
+function openViewer(list,idx){
+  viewer={list,idx,zoom:false};const el=document.createElement('div');el.className='viewer';el.id='viewer';document.body.appendChild(el);drawViewer();
+}
+async function drawViewer(){
+  const el=$('#viewer');if(!el||!viewer)return;const {list,idx}=viewer;
+  el.classList.toggle('zoom',viewer.zoom);
+  el.innerHTML=`<div class="vt"><span>${idx+1} / ${list.length}</span><span style="display:flex;gap:8px"><button data-a="v-zoom">${viewer.zoom?'适应屏幕':'放大'}</button><button data-a="v-close">关闭</button></span></div><div class="vs"><img alt="照片 ${idx+1}" id="v-img"></div><div class="nav"><button data-a="v-prev" ${idx<=0?'disabled':''}>‹ 上一张</button><button data-a="v-next" ${idx>=list.length-1?'disabled':''}>下一张 ›</button></div>`;
+  const d=await getPhoto(list[idx]);const img=$('#v-img');if(img&&d)img.src=d;
+  let sx=null;const vs=$('.vs',el);vs.ontouchstart=e=>{if(e.touches.length===1)sx=e.touches[0].clientX};vs.ontouchend=e=>{if(sx==null||viewer.zoom)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)>50)step(dx<0?1:-1)};
+}
+function step(k){if(!viewer)return;const n=viewer.idx+k;if(n<0||n>=viewer.list.length)return;viewer.idx=n;viewer.zoom=false;drawViewer()}
+
+/* ---------- 交互 ---------- */
+let toastT;function toast(m){let e=$('.toast');if(!e){e=document.createElement('div');e.className='toast';e.setAttribute('role','status');document.body.appendChild(e)}e.textContent=m;e.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>e.hidden=true,2200)}
+function armed(b){if(!b.dataset.confirm)return true;if(b.classList.contains('armed'))return true;b.dataset.orig=b.textContent;b.textContent=b.dataset.confirm;b.classList.add('armed');setTimeout(()=>{if(b.isConnected){b.classList.remove('armed');b.textContent=b.dataset.orig}},3500);return false}
+const ACT={
+  tab:b=>{tab=b.dataset.v;render();scrollTo(0,0)},
+  add:b=>openSheet('form',newDraft(b.dataset.v)),
+  close:()=>closeSheet(),
+  tx:b=>openSheet('tx',{id:b.dataset.id}),
+  member:b=>openSheet('member',{id:b.dataset.id}),
+  settle:()=>openSheet('settle',{}),
+  trips:()=>openSheet('trips',{}),
+  goday:b=>{filt.day=b.dataset.v;filt.type='all';tab='list';render();scrollTo(0,0)},
+  'clear-day':()=>{filt.day='';render()},
+  'ftype-l':b=>{filt.type=b.dataset.v;render()},
+  ftype:b=>{const s=topForm(),d=s.data,t=T();const v=b.dataset.v;if(v===d.type)return;
+    if(v==='personal'){const f=orderedIds(t,d);d.ids=new Set(f.length===1?f:[])}else if(d.type==='personal'&&d.ids.size<=1&&v!=='exchange')d.ids=new Set(t.members.map(m=>m.id));
+    if(v==='deposit'&&d.type!=='deposit')d.per=true;d.type=v;renderSheet(s)},
+  'f-chip':b=>{const s=topForm(),d=s.data;const id=b.dataset.id;if(d.type==='personal')d.ids=new Set([id]);else d.ids.has(id)?d.ids.delete(id):d.ids.add(id);renderSheet(s)},
+  'f-all':()=>{const s=topForm();s.data.ids=new Set(T().members.map(m=>m.id));renderSheet(s)},
+  'f-none':()=>{const s=topForm();s.data.ids=new Set();renderSheet(s)},
+  'f-mode':b=>{const s=topForm(),d=s.data;d.mode=b.dataset.v;if(d.mode==='custom'){const r=draftCalc({...d,mode:'equal'});(r.splits||[]).forEach(x=>{if(d.custom[x.m]==null||d.custom[x.m]==='')d.custom[x.m]=String(x.amt/100)})}renderSheet(s)},
+  'f-cat':b=>{const s=topForm();s.data.category=b.dataset.v;renderSheet(s)},
+  'ph-rm':b=>{const s=topForm();const id=s.data.photos.splice(+b.dataset.i,1)[0];if(!s.data.editId||!T().txs.find(x=>x.id===s.data.editId)?.photos.includes(id))delPhoto(id);$('#f-photos',s.body).innerHTML=photosHTML(s.data);hydrate(s.body)},
+  view:b=>{let list;if(b.dataset.src==='form')list=topForm().data.photos;else list=T().txs.find(x=>x.id===b.dataset.id).photos;openViewer(list,+b.dataset.i)},
+  'v-close':()=>{$('#viewer')?.remove();viewer=null},'v-prev':()=>step(-1),'v-next':()=>step(1),'v-zoom':()=>{viewer.zoom=!viewer.zoom;drawViewer()},
+  save:()=>saveDraft(topForm()),
+  edit:b=>{const x=T().txs.find(y=>y.id===b.dataset.id);openSheet('form',draftFromTx(x,false))},
+  dup:b=>{const x=T().txs.find(y=>y.id===b.dataset.id);openSheet('form',draftFromTx(x,true))},
+  del:b=>{if(!armed(b))return;const x=T().txs.find(y=>y.id===b.dataset.id);x.deleted=Date.now();save();closeSheet();refresh();toast('已移到回收站')},
+  restore:b=>{const x=T().txs.find(y=>y.id===b.dataset.id);delete x.deleted;save();refresh();toast('已恢复')},
+  purge:b=>{if(!armed(b))return;const t=T();const i=t.txs.findIndex(y=>y.id===b.dataset.id);(t.txs[i].photos||[]).forEach(delPhoto);t.txs.splice(i,1);save();refresh()},
+  copy:b=>copyText(b.dataset.v),
+  'trip-sw':b=>{S.cur=b.dataset.id;save();closeSheet();filt.m='';filt.cur='';filt.day='';render()},
+  'nt-more':()=>{const s=sheets[sheets.length-1];syncNT(s);s.data.rows.push('');renderSheet(s)},
+  'trip-create':()=>{const s=sheets[sheets.length-1];syncNT(s);const d=s.data;const names=d.rows.map(v=>v.trim()).filter(Boolean);
+    if(!d.name?.trim()){toast('请填写行程名称');return}if(!names.length){toast('请至少填一个成员');return}
+    const base=d.base;const t={id:uid(),name:d.name.trim(),base,members:names.map((n,i)=>({id:uid()+i,name:n,color:i})),currencies:[{code:base,rate:1}],categories:[...CATS],budget:0,txs:[]};
+    S.trips.push(t);S.cur=t.id;save();closeSheet();tab='home';render();toast('行程已创建，可在「设置」里添加外币')},
+  'trip-del':b=>{if(!armed(b))return;const t=T();t.txs.forEach(x=>(x.photos||[]).forEach(delPhoto));S.trips=S.trips.filter(x=>x!==t);if(!S.trips.length){const n=seed();S.trips=n.trips}S.cur=S.trips[0].id;save();tab='home';render();toast('行程已删除')},
+  'm-add':()=>{const i=$('#s-m-new');const n=i.value.trim();if(!n)return;const t=T();t.members.push({id:uid(),name:n,color:t.members.length});save();render()},
+  'm-del':b=>{const t=T();t.members=t.members.filter(m=>m.id!==b.dataset.id);save();render()},
+  'c-add':()=>{const c=$('#s-c-new').value;if(!c)return;T().currencies.push({code:c,rate:1});save();render();toast(`已添加 ${c}，请填写参考汇率`)},
+  'c-del':b=>{const t=T();t.currencies=t.currencies.filter(c=>c.code!==b.dataset.id);save();render()},
+  'cat-add':()=>{const v=$('#s-cat-new').value.trim();const t=T();if(v&&!t.categories.includes(v)){t.categories.push(v);save();render()}},
+  'cat-del':b=>{const t=T();t.categories=t.categories.filter(c=>c!==b.dataset.v);save();render()},
+  trash:()=>openSheet('trash',{}),
+  backup:()=>openSheet('backup',{}),
+  csv:()=>openSheet('csv',{}),
+  'csv-copy':()=>copyText($('#csv-out').value),
+  'csv-dl':()=>tryDownload(`${T().name}.csv`,csvOf(T()),'text/csv;charset=utf-8'),
+  'bk-ph':b=>{sheets[sheets.length-1].data.withPhotos=b.checked},
+  'bk-make':async()=>{const s=sheets[sheets.length-1];const photos={};if(s.data.withPhotos!==false){for(const id of await allPhotoIds()){const v=await getPhoto(id);if(v)photos[id]=v}}
+    s.data.json=JSON.stringify({app:'出差钱袋',version:1,exported:nowLocal(),data:S,photos});renderSheet(s)},
+  'bk-copy':()=>copyText($('#bk-out').value),
+  'bk-dl':()=>tryDownload(`出差钱袋备份-${nowLocal().slice(0,10)}.json`,$('#bk-out').value,'application/json'),
+  'bk-import':async b=>{const raw=$('#bk-in').value.trim();if(!raw){toast('请先选择备份文件或粘贴内容');return}if(!armed(b))return;
+    try{const o=JSON.parse(raw);if(!o.data?.trips?.length)throw 0;S=o.data;for(const[k,v]of Object.entries(o.photos||{}))await putPhoto(k,v);if(!S.trips.some(t=>t.id===S.cur))S.cur=S.trips[0].id;save();closeSheet();tab='home';render();toast('已恢复备份')}catch(e){toast('备份内容无法识别，请检查是否完整')}},
+};
+function syncNT(s){s.data.name=$('#nt-name',s.body).value;s.data.base=$('#nt-base',s.body).value;s.body.querySelectorAll('[data-nt]').forEach(i=>s.data.rows[+i.dataset.nt]=i.value)}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-a]');
+  if(!b){if(e.target.classList?.contains('ov'))closeSheet();return}
+  if(b.disabled)return;const f=ACT[b.dataset.a];if(f){if(b.tagName!=='INPUT')e.preventDefault();f(b,e)}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(viewer)ACT['v-close']();else closeSheet()}if(viewer&&e.key==='ArrowLeft')step(-1);if(viewer&&e.key==='ArrowRight')step(1)});
+document.addEventListener('input',e=>{
+  const el=e.target;
+  if(el.dataset.f){const s=topForm();if(!s)return;const d=s.data,f=el.dataset.f;const v=el.type==='checkbox'?el.checked:el.value;
+    if(f.includes('.')){const[a,k]=f.split('.');d[a][k]=v}else d[f]=v;
+    if(['cur','fromCur','toCur','advOn','per','advBy'].includes(f)){if(f==='cur')d.rate='';renderSheet(s)}else updatePreview(s);return}
+  if(el.dataset.q){filt[el.dataset.q]=el.value;if(el.dataset.q==='q'){$('#list-res').innerHTML=listRes(T())}else render()}
+});
+document.addEventListener('change',async e=>{
+  const el=e.target;
+  if(el.dataset.s){const t=T();const k=el.dataset.s;
+    if(k==='name'&&el.value.trim())t.name=el.value.trim();
+    if(k==='budget'){const v=toCents(el.value);t.budget=v>0?v:0}
+    if(k==='member'&&el.value.trim())mOf(t,el.dataset.id).name=el.value.trim();
+    if(k==='rate'){const v=Number(el.value);if(v>0)t.currencies.find(c=>c.code===el.dataset.id).rate=v}
+    save();render();toast('已保存');return}
+  if(el.dataset.file==='1'){const s=topForm();const files=[...el.files];if(!files.length)return;toast('正在压缩照片…');
+    for(const f of files){const d=await compress(f);if(!d)continue;const id='p'+uid();await putPhoto(id,d);s.data.photos.push(id)}
+    $('#f-photos',s.body).innerHTML=photosHTML(s.data);hydrate(s.body);toast(`已添加 ${files.length} 张`);return}
+  if(el.dataset.file==='bk'){const f=el.files[0];if(!f)return;$('#bk-in').value=await f.text();toast('已读取，点「恢复」确认')}
+});
+
+/* ---------- 启动 ---------- */
+async function boot(){
+  S=load();
+  if(!S){S=seed();save();putPhoto('demo-receipt',demoReceipt())}
+  else if(S.trips.some(t=>t.txs.some(x=>x.photos?.includes('demo-receipt')))&&!(await getPhoto('demo-receipt')))putPhoto('demo-receipt',demoReceipt());
+  render();
+  const h=location.hash.slice(1);if(h){const x=T().txs.find(y=>y.id===h);if(x)openSheet('tx',{id:h})}
+}
+boot();
+})();
+</script>
+</body></html>
