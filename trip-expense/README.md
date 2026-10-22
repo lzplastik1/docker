@@ -22,3 +22,15 @@
 | `sw.js` | 离线缓存 |
 
 数据保存在浏览器本地，换手机或清理浏览器前请在「设置 → 备份 / 恢复」导出备份。
+
+## 安卓安装包（APK）
+
+每次更新代码，GitHub 会自动打包并发布到 Releases。手机浏览器打开下面的链接即可下载最新版：
+
+`https://github.com/lzplastik1/docker/releases/latest/download/TripWallet.apk`
+
+- 安装时如提示「未知来源」，按提示允许本次安装。
+- 更新时直接安装新版本覆盖，数据保留；**卸载会清空数据**，卸载前请先导出备份。
+- 安装包用 `android/app/tripwallet.keystore` 固定签名（仅供自用）。
+
+iPhone 不能直接安装下载的安装包，请用 Safari「添加到主屏幕」。

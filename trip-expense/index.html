@@ -673,8 +673,8 @@ function csvOf(t){
     else rows.push([x.id,x.time.replace('T',' '),x.type==='deposit'?'入袋':x.kind==='personal'?'个人支出':'公共支出',x.category||'',x.cur,x.amount/100,((i.base||0)/100).toFixed(2),x.splits.map(s=>`${mName(t,s.m)}:${s.amt/100}`).join(' / '),x.advBy?mName(t,x.advBy):'',x.place,x.note,x.photos?.length||0])});
   return '﻿'+rows.map(r=>r.map(q).join(',')).join('\n');
 }
-function tryDownload(name,text,type){try{const b=new Blob([text],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);toast('已尝试下载；没反应请用「复制」')}catch(e){toast('此环境不能下载，请用「复制」')}}
-async function copyText(v){try{await navigator.clipboard.writeText(v);toast('已复制')}catch(e){toast('复制失败，请长按文本框手动复制')}}
+function tryDownload(name,text,type){if(window.AndroidBridge){const p=AndroidBridge.save(name,type,text);toast(p?'已保存到 '+p:'保存失败，请用「复制」');return}try{const b=new Blob([text],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);toast('已尝试下载；没反应请用「复制」')}catch(e){toast('此环境不能下载，请用「复制」')}}
+async function copyText(v){if(window.AndroidBridge){AndroidBridge.copy(v);toast('已复制');return}try{await navigator.clipboard.writeText(v);toast('已复制')}catch(e){toast('复制失败，请长按文本框手动复制')}}
 
 /* ----- 照片查看 ----- */
 let viewer=null;
@@ -784,8 +784,9 @@ async function boot(){
   render();
   const h=location.hash.slice(1);if(h){const x=T().txs.find(y=>y.id===h);if(x)openSheet('tx',{id:h})}
 }
+window.__back=()=>{if(viewer){ACT['v-close']();return true}if(sheets.length){closeSheet();return true}if(tab!=='home'){tab='home';render();return true}return false};
 boot();
 })();
-if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+if('serviceWorker' in navigator&&location.protocol==='https:'&&!window.AndroidBridge)navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body></html>

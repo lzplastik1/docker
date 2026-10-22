@@ -1,0 +1,45 @@
+name: 出差钱袋 安卓安装包
+
+on:
+  push:
+    branches: [master, claude/vibrant-bardeen-icicvj]
+    paths: ['trip-expense/**', '.github/workflows/trip-expense-android.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: 打包 APK
+        working-directory: trip-expense/android
+        env:
+          VERSION_CODE: ${{ github.run_number }}
+        run: gradle assembleRelease --no-daemon
+      - name: 改名
+        run: cp trip-expense/android/app/build/outputs/apk/release/app-release.apk TripWallet.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TripWallet-apk
+          path: TripWallet.apk
+      - name: 发布到 Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: trip-wallet-v1.0.${{ github.run_number }}
+          name: 出差钱袋 v1.0.${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          make_latest: true
+          files: TripWallet.apk
+          body: |
+            出差钱袋 安卓安装包。下载 TripWallet.apk 到手机安装即可。
+            更新时直接安装新版本覆盖，数据会保留（不要先卸载）。

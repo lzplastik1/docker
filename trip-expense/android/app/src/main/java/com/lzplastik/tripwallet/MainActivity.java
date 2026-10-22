@@ -1,0 +1,177 @@
+package com.lzplastik.tripwallet;
+
+import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.view.View;
+import android.webkit.JavascriptInterface;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+
+import androidx.webkit.WebViewAssetLoader;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+
+public class MainActivity extends Activity {
+    private static final String HOST = "appassets.androidplatform.net";
+    private static final String START_URL = "https://" + HOST + "/assets/www/index.html";
+    private static final int FILE_REQ = 1;
+
+    private WebView web;
+    private ValueCallback<Uri[]> fileCallback;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getWindow().setStatusBarColor(Color.parseColor("#EBF0EE"));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        }
+
+        web = new WebView(this);
+        setContentView(web);
+
+        final WebViewAssetLoader loader = new WebViewAssetLoader.Builder()
+                .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
+                .build();
+
+        WebSettings s = web.getSettings();
+        s.setJavaScriptEnabled(true);
+        s.setDomStorageEnabled(true);
+        s.setDatabaseEnabled(true);
+        s.setAllowFileAccess(false);
+        s.setAllowContentAccess(true);
+
+        web.setWebViewClient(new WebViewClient() {
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                return loader.shouldInterceptRequest(request.getUrl());
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                Uri u = request.getUrl();
+                if (HOST.equals(u.getHost())) return false;
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, u));
+                } catch (Exception ignored) {
+                }
+                return true;
+            }
+        });
+
+        web.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback, FileChooserParams params) {
+                if (fileCallback != null) fileCallback.onReceiveValue(null);
+                fileCallback = callback;
+                String[] types = params.getAcceptTypes();
+                boolean image = types != null && types.length > 0 && types[0].startsWith("image");
+                Intent pick = new Intent(Intent.ACTION_GET_CONTENT);
+                pick.addCategory(Intent.CATEGORY_OPENABLE);
+                pick.setType(image ? "image/*" : "*/*");
+                if (params.getMode() == FileChooserParams.MODE_OPEN_MULTIPLE) {
+                    pick.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                }
+                try {
+                    startActivityForResult(Intent.createChooser(pick, image ? "选择照片" : "选择文件"), FILE_REQ);
+                } catch (Exception e) {
+                    fileCallback = null;
+                    return false;
+                }
+                return true;
+            }
+        });
+
+        web.addJavascriptInterface(new Bridge(), "AndroidBridge");
+
+        if (savedInstanceState != null) web.restoreState(savedInstanceState);
+        else web.loadUrl(START_URL);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        web.saveState(outState);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != FILE_REQ || fileCallback == null) return;
+        Uri[] result = null;
+        if (resultCode == RESULT_OK && data != null) {
+            ClipData clip = data.getClipData();
+            if (clip != null) {
+                result = new Uri[clip.getItemCount()];
+                for (int i = 0; i < clip.getItemCount(); i++) result[i] = clip.getItemAt(i).getUri();
+            } else if (data.getData() != null) {
+                result = new Uri[]{data.getData()};
+            }
+        }
+        fileCallback.onReceiveValue(result);
+        fileCallback = null;
+    }
+
+    @Override
+    public void onBackPressed() {
+        // 先让网页关掉弹层；没有弹层时才退出
+        web.evaluateJavascript("window.__back?window.__back():false", v -> {
+            if (!"true".equals(v)) finish();
+        });
+    }
+
+    private class Bridge {
+        @JavascriptInterface
+        public void copy(String text) {
+            ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            if (cm != null) cm.setPrimaryClip(ClipData.newPlainText("出差钱袋", text));
+        }
+
+        /** 保存到「下载」文件夹，返回保存位置；失败返回空字符串。 */
+        @JavascriptInterface
+        public String save(String name, String mime, String text) {
+            byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    ContentValues v = new ContentValues();
+                    v.put(MediaStore.Downloads.DISPLAY_NAME, name);
+                    v.put(MediaStore.Downloads.MIME_TYPE, mime);
+                    Uri uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, v);
+                    if (uri == null) return "";
+                    try (OutputStream os = getContentResolver().openOutputStream(uri)) {
+                        if (os == null) return "";
+                        os.write(bytes);
+                    }
+                    return "下载/" + name;
+                }
+                File dir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+                if (dir == null) return "";
+                File f = new File(dir, name);
+                try (FileOutputStream os = new FileOutputStream(f)) {
+                    os.write(bytes);
+                }
+                return f.getAbsolutePath();
+            } catch (Exception e) {
+                return "";
+            }
+        }
+    }
+}
