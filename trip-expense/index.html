@@ -129,6 +129,8 @@ main.wrap{padding-block:14px 150px;display:flex;flex-direction:column;gap:14px}
 .seg button{flex:1;border:0;background:none;border-radius:11px;padding:9px 4px;font-size:14px;color:var(--muted);white-space:nowrap}
 .seg button.on{background:linear-gradient(135deg,var(--accent-2),var(--accent));color:#fff;font-weight:700;box-shadow:0 6px 14px -8px rgba(14,107,87,.8)}
 .filters{display:flex;flex-direction:column;gap:10px}
+.filters .seg{overflow-x:auto;scrollbar-width:none}
+.filters .seg button{flex:1 0 auto;padding-inline:10px}
 .frow{display:flex;gap:8px;flex-wrap:wrap}
 .frow>*{flex:1;min-width:120px}
 input.in,select.in,textarea.in{width:100%;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px;font-size:15px;min-width:0}
@@ -252,6 +254,9 @@ h4{margin:0 0 8px;font-size:15px}
   #print-root{display:block!important}
   .a4{min-width:0;padding:0;font-size:10.5pt}
   .a4 tr{break-inside:avoid}
+  .a4 .o2,.a4 td.ty,.a4 th{white-space:normal}
+  .a4 td,.a4 th{padding:4px 4px}
+  .a4 td.n{white-space:nowrap}
   .a4 thead{display:table-header-group}
 }
 </style>
@@ -273,10 +278,10 @@ const sum=a=>a.reduce((x,y)=>x+y,0);
 const pad=n=>String(n).padStart(2,'0');
 const PAL=['#2F7BD6','#D2721C','#8A57D6','#1F9A5E','#D0425A','#1593A6','#9A7B22','#5562C4'];
 const CATS=['餐饮','交通','住宿','门票','通讯','购物','杂费'];
-const CUR={CNY:['¥',2,'人民币'],TMT:['TMT ',2,'土库曼马纳特'],INR:['₹',2,'印度卢比'],USD:['$',2,'美元'],EUR:['€',2,'欧元'],GBP:['£',2,'英镑'],JPY:['JP¥',0,'日元'],KRW:['₩',0,'韩元'],THB:['฿',2,'泰铢'],HKD:['HK$',2,'港币'],MOP:['MOP$',2,'澳门元'],TWD:['NT$',0,'新台币'],SGD:['S$',2,'新加坡元'],MYR:['RM',2,'马币'],VND:['₫',0,'越南盾'],IDR:['Rp',0,'印尼盾'],PHP:['₱',2,'比索'],LAK:['₭',0,'老挝基普'],KHR:['៛',0,'柬埔寨瑞尔'],MMK:['K',0,'缅元'],AUD:['A$',2,'澳元'],CAD:['C$',2,'加元'],AED:['AED',2,'迪拉姆'],RUB:['₽',2,'卢布']};
+const CUR={CNY:['¥',2,'人民币','Hytaý ýuany'],TMT:['TMT ',2,'土库曼马纳特','Türkmen manady'],INR:['₹',2,'印度卢比','Hindi rupiýasy'],USD:['$',2,'美元','ABŞ dollary'],EUR:['€',2,'欧元','Ýewro'],GBP:['£',2,'英镑','Funt sterling'],JPY:['JP¥',0,'日元','Ýapon ýeni'],KRW:['₩',0,'韩元','Koreý wony'],THB:['฿',2,'泰铢','Taý baty'],HKD:['HK$',2,'港币','Gonkong dollary'],MOP:['MOP$',2,'澳门元','Makao patakasy'],TWD:['NT$',0,'新台币','Taýwan dollary'],SGD:['S$',2,'新加坡元','Singapur dollary'],MYR:['RM',2,'马币','Malaýziýa ringgiti'],VND:['₫',0,'越南盾','Wýetnam dongy'],IDR:['Rp',0,'印尼盾','Indoneziýa rupiýasy'],PHP:['₱',2,'比索','Filippin pesosy'],LAK:['₭',0,'老挝基普','Laos kipi'],KHR:['៛',0,'柬埔寨瑞尔','Kamboja rieli'],MMK:['K',0,'缅元','Mýanma kýaty'],AUD:['A$',2,'澳元','Awstraliýa dollary'],CAD:['C$',2,'加元','Kanada dollary'],AED:['AED',2,'迪拉姆','BAE dirhemi'],TRY:['₺',2,'土耳其里拉','Türk lirasy'],KZT:['₸',2,'哈萨克斯坦坚戈','Gazak teňňesi'],UZS:['UZS ',0,'乌兹别克苏姆','Özbek somy'],RUB:['₽',2,'卢布','Rus rubly']};
 const sym=c=>CUR[c]?.[0]??(c+' ');
 const dec=c=>CUR[c]?.[1]??2;
-const cname=c=>CUR[c]?.[2]??c;
+const cname=c=>(LANG==='tk'?CUR[c]?.[3]:CUR[c]?.[2])??c;
 const fmtN=(cents,c)=>{const d=dec(c);return (Math.abs(cents)/100).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})};
 const money=(cents,c,sign)=>(cents<0?'−':(sign&&cents>0?'+':''))+sym(c)+fmtN(Math.round(cents),c);
 const toCents=str=>{
@@ -286,22 +291,158 @@ const toCents=str=>{
 };
 const nowLocal=()=>{const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`};
 const WK='日一二三四五六';
-const dayLabel=day=>{const [y,m,d]=day.split('-').map(Number);const w=new Date(y,m-1,d).getDay();return `${m}月${d}日 周${WK[w]}`};
+const dayLabel=day=>{const [y,m,d]=day.split('-').map(Number);const w=new Date(y,m-1,d).getDay();return LANG==='tk'?`${d} ${TK_MON[m-1]}, ${TK_WD[w]}`:`${m}月${d}日 周${WK[w]}`};
 const hm=t=>t.slice(11,16);
 const catColor=c=>{let h=0;for(const ch of String(c))h=(h*31+ch.charCodeAt(0))>>>0;return PAL[h%PAL.length]};
+
+/* ---------- 语言：中文 / Türkmençe ---------- */
+let LANG='zh';
+const TK_MON=['ýanwar','fewral','mart','aprel','maý','iýun','iýul','awgust','sentýabr','oktýabr','noýabr','dekabr'];
+const TK_WD=['ýekşenbe','duşenbe','sişenbe','çarşenbe','penşenbe','anna','şenbe'];
+const TK={
+ '钱袋':'Gapjyk','流水':'Ýazgylar','成员':'Agzalar','统计':'Statistika','设置':'Sazlamalar',
+ '记一笔':'Ýazgy goş','关闭':'Ýap','示例':'Mysal','新建行程':'Täze sapar',
+ '这是示例行程，随便点、随便改。准备好后新建你自己的行程。':'Bu mysal sapar: islän ýeriňize basyp, üýtgedip bilersiňiz. Taýyn bolsaňyz, öz saparyňyzy dörediň.',
+ '此浏览器无法保存数据，关闭后会丢失。请定期导出备份。':'Bu brauzer maglumatlary saklap bilmeýär, ýapsaňyz ýiter. Yzygiderli ätiýaçlyk nusga alyň.',
+ '钱袋余额 · 折合':'Gapjykdaky galyndy · ','累计入钱':'Jemi goýlan','累计支出':'Jemi çykdajy','钱的来源':'Puluň çeşmesi',
+ '钱袋还是空的，先点「入钱」把钱放进来。':'Gapjyk heniz boş. Ilki «Pul goşmak» basyp, pul goşuň.',
+ '预算':'Býudjet','已用':'Sarp edildi','入钱':'Pul goşmak','换汇':'Walýuta çalyşmak',
+ '个人支出':'Şahsy çykdajy','只算一个人':'Diňe bir adama','共同支出':'Umumy çykdajy','总额自动分摊':'Jemi awtomatik bölünýär',
+ '币种账户（点开看账单）':'Walýuta hasaplary (hasabat üçin basyň)','打印总账':'Umumy hasabaty çap et',
+ '本位币':'Esasy walýuta','成本':'Gymmaty','有币种账户是负数：钱不够了，请补记入钱或换汇。':'Käbir walýuta hasaby minusda: pul ýetenok. Pul goşuň ýa-da walýuta çalşyň.',
+ '成员余额':'Agzalaryň galyndysy','结算':'Hasaplaşyk','最近流水':'Soňky ýazgylar','今天已花':'şu gün sarp edildi','全部':'Hemmesi',
+ '还没有记录。点右下角「记一笔」开始。':'Heniz ýazgy ýok. Aşakdaky «Ýazgy goş» düwmesine basyň.','还没有记录':'Heniz ýazgy ýok',
+ '外部':'Daşky','个人':'Şahsy','垫付':'tölän','全员':'Hemmeler','来源':'Çeşme','支出':'Çykdajy',
+ '所有成员':'Ähli agzalar','所有币种':'Ähli walýutalar','只看这一天':'Diňe şu gün','搜索备注、地点、类别、编号':'Bellik, ýer, kategoriýa, belgi boýunça gözle',
+ '取消日期（正在看':'Senäni aýyr (görkezilýär:','没有符合条件的记录':'Şertlere laýyk ýazgy ýok','支出合计':'çykdajy jemi',
+ '打印总账（A4 · 类型 / 备注 / 时间 / 入 / 出 / 余额）':'Umumy hasabaty çap et (A4 · görnüşi / bellik / wagt / giriş / çykyş / galyndy)',
+ '投入':'Goýan','欠钱袋':'Gapjyga bergili','钱袋欠他':'Gapjyk oňa bergili','查看结算方案':'Hasaplaşyk meýilnamasy',
+ '打印总账 / 成员账单（A4）':'Umumy we agzalaryň hasabatyny çap et (A4)','还没有支出记录':'Heniz çykdajy ýok',
+ '总支出':'Jemi çykdajy','天数':'Gün sany','日均':'Gündelik ortaça','人均':'Adam başyna','预算剩余':'Býudjetden galan',
+ '按类别':'Kategoriýa boýunça','按人（各自分摊到的）':'Adam boýunça (her kime düşen)','按天（点击查看当天流水）':'Gün boýunça (şol günüň ýazgylary üçin basyň)',
+ '行程':'Saparlar','行程名称':'Saparyň ady','例如 20000':'mysal üçin 20000','成员名称':'Agzanyň ady','删除':'Poz','已记账':'Ýazgysy bar',
+ '已有记账，不能删除':'Ýazgysy bar, pozup bolmaýar','新成员名字':'Täze agzanyň ady','添加':'Goş','币种与参考汇率':'Walýutalar we salgylanma kurslary',
+ '参考汇率用于外币直接入钱、或账户没有成本时的折算。换汇后会自动用实际成本。':'Salgylanma kursy daşary ýurt walýutasy göni goşulanda ýa-da hasapda gymmat ýok mahaly ulanylýar. Walýuta çalşylandan soň hakyky gymmat awtomatik ulanylýar.',
+ '添加币种…':'Walýuta goş…','费用类别':'Çykdajy kategoriýalary','新类别，如 洗衣':'Täze kategoriýa, mysal: kir ýuwmak',
+ '数据（只保存在本机）':'Maglumatlar (diňe şu enjamda)','打印账单（A4）':'Hasabaty çap et (A4)','备份 / 恢复全部数据':'Ätiýaçlyk nusga / dikeltmek',
+ '导出本行程表格（CSV，可用 Excel 打开）':'Saparyň tablisasyny eksport et (CSV, Excel bilen açylýar)','删除此行程':'Bu sapary poz',
+ '再点一次：永久删除此行程':'Ýene basyň: sapar düýbünden pozular',
+ '数据存在这台手机的浏览器里，不上传任何服务器。清理浏览器数据会丢失，请定期备份。':'Maglumatlar şu telefonda saklanýar, hiç bir serwere iberilmeýär. Brauzer arassalansa ýiter, yzygiderli ätiýaçlyk nusga alyň.',
+ '钱袋入钱':'Gapjyga pul goş','编辑':'Üýtget','钱从哪来':'Pul nireden','成员存入':'Agza goýýar','外部来源（公司等）':'Daşky çeşme (kompaniýa we ş.m.)',
+ '存入金额':'Goýulýan möçber','每人存入':'Her kim goýýar','总共存入':'Jemi goýulýar','总金额':'Jemi möçber',
+ '可直接输入算式，如 120+35×2':'Hasaby göni ýazyp bolýar, mysal: 120+35×2','来源名称':'Çeşmäniň ady','如 公司备用金、报销款':'mysal: kompaniýanyň ätiýaç puly',
+ '按每人金额输入（每个被选的人存同样多）':'Her adam üçin möçber (saýlanan her kim deň goýýar)','（参考汇率）':' (salgylanma kursy)',
+ '谁一起用（点头像取消，不一定 5 人）':'Kim bilelikde ulandy (aýyrmak üçin basyň, hökman 5 adam däl)',
+ '是谁的支出':'Kimiň çykdajysy','谁存入':'Kim goýýar','全选':'Hemmesi','全不选':'Hiç biri','平分':'Deň böl','按份数':'Paý boýunça','各填金额':'Her kime aýratyn',
+ '合计':'Jemi','份':'paý','类别':'Kategoriýa','有人自掏腰包垫付（钱没从钱袋出）':'Kimdir biri öz puly bilen töledi (gapjykdan çykmady)',
+ '垫付人（金额记为他的投入）':'Tölän adam (möçber onuň goýany bolup ýazylýar)','时间':'Wagt','地点':'Ýeri','如 酒店前台':'mysal: myhmanhananyň kabulhanasy',
+ '备注':'Bellik','如 晚饭、打车去机场':'mysal: agşamlyk nahar, howa menziline taksi','照片（小票、发票）':'Suratlar (çek, faktura)','照片':'Surat',
+ '保存':'Sakla','保存修改':'Üýtgeşmeleri sakla','付出（从钱袋拿出）':'Berilýär (gapjykdan alynýar)','得到（放回钱袋）':'Alynýar (gapjyga goýulýar)',
+ '汇率':'Kurs','反向':'Ters','折合成本':'Gymmaty','请填写两边金额':'Iki tarapyň möçberini ýazyň','请选择不同的币种':'Dürli walýuta saýlaň',
+ '请选择是谁的支出':'Kimiň çykdajysydygyny saýlaň','请选择谁存入':'Kim goýýandygyny saýlaň','请至少选择一个人':'Iň bolmanda bir adam saýlaň',
+ '请填写每人金额':'Her adamyň möçberini ýazyň','请填写总金额':'Jemi möçberi ýazyň','请填写金额':'Möçberi ýazyň','份数不能全为 0':'Paýlaryň hemmesi 0 bolup bilmez',
+ '请填写钱从哪来，如 公司备用金':'Puluň nireden gelýändigini ýazyň, mysal: kompaniýanyň ätiýaç puly',
+ '外部来源的钱不算任何成员的投入；结算时钱袋剩下的钱先还给它。':'Daşky çeşmäniň puly hiç bir agzanyň goýany hasaplanmaýar; hasaplaşykda gapjykda galan pul ilki oňa gaýtarylýar.',
+ '删除照片':'Suraty poz','照片丢失':'Surat tapylmady','记录不存在':'Ýazgy ýok','这笔记录已被彻底删除。':'Bu ýazgy düýbünden pozuldy.','已删除':'Pozuldy',
+ '实际汇率':'Hakyky kurs','成本转移':'Geçirilen gymmat','分摊明细':'Bölünişi','（平分）':' (deň)','（按份数）':' (paý boýunça)','（各填金额）':' (aýratyn)',
+ '（外部，不算成员投入）':' (daşky, agzalaryň goýany däl)','编号':'Belgi','复制':'Göçür','恢复这笔':'Bu ýazgyny dikelt','再记一笔同样的':'Şunuň ýaly ýene ýaz',
+ '再点一次删除':'Pozmak üçin ýene basyň','已移到回收站':'Sebede geçirildi','已恢复':'Dikeldildi','确认':'Tassykla','彻底删':'Düýbünden poz','恢复':'Dikelt',
+ '余额':'Galyndy','币种':'Walýuta','用掉':'Sarp eden','暂无相关记录':'Degişli ýazgy ýok','本人垫付':'özi tölän',
+ '结算方案':'Hasaplaşyk meýilnamasy','每人余额':'Her kimiň galyndysy','最少转账':'Iň az geçirim','账已平，无需转账':'Hasap deň, geçirim gerek däl',
+ '钱袋剩余':'Gapjykda galan','钱袋（透支）':'Gapjyk (minusda)','钱袋里剩的钱':'Gapjykda galan pul','复制结算文字（发群里）':'Hasaplaşyk tekstini göçür (topara ibermek üçin)',
+ '转账：':'Geçirimler:','无需转账':'Geçirim gerek däl','当前':'Häzirki','名称':'Ady','本位币（最后按它结算）':'Esasy walýuta (hasaplaşyk şonda)',
+ '多一个人':'Ýene bir adam','创建并切换':'Döret we geç','请填写行程名称':'Saparyň adyny ýazyň','请至少填一个成员':'Iň bolmanda bir agza ýazyň',
+ '行程已创建，可在「设置」里添加外币':'Sapar döredildi. Daşary ýurt walýutasyny «Sazlamalar» bölüminde goşup bilersiňiz','行程已删除':'Sapar pozuldy',
+ '回收站':'Sebet','回收站是空的':'Sebet boş','删除的记录先放这里，不参与计算，随时可恢复。':'Pozulan ýazgylar şu ýerde durýar, hasaba girmeýär we islän wagtyňyz dikeldip bilersiňiz.',
+ '备份 / 恢复':'Ätiýaçlyk / dikeltmek','导出备份':'Ätiýaçlyk nusga al','包含照片（文件会大一些）':'Suratlar bilen (faýl ulurak bolar)','生成备份':'Ätiýaçlyk döret',
+ '下载文件':'Faýly ýükle','若「下载文件」没反应，用「复制」后粘贴到备忘录或发给自己保存。':'«Faýly ýükle» işlemese, «Göçür» basyp bellikler programmasyna goýuň ýa-da özüňize iberiň.',
+ '从备份恢复':'Ätiýaçlykdan dikelt','或把备份内容粘贴到这里':'ýa-da ätiýaçlyk mazmunyny şu ýere goýuň','恢复（会覆盖本机现有数据）':'Dikelt (şu enjamdaky maglumatlar çalşylar)',
+ '再点一次：用备份覆盖本机全部数据':'Ýene basyň: ähli maglumatlar ätiýaçlyk bilen çalşylar','请先选择备份文件或粘贴内容':'Ilki ätiýaçlyk faýlyny saýlaň ýa-da mazmunyny goýuň',
+ '已恢复备份':'Ätiýaçlyk dikeldildi','备份内容无法识别，请检查是否完整':'Ätiýaçlyk tanalmady, doly göçürilendigini barlaň','已读取，点「恢复」确认':'Okaldy, tassyklamak üçin «Dikelt» basyň',
+ '导出表格':'Tablisa eksporty','下载 CSV':'CSV ýükle','每笔一行，包含分摊明细，可直接用 Excel / Numbers 打开。':'Her ýazgy bir setirde, bölünişi bilen; Excel / Numbers bilen açyp bolýar.',
+ '已复制':'Göçürildi','复制失败，请长按文本框手动复制':'Göçürip bolmady, tekste basyp saklap el bilen göçüriň','已尝试下载；没反应请用「复制」':'Ýüklemäge synanyşyldy; işlemese «Göçür» ulanyň',
+ '此环境不能下载，请用「复制」':'Bu ýerde ýükläp bolmaýar, «Göçür» ulanyň','保存失败，请用「复制」':'Saklap bolmady, «Göçür» ulanyň','已保存到':'Saklandy:',
+ '已记一笔':'Ýazyldy','已保存修改':'Üýtgeşmeler saklandy','已保存':'Saklandy','正在压缩照片…':'Suratlar kiçeldilýär…',
+ '保存失败：浏览器存储不可用或已满，请导出备份':'Saklap bolmady: brauzeriň ýady elýeterli däl ýa-da doly, ätiýaçlyk nusga alyň',
+ '上一张':'Öňki','下一张':'Indiki','放大':'Ulalt','适应屏幕':'Ekrana sygdyr',
+ 'A4 账单':'A4 hasabat','打印哪一本账':'Haýsy hasabaty çap etmeli','从（可不填）':'Başy (hökman däl)','到（可不填）':'Soňy (hökman däl)',
+ '打印 / 存为 PDF':'Çap et / PDF sakla','复制为表格（可粘贴到 Excel）':'Tablisa hökmünde göçür (Excel üçin)',
+ '钱袋总账':'Gapjygyň umumy hasabaty','期间':'Döwür','金额单位':'Pul birligi','出差钱袋':'Iş sapary gapjygy','打印时间':'Çap edilen wagty',
+ '期初余额':'Başdaky galyndy','入 合计':'Giriş jemi','出 合计':'Çykyş jemi','期末余额':'Ahyrky galyndy','摘要（类别 · 备注 · 地点）':'Mazmuny (kategoriýa · bellik · ýer)',
+ '相关人':'Degişli adamlar','原币金额':'Asyl möçber','入':'Giriş','出':'Çykyş','类型':'Görnüşi','摘要':'Mazmuny','外部入钱':'Daşky goýum',
+ '换得':'Alnan','付出':'Berlen','这段时间没有记录':'Bu döwürde ýazgy ýok','记账人':'Ýazan','核对人':'Barlan','日期':'Sene','开始':'başy','现在':'häzir',
+ '没有弹出打印窗口？请用浏览器菜单里的「打印」，或「复制为表格」':'Çap penjiresi açylmadymy? Brauzeriň menýusyndaky «Çap» ulanyň ýa-da «Tablisa hökmünde göçür».',
+ '餐饮':'Nahar','交通':'Ulag','住宿':'Ýaşaýyş','门票':'Bilet','通讯':'Aragatnaşyk','购物':'Söwda','杂费':'Beýlekiler','其他':'Beýleki',
+ '编号':'Belgi','金额':'Möçber','参与人/分摊':'Gatnaşyjylar / paýy','垫付人':'Tölän adam','照片数':'Surat sany','折合':'Hasabynda ',
+ '语言':'Dil','钱袋内换汇':'Gapjygyň içinde çalyşmak','个人账单':'şahsy hasabat'
+};
+const TKP=[
+ [/^共 (\d+) 笔 · 支出合计$/,'Jemi $1 ýazgy · çykdajy jemi'],
+ [/^余额 = 投入 − 已用（全部折合(.+?)）。外币按换汇实际成本折算。$/,'Galyndy = goýan − sarp eden ($1 hasabynda). Daşary ýurt walýutasy hakyky çalyşma gymmaty boýunça hasaplanýar.'],
+ [/^预算（(\w+)，可不填）$/,'Býudjet ($1, hökman däl)'],
+ [/^本位币：(\w+) (.+?)（新建行程时选择）$/,'Esasy walýuta: $1 $2 (täze sapar döredilende saýlanýar)'],
+ [/^删除类别(.+)$/,'Kategoriýany poz: $1'],
+ [/^回收站（(\d+) 笔）$/,'Sebet ($1 ýazgy)'],
+ [/^汇率 1 (\w+) = \? (\w+)$/,'Kurs: 1 $1 = ? $2'],
+ [/^钱袋 (\w+) 余额 (.+)$/,'Gapjykdaky $1 galyndysy: $2'],
+ [/^各人合计 (.+)，与总额相差 (.+)$/,'Adamlaryň jemi $1, umumy möçberden tapawudy $2'],
+ [/^(.+) 存入钱袋$/,'$1 gapjyga goýýar'],
+ [/^(.+)的份数$/,'$1: paý'],[/^(.+)的金额$/,'$1: möçber'],
+ [/^(.+) 自掏腰包垫付，这 (.+) 记为他的投入。$/,'$1 öz puly bilen töledi; bu $2 onuň goýany bolup ýazyldy.'],
+ [/^\[图(\d+)\]$/,'[$1 surat]'],
+ [/^照片（(\d+)）$/,'Suratlar ($1)'],[/^照片 ?(\d+)$/,'Surat $1'],[/^图(\d+)$/,'$1 surat'],
+ [/^(.*?) ?的账$/,'$1 hasaby'],
+ [/^(.+) 的 A4 账单 \/ 打印$/,'$1: A4 hasabat / çap'],
+ [/^「钱袋剩余」= 钱袋里还剩的钱（按成本价折合 (.+)）。直接从钱袋拿出来给对应的人即可。$/,'«Gapjykda galan»: gapjykda galan pul (gymmaty boýunça $1). Ony gapjykdan alyp, degişli adama beriň.'],
+ [/^外币可以先换回(.+?)（记一笔换汇）再结算，结果会按实际换回的钱更新。$/,'Daşary ýurt walýutasyny ilki $1 çalşyp (walýuta çalyşmak ýazgysy), soň hasaplaşyp bilersiňiz; netije hakyky alnan pul boýunça täzelener.'],
+ [/^钱袋总账（折合 (\w+)）$/,'Gapjygyň umumy hasabaty ($1 hasabynda)'],
+ [/^钱袋 (\w+) (.+) 账户$/,'Gapjyk: $1 ($2) hasaby'],
+ [/^(.+) 个人账单$/,'$1: şahsy hasabat'],
+ [/^(.+) 入钱$/,'$1: pul goýumy'],
+ [/^外币按换汇实际成本折算为(.+?)。入 = 本人存入和垫付；出 = 本人分摊到的支出。$/,'Daşary ýurt walýutasy hakyky çalyşma gymmaty boýunça $1 hasaplanýar. Giriş = özüniň goýany we tölänleri; Çykyş = özüne düşen çykdajylar.'],
+ [/^外币按换汇实际成本折算为(.+?)。换汇只是钱袋内部换币，不计入、出。$/,'Daşary ýurt walýutasy hakyky çalyşma gymmaty boýunça $1 hasaplanýar. Walýuta çalyşmak diňe gapjygyň içinde, giriş-çykyşa girmeýär.'],
+ [/^已添加 (\d+) 张$/,'$1 surat goşuldy'],
+ [/^已添加 (\w+)，请填写参考汇率$/,'$1 goşuldy, salgylanma kursuny ýazyň'],
+ [/^成员 (\d+)$/,'$1-nji agza'],
+ [/^如 (\d+) 胡志明出差$/,'mysal: $1 Aşgabat iş sapary'],
+];
+const TKK=Object.keys(TK).filter(k=>k.length>1).sort((a,b)=>b.length-a.length);
+const HAN=/[一-鿿]/;
+function trText(s){
+  if(LANG!=='tk'||s==null||!HAN.test(s))return s;
+  const t=String(s).trim();
+  if(TK[t]!=null)return String(s).replace(t,TK[t]);
+  let r=t;
+  for(const [re,rep] of TKP){if(re.test(r)){r=r.replace(re,rep);break}}
+  for(const k of TKK)if(r.includes(k))r=r.split(k).join(TK[k]);
+  r=r.replace(/(?:钱袋|Gapjyk) ([A-Z]{3}) (.+?) 账户/g,'Gapjyk: $1 ($2) hasaby').replace(/(^|[\s（(·/])共 /g,'$1jemi ').replace(/· 总 /g,'· jemi ').replace(/^占 /,'Paýy ').replace(/ · 按 1/g,' · kurs 1').replace(/ 至 /g,' – ')
+     .replace(/(\d+)\s*笔相关/g,'$1 degişli ýazgy').replace(/(\d+)\s*人/g,'$1 adam').replace(/(\d+)\s*笔/g,'$1 ýazgy').replace(/(\d+)\s*份/g,'$1 paý').replace(/(\d+)\s*天/g,'$1 gün').replace(/(\d+)\s*张/g,'$1 surat')
+     .replace(/（/g,' (').replace(/）/g,')').replace(/，/g,', ').replace(/。/g,'. ').replace(/：/g,': ').replace(/；/g,'; ').replace(/、/g,', ').replace(/「|“/g,'«').replace(/」|”/g,'»')
+     .replace(/\(\s+/g,'(').replace(/\s+\)/g,')').replace(/ {2,}/g,' ').trim();
+  return String(s).replace(t,r);
+}
+const L=s=>trText(s);
+function tr(root){
+  if(LANG!=='tk'||!root)return;
+  if(root===document.body||root.contains?.($('#hdr')))document.title=trText(document.title);
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const ns=[];let n;
+  while(n=w.nextNode()){if(HAN.test(n.nodeValue)&&!n.parentElement.closest('script,style,textarea,[translate="no"]'))ns.push(n)}
+  ns.forEach(n=>n.nodeValue=trText(n.nodeValue));
+  if(root.querySelectorAll)[root,...root.querySelectorAll('[placeholder],[aria-label],[title],[alt],[data-confirm]')].forEach(e=>['placeholder','aria-label','title','alt','data-confirm'].forEach(a=>{const v=e.getAttribute(a);if(v&&HAN.test(v))e.setAttribute(a,trText(v))}));
+}
 
 /* ---------- 存储 ---------- */
 const KEY='tripwallet.v1';
 let S=null, persistOK=true;
 function load(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):null}catch(e){persistOK=false;return null}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){persistOK=false;toast('保存失败：浏览器存储不可用或已满，请导出备份')}}
+function save(noTouch){if(!noTouch){const t=S&&T();if(t&&t.demo)t.touched=true}try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){persistOK=false;toast('保存失败：浏览器存储不可用或已满，请导出备份')}}
 const pmem=new Map(); let dbp=null;
 function idb(){if(dbp)return dbp;dbp=new Promise(res=>{try{const r=indexedDB.open('tripwallet-photos',1);r.onupgradeneeded=()=>r.result.createObjectStore('p');r.onsuccess=()=>res(r.result);r.onerror=()=>res(null)}catch(e){res(null)}});return dbp}
 async function putPhoto(id,data){pmem.set(id,data);const db=await idb();if(!db)return;try{db.transaction('p','readwrite').objectStore('p').put(data,id)}catch(e){}}
 async function getPhoto(id){if(pmem.has(id))return pmem.get(id);const db=await idb();if(!db)return null;return new Promise(res=>{try{const q=db.transaction('p').objectStore('p').get(id);q.onsuccess=()=>{if(q.result)pmem.set(id,q.result);res(q.result||null)};q.onerror=()=>res(null)}catch(e){res(null)}})}
 async function delPhoto(id){pmem.delete(id);const db=await idb();try{db&&db.transaction('p','readwrite').objectStore('p').delete(id)}catch(e){}}
 async function allPhotoIds(){const db=await idb();if(!db)return [...pmem.keys()];return new Promise(res=>{try{const q=db.transaction('p').objectStore('p').getAllKeys();q.onsuccess=()=>res([...new Set([...q.result,...pmem.keys()])]);q.onerror=()=>res([...pmem.keys()])}catch(e){res([...pmem.keys()])}})}
-function hydrate(root){root.querySelectorAll('img[data-photo]').forEach(async img=>{const d=await getPhoto(img.dataset.photo);if(d)img.src=d;else img.alt='照片丢失'})}
+function hydrate(root){tr(root);root.querySelectorAll('img[data-photo]').forEach(async img=>{const d=await getPhoto(img.dataset.photo);if(d)img.src=d;else img.alt='照片丢失'})}
 function compress(file){return new Promise(res=>{const fr=new FileReader();fr.onload=()=>{const img=new Image();img.onload=()=>{const M=1600;const k=Math.min(1,M/Math.max(img.naturalWidth,img.naturalHeight));const c=document.createElement('canvas');c.width=Math.round(img.naturalWidth*k);c.height=Math.round(img.naturalHeight*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.82))};img.onerror=()=>res(null);img.src=fr.result};fr.onerror=()=>res(null);fr.readAsDataURL(file)})}
 
 /* ---------- 分摊 ---------- */
@@ -368,26 +509,27 @@ function settle(t){
 }
 
 /* ---------- 示例数据 ---------- */
-function seed(){
-  const ms=['阿强','小美','老陈','阿杰','小林'].map((n,i)=>({id:'m'+(i+1),name:n,color:i}));
+function seed(lang){
+  const K=lang==='tk',Z=(zh,tk)=>K?tk:zh;
+  const ms=(K?['Aman','Maral','Merdan','Ýazgül','Döwlet']:['阿强','小美','老陈','阿杰','小林']).map((n,i)=>({id:'m'+(i+1),name:n,color:i}));
   const all=ms.map(m=>m.id);
-  const t={id:'demo',name:'曼谷出差',demo:true,base:'CNY',members:ms,
+  const t={id:'demo',name:Z('曼谷出差','Bangkok iş sapary'),demo:true,base:'CNY',members:ms,
     currencies:[{code:'CNY',rate:1},{code:'THB',rate:0.2},{code:'USD',rate:7.1}],categories:[...CATS],budget:2000000,txs:[]};
   let n=0;const add=o=>t.txs.push(Object.assign({id:'d'+(++n),created:n,photos:[],place:'',note:''},o));
   const eq=(v,ids,c)=>splitAmounts(v,ids,null,c);
-  add({type:'deposit',kind:'deposit',time:'2026-10-20T08:30',cur:'CNY',amount:1000000,splits:all.map(m=>({m,amt:200000})),per:true,note:'出发前每人 2000 入钱'});
-  add({type:'deposit',kind:'deposit',src:'ext',srcName:'公司备用金',time:'2026-10-20T08:40',cur:'CNY',amount:300000,splits:[],note:'公司预支差旅费'});
-  add({type:'exchange',time:'2026-10-20T10:10',fromCur:'CNY',fromAmt:400000,toCur:'THB',toAmt:1960000,place:'素万那普机场 SuperRich',note:'机场换汇'});
-  add({type:'deposit',kind:'deposit',time:'2026-10-20T10:20',cur:'USD',amount:20000,rate:7.1,splits:[{m:'m1',amt:20000}],note:'阿强带的美元现金'});
-  add({type:'expense',kind:'shared',time:'2026-10-20T12:40',cur:'THB',amount:125000,splits:eq(125000,all,'THB'),mode:'equal',category:'餐饮',place:'Terminal 21 美食广场',note:'午饭'});
-  add({type:'expense',kind:'shared',time:'2026-10-20T15:05',cur:'THB',amount:90000,splits:eq(90000,['m1','m2','m3','m4'],'THB'),mode:'equal',category:'交通',place:'Grab',note:'去客户公司打车（4人）'});
-  add({type:'expense',kind:'personal',time:'2026-10-20T18:30',cur:'THB',amount:29900,splits:[{m:'m5',amt:29900}],category:'通讯',place:'7-Eleven',note:'小林买电话卡'});
-  add({type:'expense',kind:'shared',time:'2026-10-21T13:00',cur:'USD',amount:6000,splits:eq(6000,all,'USD'),mode:'equal',category:'门票',place:'大皇宫',note:'门票'});
-  add({type:'expense',kind:'shared',time:'2026-10-21T19:45',cur:'THB',amount:100000,splits:eq(100000,['m1','m2','m3'],'THB'),mode:'equal',category:'餐饮',place:'Som Tam Nua',note:'晚饭（3人）',photos:['demo-receipt']});
-  add({type:'expense',kind:'shared',time:'2026-10-21T21:00',cur:'CNY',amount:360000,splits:eq(360000,all,'CNY'),mode:'equal',category:'住宿',place:'酒店前台',note:'两晚房费，老陈刷卡垫付',advBy:'m3'});
+  add({type:'deposit',kind:'deposit',time:'2026-10-20T08:30',cur:'CNY',amount:1000000,splits:all.map(m=>({m,amt:200000})),per:true,note:Z('出发前每人 2000 入钱','Ugramazdan öň her kim 2000 goýdy')});
+  add({type:'deposit',kind:'deposit',src:'ext',srcName:Z('公司备用金','Kompaniýanyň ätiýaç puly'),time:'2026-10-20T08:40',cur:'CNY',amount:300000,splits:[],note:Z('公司预支差旅费','Kompaniýanyň iş sapary üçin beren puly')});
+  add({type:'exchange',time:'2026-10-20T10:10',fromCur:'CNY',fromAmt:400000,toCur:'THB',toAmt:1960000,place:Z('素万那普机场 SuperRich','Suwarnabhumi howa menzili, SuperRich'),note:Z('机场换汇','Howa menzilinde walýuta çalyşmak')});
+  add({type:'deposit',kind:'deposit',time:'2026-10-20T10:20',cur:'USD',amount:20000,rate:7.1,splits:[{m:'m1',amt:20000}],note:Z('阿强带的美元现金','Amanyň getiren dollar nagt puly')});
+  add({type:'expense',kind:'shared',time:'2026-10-20T12:40',cur:'THB',amount:125000,splits:eq(125000,all,'THB'),mode:'equal',category:'餐饮',place:Z('Terminal 21 美食广场','Terminal 21 nahar meýdançasy'),note:Z('午饭','Günortanlyk nahar')});
+  add({type:'expense',kind:'shared',time:'2026-10-20T15:05',cur:'THB',amount:90000,splits:eq(90000,['m1','m2','m3','m4'],'THB'),mode:'equal',category:'交通',place:'Grab',note:Z('去客户公司打车（4人）','Müşderiniň ofisine taksi (4 adam)')});
+  add({type:'expense',kind:'personal',time:'2026-10-20T18:30',cur:'THB',amount:29900,splits:[{m:'m5',amt:29900}],category:'通讯',place:'7-Eleven',note:Z('小林买电话卡','Döwlet SIM-kart aldy')});
+  add({type:'expense',kind:'shared',time:'2026-10-21T13:00',cur:'USD',amount:6000,splits:eq(6000,all,'USD'),mode:'equal',category:'门票',place:Z('大皇宫','Beýik köşk'),note:Z('门票','Giriş bileti')});
+  add({type:'expense',kind:'shared',time:'2026-10-21T19:45',cur:'THB',amount:100000,splits:eq(100000,['m1','m2','m3'],'THB'),mode:'equal',category:'餐饮',place:'Som Tam Nua',note:Z('晚饭（3人）','Agşamlyk nahar (3 adam)'),photos:['demo-receipt']});
+  add({type:'expense',kind:'shared',time:'2026-10-21T21:00',cur:'CNY',amount:360000,splits:eq(360000,all,'CNY'),mode:'equal',category:'住宿',place:Z('酒店前台','Myhmanhananyň kabulhanasy'),note:Z('两晚房费，老陈刷卡垫付','Iki gijelik myhmanhana, Merdan karty bilen tölädi'),advBy:'m3'});
   const sh={m1:1,m2:1,m3:2,m4:1,m5:1};
-  add({type:'expense',kind:'shared',time:'2026-10-22T09:15',cur:'THB',amount:48000,splits:splitAmounts(48000,all,sh,'THB'),mode:'shares',shares:sh,category:'餐饮',place:'酒店餐厅',note:'早餐，老陈带同事算 2 份'});
-  return {v:1,cur:'demo',trips:[t],last:{}};
+  add({type:'expense',kind:'shared',time:'2026-10-22T09:15',cur:'THB',amount:48000,splits:splitAmounts(48000,all,sh,'THB'),mode:'shares',shares:sh,category:'餐饮',place:Z('酒店餐厅','Myhmanhananyň restorany'),note:Z('早餐，老陈带同事算 2 份','Ertirlik, Merdan kärdeşi bilen: 2 paý')});
+  return {v:1,cur:'demo',trips:[t],last:{},lang:K?'tk':'zh'};
 }
 function demoReceipt(){
   const c=document.createElement('canvas');c.width=600;c.height=860;const g=c.getContext('2d');
@@ -421,9 +563,9 @@ function txTitle(t,x){
   return x.note||x.category||'支出';
 }
 function txIcon(x){
-  if(x.type==='deposit')return `<span class="ic-sq" style="background-color:var(--pos)">入</span>`;
-  if(x.type==='exchange')return `<span class="ic-sq" style="background-color:#6B7C76">换</span>`;
-  return `<span class="ic-sq" style="background-color:${catColor(x.category)}">${esc((x.category||'支').slice(0,1))}</span>`;
+  if(x.type==='deposit')return `<span class="ic-sq" style="background-color:var(--pos)" translate="no">${LANG==='tk'?'+':'入'}</span>`;
+  if(x.type==='exchange')return `<span class="ic-sq" style="background-color:#6B7C76" translate="no">⇄</span>`;
+  return `<span class="ic-sq" style="background-color:${catColor(x.category)}">${esc(L(x.category||'支').slice(0,1))}</span>`;
 }
 function txRow(t,x){
   const t2=[];t2.push(hm(x.time));
@@ -436,10 +578,10 @@ function txRow(t,x){
   const tags=[];if(x.src==='ext')tags.push('<span class="tag ext">外部</span>');if(x.kind==='personal')tags.push('<span class="tag">个人</span>');if(x.advBy)tags.push('<span class="tag adv">垫付</span>');if(x.photos?.length)tags.push(`<span class="tag ph">图${x.photos.length}</span>`);
   return `<button class="txr" data-a="tx" data-id="${x.id}">${txIcon(x)}<span class="mid"><span class="t1"><span class="n">${esc(txTitle(t,x))}</span>${tags.join('')}</span><span class="t2">${esc(t2.join(' · '))}</span></span><span class="rt"><div class="a1">${a1}</div><div class="a2 num">${a2}</div></span></button>`;
 }
-function dateRange(t){const ds=live(t).map(x=>x.time.slice(0,10)).sort();if(!ds.length)return '还没有记录';const a=ds[0],b=ds[ds.length-1];const f=d=>{const[,m,dd]=d.split('-');return `${+m}月${+dd}日`};return a===b?f(a):`${f(a)} – ${f(b)}`}
+function dateRange(t){const ds=live(t).map(x=>x.time.slice(0,10)).sort();if(!ds.length)return '还没有记录';const a=ds[0],b=ds[ds.length-1];const f=d=>{const[,m,dd]=d.split('-');return LANG==='tk'?`${+dd} ${TK_MON[m-1]}`:`${+m}月${+dd}日`};return a===b?f(a):`${f(a)} – ${f(b)}`}
 
 function vHeader(t){
-  return `<button class="trip-btn" data-a="trips"><b>${esc(t.name)} ▾</b><span>${esc(dateRange(t))} · ${t.members.length}人 · 本位币 ${t.base}</span></button>${t.demo?'<span class="pill warn">示例</span>':''}`;
+  return `<button class="trip-btn" data-a="trips"><b>${esc(t.name)} ▾</b><span>${esc(dateRange(t))} · ${t.members.length}人 · 本位币 ${t.base}</span></button>${t.demo?'<span class="pill warn">示例</span>':''}<button class="pill gold" style="border:0;padding:5px 10px" data-a="lang" data-v="${LANG==='tk'?'zh':'tk'}" translate="no" aria-label="语言 / Dil">${LANG==='tk'?'中文':'TM'}</button>`;
 }
 function vHome(t){
   let h='';
@@ -451,8 +593,8 @@ function vHome(t){
   <div class="row"><span>累计入钱 <b>${money(C.deposited,t.base)}</b></span><span>累计支出 <b>${money(C.spent,t.base)}</b></span></div>
   ${srcs.length?`<div><div class="lbl" style="margin-bottom:6px">钱的来源</div><div class="src">${srcs.map(([n,v])=>`<span>${esc(n)} <b class="num">${money(v,t.base)}</b></span>`).join('')}</div></div>`:'<div class="row">钱袋还是空的，先点「入钱」把钱放进来。</div>'}
   ${t.budget?`<div><div class="row" style="justify-content:space-between;margin-bottom:6px"><span>预算 <b>${money(t.budget,t.base)}</b></span><span>已用 ${pct.toFixed(0)}%</span></div><div class="bar ${pct>100?'over':''}"><i style="width:${Math.min(100,pct)}%"></i></div></div>`:''}
-  <div class="acts"><button data-a="add" data-v="deposit"><i>入</i>入钱</button><button data-a="add" data-v="exchange"><i>换</i>换汇</button></div></section>`;
-  h+=`<div class="quick"><button data-a="add" data-v="personal"><span class="ic">个</span><span>个人支出<small>只算一个人</small></span></button><button data-a="add" data-v="shared"><span class="ic gold">共</span><span>共同支出<small>总额自动分摊</small></span></button></div>`;
+  <div class="acts"><button data-a="add" data-v="deposit"><i translate="no">${LANG==='tk'?'+':'入'}</i>入钱</button><button data-a="add" data-v="exchange"><i translate="no">⇄</i>换汇</button></div></section>`;
+  h+=`<div class="quick"><button data-a="add" data-v="personal"><span class="ic" translate="no">${LANG==='tk'?'Ş':'个'}</span><span>个人支出<small>只算一个人</small></span></button><button data-a="add" data-v="shared"><span class="ic gold" translate="no">${LANG==='tk'?'U':'共'}</span><span>共同支出<small>总额自动分摊</small></span></button></div>`;
   const codes=t.currencies.map(c=>c.code).filter(c=>c===t.base||Math.abs(C.acc[c]?.bal||0)>0||live(t).some(x=>x.cur===c||x.fromCur===c||x.toCur===c));
   h+=`<div class="sec-t"><h3>币种账户（点开看账单）</h3><button class="link" data-a="stmt" data-v="pool">打印总账</button></div><div class="accts">${codes.map(c=>{const a=C.acc[c]||{bal:0,cost:0};return `<button class="acct ${a.bal<0?'neg-b':''}" data-a="stmt" data-v="cur:${c}"><div class="c"><span>${cname(c)}</span><span>${c}</span></div><div class="v num ${a.bal<0?'neg':''}">${money(a.bal,c)}</div><div class="r num">${c===t.base?'本位币':`成本 1${c} ≈ ${sym(t.base)}${C.avg(c).toFixed(4)}`}</div></button>`}).join('')}</div>`;
   if(codes.some(c=>(C.acc[c]?.bal||0)<0))h+=`<div class="banner"><b>有币种账户是负数：钱不够了，请补记入钱或换汇。</b><button data-a="add" data-v="deposit">入钱</button></div>`;
@@ -513,7 +655,8 @@ function vStats(t){
 function vSettings(t){
   const used=id=>t.txs.some(x=>(x.splits||[]).some(s=>s.m===id)||x.advBy===id);
   const curUsed=c=>t.txs.some(x=>x.cur===c||x.fromCur===c||x.toCur===c);
-  return `<div class="card"><h4>行程</h4><div style="display:flex;flex-direction:column;gap:10px">
+  return `<div class="card" translate="no"><h4>语言 / Dil</h4><div class="seg">${[['zh','中文'],['tk','Türkmençe']].map(([k,l])=>`<button data-a="lang" data-v="${k}" class="${LANG===k?'on':''}">${l}</button>`).join('')}</div></div>
+  <div class="card"><h4>行程</h4><div style="display:flex;flex-direction:column;gap:10px">
    <label class="fl">行程名称<input class="in" id="s-name" data-s="name" value="${esc(t.name)}"></label>
    <label class="fl">预算（${t.base}，可不填）<input class="in" id="s-budget" data-s="budget" inputmode="decimal" value="${t.budget?t.budget/100:''}" placeholder="例如 20000"></label>
    <div class="hint">本位币：${t.base} ${cname(t.base)}（新建行程时选择）</div></div></div>
@@ -539,6 +682,7 @@ function render(){
   $('#view').innerHTML=VIEWS[tab](t);
   $('#tabs').innerHTML=TABS.map(([k,l])=>`<button data-a="tab" data-v="${k}" class="${tab===k?'on':''}" aria-label="${l}">${ICON[k]}${l}</button>`).join('');
   $('.fab').hidden=tab==='settings';
+  document.documentElement.lang=LANG==='tk'?'tk':'zh-CN';document.title=LANG==='tk'?'Iş sapary gapjygy':'出差钱袋';tr($('#hdr'));tr($('#tabs'));tr($('.fab'));
   hydrate($('#view'));
 }
 
@@ -664,7 +808,7 @@ function updatePreview(s){
   else if(p){ // 正在预览区里输入：只刷新数值，不打断输入
     const r=draftCalc(s.data);r.splits?.forEach(x=>{const el=p.querySelector(`[data-pv="${x.m}"]`);if(el&&s.data.mode!=='custom')el.textContent=money(x.amt,s.data.cur)});
     let e=p.querySelector('.err');const msg=r.err&&r.ids?.length?r.err:'';
-    if(msg){if(!e){e=document.createElement('div');e.className='pr err';p.appendChild(e)}e.textContent=msg}else if(e)e.remove();
+    if(msg){if(!e){e=document.createElement('div');e.className='pr err';p.appendChild(e)}e.textContent=trText(msg)}else if(e)e.remove();
     if(aid){const n=document.getElementById(aid);if(n&&n!==ae){n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}}}
   }
   const b=$('#f-save',s.body);if(b)b.disabled=!!draftCalc(s.data).err;
@@ -723,6 +867,7 @@ SHEETS.settle=()=>{
   const t=T();const r=settle(t);
   const left=Object.entries(C.acc).filter(([,a])=>a.bal!==0);
   let txt=`【${t.name}】结算（${cname(t.base)}）\n`+r.ppl.map(p=>`${p.name}：投入 ${money(C.mem[p.id].in,t.base)}，已用 ${money(C.mem[p.id].out,t.base)}，余额 ${money(p.b,t.base,true)}`).join('\n')+'\n转账：\n'+(r.out.map(o=>`${o.from.name} → ${o.to.name}  ${money(o.v,t.base)}`).join('\n')||'无需转账');
+  txt=trText(txt);
   return head('结算方案')+`<div class="card"><h4>每人余额</h4><div class="rows">${r.ppl.map(p=>`<div class="mrow">${av(t,p.id)}<span class="nm">${esc(p.name)}</span><span class="num ${p.b<0?'neg':'pos'}">${money(p.b,t.base,true)}</span></div>`).join('')}</div></div>
   <div class="card"><h4>最少转账</h4>${r.out.length?r.out.map(o=>`<div class="xfer"><b>${esc(o.from.name)}</b><span class="ar">→</span><b>${esc(o.to.name)}</b><span class="v num">${money(o.v,t.base)}</span></div>`).join(''):'<div class="empty">账已平，无需转账</div>'}
   ${r.pool>0?`<p class="note">「钱袋剩余」= 钱袋里还剩的钱（按成本价折合 ${money(r.pool,t.base)}）。直接从钱袋拿出来给对应的人即可。</p>`:''}</div>
@@ -758,10 +903,10 @@ SHEETS.backup=(d)=>head('备份 / 恢复')+`<div class="card" style="display:fle
 SHEETS.csv=()=>{const t=T();const txt=csvOf(t);return head('导出表格')+`<div class="card" style="display:flex;flex-direction:column;gap:10px"><textarea class="in mono" id="csv-out" readonly>${esc(txt)}</textarea><div class="btns"><button class="btn2" data-a="csv-copy">复制</button><button class="btn2" data-a="csv-dl">下载 CSV</button></div><p class="note">每笔一行，包含分摊明细，可直接用 Excel / Numbers 打开。</p></div>`};
 function csvOf(t){
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const rows=[['编号','时间','类型','类别','币种','金额','折合'+t.base,'参与人/分摊','垫付人','地点','备注','照片数']];
+  const rows=[['编号','时间','类型','类别','币种','金额','折合'+t.base,'参与人/分摊','垫付人','地点','备注','照片数'].map(L)];
   live(t).sort(byTime).forEach(x=>{const i=C.info[x.id]||{};
-    if(x.type==='exchange')rows.push([x.id,x.time.replace('T',' '),'换汇','',`${x.fromCur}→${x.toCur}`,`${x.fromAmt/100}→${x.toAmt/100}`,((i.base||0)/100).toFixed(2),'','',x.place,x.note,x.photos?.length||0]);
-    else rows.push([x.id,x.time.replace('T',' '),x.type==='deposit'?'入钱':x.kind==='personal'?'个人支出':'共同支出',x.category||'',x.cur,x.amount/100,((i.base||0)/100).toFixed(2),x.splits.map(s=>`${mName(t,s.m)}:${s.amt/100}`).join(' / '),x.advBy?mName(t,x.advBy):'',x.place,x.note,x.photos?.length||0])});
+    if(x.type==='exchange')rows.push([x.id,x.time.replace('T',' '),L('换汇'),'',`${x.fromCur}→${x.toCur}`,`${x.fromAmt/100}→${x.toAmt/100}`,((i.base||0)/100).toFixed(2),'','',x.place,x.note,x.photos?.length||0]);
+    else rows.push([x.id,x.time.replace('T',' '),L(x.type==='deposit'?'入钱':x.kind==='personal'?'个人支出':'共同支出'),L(x.category||''),x.cur,x.amount/100,((i.base||0)/100).toFixed(2),x.splits.map(s=>`${mName(t,s.m)}:${s.amt/100}`).join(' / '),x.advBy?mName(t,x.advBy):'',x.place,x.note,x.photos?.length||0])});
   return '﻿'+rows.map(r=>r.map(q).join(',')).join('\n');
 }
 function tryDownload(name,text,type){if(window.AndroidBridge){const p=AndroidBridge.save(name,type,text);toast(p?'已保存到 '+p:'保存失败，请用「复制」');return}try{const b=new Blob([text],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);toast('已尝试下载；没反应请用「复制」')}catch(e){toast('此环境不能下载，请用「复制」')}}
@@ -814,9 +959,9 @@ function stmtHTML(t,d){
   ${(d.scope||'pool').startsWith('cur:')?'':`<div class="fine">外币按换汇实际成本折算为${cname(t.base)}。${s.member?'入 = 本人存入和垫付；出 = 本人分摊到的支出。':'换汇只是钱袋内部换币，不计入、出。'}</div>`}
   <div class="foot"><span>记账人</span><span>核对人</span><span>日期</span></div></div>`;
 }
-function stmtTSV(t,d){const s=stmtData(t,d);const rows=[['时间','类型','摘要','相关人','原币金额','入','出','余额']];
-  s.rows.forEach(r=>rows.push([r.time.replace('T',' '),r.type,r.desc,r.who,r.orig,r.inn?(r.inn/100).toFixed(2):'',r.out?(r.out/100).toFixed(2):'',(r.bal/100).toFixed(2)]));
-  return `${t.name} ${s.title}（${s.unit}）\n`+rows.map(r=>r.map(v=>String(v).replace(/\t|\n/g,' ')).join('\t')).join('\n')}
+function stmtTSV(t,d){const s=stmtData(t,d);const rows=[['时间','类型','摘要','相关人','原币金额','入','出','余额'].map(L)];
+  s.rows.forEach(r=>rows.push([r.time.replace('T',' '),L(r.type),L(r.desc),r.who,r.orig,r.inn?(r.inn/100).toFixed(2):'',r.out?(r.out/100).toFixed(2):'',(r.bal/100).toFixed(2)]));
+  return L(`${t.name} ${s.title}（${s.unit}）`)+'\n'+rows.map(r=>r.map(v=>String(v).replace(/\t|\n/g,' ')).join('\t')).join('\n')}
 SHEETS.stmt=d=>{
   const t=T();
   const opts=[['pool',`钱袋总账（折合 ${t.base}）`],...t.currencies.map(c=>['cur:'+c.code,`钱袋 ${c.code} ${cname(c.code)} 账户`]),...t.members.map(m=>['m:'+m.id,`${m.name} 个人账单`])];
@@ -836,15 +981,18 @@ async function drawViewer(){
   const el=$('#viewer');if(!el||!viewer)return;const {list,idx}=viewer;
   el.classList.toggle('zoom',viewer.zoom);
   el.innerHTML=`<div class="vt"><span>${idx+1} / ${list.length}</span><span style="display:flex;gap:8px"><button data-a="v-zoom">${viewer.zoom?'适应屏幕':'放大'}</button><button data-a="v-close">关闭</button></span></div><div class="vs"><img alt="照片 ${idx+1}" id="v-img"></div><div class="nav"><button data-a="v-prev" ${idx<=0?'disabled':''}>‹ 上一张</button><button data-a="v-next" ${idx>=list.length-1?'disabled':''}>下一张 ›</button></div>`;
-  const d=await getPhoto(list[idx]);const img=$('#v-img');if(img&&d)img.src=d;
+  tr(el);const d=await getPhoto(list[idx]);const img=$('#v-img');if(img&&d)img.src=d;
   let sx=null;const vs=$('.vs',el);vs.ontouchstart=e=>{if(e.touches.length===1)sx=e.touches[0].clientX};vs.ontouchend=e=>{if(sx==null||viewer.zoom)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)>50)step(dx<0?1:-1)};
 }
 function step(k){if(!viewer)return;const n=viewer.idx+k;if(n<0||n>=viewer.list.length)return;viewer.idx=n;viewer.zoom=false;drawViewer()}
 
 /* ---------- 交互 ---------- */
-let toastT;function toast(m){let e=$('.toast');if(!e){e=document.createElement('div');e.className='toast';e.setAttribute('role','status');document.body.appendChild(e)}e.textContent=m;e.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>e.hidden=true,2200)}
+let toastT;function toast(m){m=trText(m);let e=$('.toast');if(!e){e=document.createElement('div');e.className='toast';e.setAttribute('role','status');document.body.appendChild(e)}e.textContent=m;e.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>e.hidden=true,2200)}
 function armed(b){if(!b.dataset.confirm)return true;if(b.classList.contains('armed'))return true;b.dataset.orig=b.textContent;b.textContent=b.dataset.confirm;b.classList.add('armed');setTimeout(()=>{if(b.isConnected){b.classList.remove('armed');b.textContent=b.dataset.orig}},3500);return false}
 const ACT={
+  lang:b=>{const v=b.dataset.v;if(v===LANG)return;LANG=v;S.lang=v;
+    if(S.trips.length===1&&S.trips[0].demo&&!S.trips[0].touched){const n=seed(v);S.trips=n.trips;S.cur=n.cur}
+    save(true);filt.m='';refresh();toast(v==='tk'?'Dil: Türkmençe':'语言：中文')},
   tab:b=>{tab=b.dataset.v;render();scrollTo(0,0)},
   add:b=>openSheet('form',newDraft(b.dataset.v)),
   close:()=>closeSheet(),
@@ -864,7 +1012,7 @@ const ACT={
   'f-mode':b=>{const s=topForm(),d=s.data;d.mode=b.dataset.v;if(d.mode==='custom'){const r=draftCalc({...d,mode:'equal'});(r.splits||[]).forEach(x=>{if(d.custom[x.m]==null||d.custom[x.m]==='')d.custom[x.m]=String(x.amt/100)})}renderSheet(s)},
   'f-src':b=>{const s=topForm();s.data.src=b.dataset.v;renderSheet(s)},
   stmt:b=>{const s=openSheet('stmt',{scope:b.dataset.v||'pool'});s.body.classList.add('wide')},
-  print:()=>{const s=[...sheets].reverse().find(x=>x.kind==='stmt');const t=T();$('#print-root').innerHTML=stmtHTML(t,s.data);
+  print:()=>{const s=[...sheets].reverse().find(x=>x.kind==='stmt');const t=T();$('#print-root').innerHTML=stmtHTML(t,s.data);tr($('#print-root'));
     if(window.AndroidBridge&&AndroidBridge.print){AndroidBridge.print(`${t.name}-${stmtData(t,s.data).title}`);return}
     const t0=Date.now();try{window.print()}catch(e){}if(Date.now()-t0<300)toast('没有弹出打印窗口？请用浏览器菜单里的「打印」，或「复制为表格」')},
   'stmt-copy':()=>{const s=[...sheets].reverse().find(x=>x.kind==='stmt');copyText(stmtTSV(T(),s.data))},
@@ -918,7 +1066,7 @@ document.addEventListener('input',e=>{
     if(f.includes('.')){const[a,k]=f.split('.');d[a][k]=v}else d[f]=v;
     if(['cur','fromCur','toCur','advOn','per','advBy'].includes(f)){if(f==='cur')d.rate='';renderSheet(s)}else updatePreview(s);return}
   if(el.dataset.st){const s=[...sheets].reverse().find(x=>x.kind==='stmt');if(s){s.data[el.dataset.st]=el.value;renderSheet(s)}return}
-  if(el.dataset.q){filt[el.dataset.q]=el.value;if(el.dataset.q==='q'){$('#list-res').innerHTML=listRes(T())}else render()}
+  if(el.dataset.q){filt[el.dataset.q]=el.value;if(el.dataset.q==='q'){$('#list-res').innerHTML=listRes(T());tr($('#list-res'))}else render()}
 });
 document.addEventListener('change',async e=>{
   const el=e.target;
@@ -936,8 +1084,8 @@ document.addEventListener('change',async e=>{
 
 /* ---------- 启动 ---------- */
 async function boot(){
-  S=load();
-  if(!S){S=seed();save();putPhoto('demo-receipt',demoReceipt())}
+  S=load();LANG=S?.lang||'zh';
+  if(!S){S=seed('zh');save(true);putPhoto('demo-receipt',demoReceipt())}
   else if(S.trips.some(t=>t.txs.some(x=>x.photos?.includes('demo-receipt')))&&!(await getPhoto('demo-receipt')))putPhoto('demo-receipt',demoReceipt());
   render();
   const h=location.hash.slice(1);if(h){const x=T().txs.find(y=>y.id===h);if(x)openSheet('tx',{id:h})}
