@@ -11,6 +11,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.print.PrintAttributes;
+import android.print.PrintManager;
 import android.provider.MediaStore;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -156,6 +158,19 @@ public class MainActivity extends Activity {
         public void copy(String text) {
             ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             if (cm != null) cm.setPrimaryClip(ClipData.newPlainText("出差钱袋", text));
+        }
+
+        /** 打开系统打印（A4），可选打印机或「另存为 PDF」。 */
+        @JavascriptInterface
+        public void print(String title) {
+            runOnUiThread(() -> {
+                PrintManager pm = (PrintManager) getSystemService(Context.PRINT_SERVICE);
+                if (pm == null) return;
+                PrintAttributes attrs = new PrintAttributes.Builder()
+                        .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
+                        .build();
+                pm.print(title, web.createPrintDocumentAdapter(title), attrs);
+            });
         }
 
         /** 保存到「下载」文件夹，返回保存位置；失败返回空字符串。 */
