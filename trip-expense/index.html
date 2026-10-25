@@ -220,31 +220,55 @@ h4{margin:0 0 8px;font-size:15px}
 .sw{display:flex;align-items:center;gap:10px;font-size:14px}
 .sw input{width:20px;height:20px;accent-color:var(--accent)}
 
-/* A4 账单：纸张固定白底黑字，屏幕预览和打印一致 */
-.paper-wrap{overflow-x:auto;border-radius:14px;box-shadow:var(--shadow)}
-.a4{background:#FFFFFF;color:#16201C;font-family:var(--f-body);font-size:12px;line-height:1.45;padding:28px 26px;min-width:640px}
-.a4 .h{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;border-bottom:2px solid #0E6B57;padding-bottom:10px;margin-bottom:12px}
-.a4 h1{margin:0;font-family:var(--f-display);font-size:20px;letter-spacing:-.01em;color:#0B3F34}
-.a4 .meta{font-size:11px;color:#55635E;text-align:right}
-.a4 .sum{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
-.a4 .sum div{border:1px solid #D6DFDB;border-radius:8px;padding:6px 10px}
-.a4 .sum span{display:block;font-size:10px;color:#5E6B66;letter-spacing:.06em}
-.a4 .sum b{font-family:var(--f-display);font-size:14px;font-variant-numeric:tabular-nums}
-.a4 table{width:100%;border-collapse:collapse}
-.a4 th{background:#EEF4F1;color:#2E3B37;font-weight:600;font-size:11px;text-align:left;padding:6px;border-bottom:1px solid #B9C7C1}
-.a4 td{padding:5px 6px;border-bottom:1px solid #E1E7E4;vertical-align:top}
-.a4 td.n,.a4 th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-.a4 td.t,.a4 td.ty{white-space:nowrap;color:#46524E}
-.a4 td.who{min-width:150px;word-break:keep-all;overflow-wrap:normal}
-.a4+.a4{margin-top:18px;border-top:6px solid #EDF1EF}
-.a4 .o2{font-size:10px;color:#6B7772;white-space:nowrap}
-.a4 th{white-space:nowrap}
-.a4 td.in{color:#16703F}
-.a4 td.out{color:#A3312F}
-.a4 tr.open td,.a4 tr.close td{background:#F6F8F7;font-weight:600}
-.a4 .foot{display:flex;justify-content:space-between;gap:20px;margin-top:26px;font-size:12px;color:#3A4642}
-.a4 .foot span{flex:1;border-top:1px solid #8A9692;padding-top:4px}
-.a4 .fine{margin-top:10px;font-size:10px;color:#7A8682}
+/* A4 账单（竖版）：纸张固定白底，字号用 pt/mm，屏幕预览与打印一致 */
+.paper-wrap{overflow-x:auto;border-radius:14px;background:#9AA5A1;padding:10px 0;box-shadow:var(--shadow)}
+.a4{background:#fff;color:#14201C;font-family:Roboto,"Noto Sans",var(--f-body);font-size:8.6pt;line-height:1.35;width:210mm;padding:12mm;margin:0 auto;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.paper-wrap .a4+.a4{margin-top:6mm}
+.a4 .n{font-family:var(--f-display);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.a4 .hd{display:flex;justify-content:space-between;align-items:flex-end;gap:8mm;padding-bottom:2.5mm;border-bottom:.6mm solid #0E6B57}
+.a4 h1{margin:0;font-family:var(--f-display);font-size:15pt;line-height:1.1;color:#0B3F34}
+.a4 .sub{font-size:9pt;color:#64716C;margin-top:1mm}
+.a4 .meta{font-size:7.4pt;color:#64716C;text-align:right;line-height:1.5;white-space:nowrap}
+.a4 .kpi{display:grid;grid-template-columns:repeat(4,1fr);border:.25mm solid #DDE5E1;border-radius:2mm;margin:3mm 0 3.5mm}
+.a4 .kpi div{padding:1.8mm 3mm;border-left:.25mm solid #DDE5E1}
+.a4 .kpi div:first-child{border-left:0}
+.a4 .kpi span{display:block;font-size:6.8pt;color:#64716C;letter-spacing:.03em}
+.a4 .kpi b{font-family:var(--f-display);font-size:11pt;font-variant-numeric:tabular-nums}
+.a4 .in{color:#16703F}.a4 .out{color:#A3312F}
+.a4 table{width:100%;border-collapse:collapse;table-layout:fixed}
+.a4 th{font-size:7pt;font-weight:600;color:#44524D;text-align:left;padding:1.4mm 1.2mm;background:#F3F6F5;border-bottom:.3mm solid #B9C7C1}
+.a4 th.n{text-align:right;white-space:normal}
+.a4 td{padding:1.5mm 1.2mm;border-bottom:.2mm solid #DDE5E1;vertical-align:top;overflow-wrap:anywhere}
+.a4 tr{break-inside:avoid}
+.a4 thead{display:table-header-group}
+.a4 td.i{color:#64716C;font-size:7.4pt}
+.a4 td.w b{display:block;font-weight:600}
+.a4 td.w span{color:#64716C;font-size:7.4pt}
+.a4 td.who{font-size:7.8pt;color:#33403B}
+.a4 td.none{text-align:center;color:#8A9692;padding:4mm}
+.a4 .tag{display:inline-block;font-size:6.6pt;font-weight:700;letter-spacing:.02em;padding:.2mm 1.4mm;border-radius:1mm;margin-right:1.2mm;vertical-align:.2mm}
+.a4 .t-in{background:#E3F2E9;color:#16703F}.a4 .t-sh{background:#DDEFE8;color:#0E6B57}.a4 .t-me{background:#F7EAD8;color:#8A5212}.a4 .t-fx{background:#ECEFEE;color:#55625D}
+.a4 .m2{color:#64716C}
+.a4 .pic{color:#8A6A2A;font-size:7.4pt}
+.a4 .o2{display:block;font-size:6.8pt;color:#64716C}
+.a4 tr.tot td,.a4 tr.open td{background:#F3F6F5;font-weight:700;border-bottom:0}
+.a4 .h2{display:flex;align-items:baseline;justify-content:space-between;margin:5mm 0 1.5mm}
+.a4 .h2 h2{margin:0;font-size:10pt;font-family:var(--f-display)}
+.a4 .h2 span{font-size:7.4pt;color:#64716C}
+.a4 .mem{margin-top:4.5mm;break-inside:avoid}
+.a4 .keep{break-inside:avoid}
+.a4 .mh{display:flex;align-items:center;flex-wrap:wrap;gap:1mm 3mm;padding:1.6mm 2.4mm;border-radius:1.6mm;background:linear-gradient(90deg,#0B3F34,#0E6B57);color:#fff}
+.a4 .mh b{font-size:10pt;font-family:var(--f-display);flex:1}
+.a4 .mh span{font-size:7.6pt;color:rgba(255,255,255,.82)}
+.a4 .mh span i{font-style:normal;font-family:var(--f-display);font-weight:600;color:#fff}
+.a4 .mf{text-align:right;font-size:7.4pt;color:#64716C;margin-top:1.6mm}
+.a4 .sig{display:flex;gap:10mm;margin-top:9mm;font-size:8pt;color:#3A4642;break-inside:avoid}
+.a4 .sig span{flex:1;border-top:.25mm solid #8A9692;padding-top:1mm}
+.a4 .fine{font-size:6.8pt;color:#7A8682;margin-top:1.6mm}
+.a4 .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:4mm;margin-top:3mm}
+.a4 figure{margin:0;border:.25mm solid #DDE5E1;border-radius:2mm;padding:2mm;break-inside:avoid}
+.a4 figure img{display:block;width:100%;height:95mm;object-fit:contain;background:#F3F6F5}
+.a4 figcaption{font-size:7.4pt;color:#3A4642;margin-top:1.5mm}
 #print-root{display:none}
 /* 计算器键盘 */
 #calc{position:fixed;left:0;right:0;bottom:0;z-index:35;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -12px 30px -12px rgba(0,0,0,.35);padding:8px max(10px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px))}
@@ -276,11 +300,6 @@ body.calc-open main.wrap{padding-bottom:360px}
 @keyframes shk{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 @media (prefers-reduced-motion:reduce){#lock.shake .dots{animation:none}}
 /* 小票照片附页 */
-.a4 .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.a4 figure{margin:0;border:1px solid #D6DFDB;border-radius:8px;padding:8px;break-inside:avoid}
-.a4 figure img{display:block;width:100%;height:300px;object-fit:contain;background:#F4F6F5}
-.a4 figcaption{font-size:11px;color:#3A4642;margin-top:6px}
-.a4 .dsum{margin-top:12px;width:auto;min-width:50%}
 .fxwarn{color:var(--warn);font-weight:600}
 .sugs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0 0;font-weight:400}
 .sugs button{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 11px;font-size:13px;max-width:70vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -293,16 +312,8 @@ body.calc-open main.wrap{padding-bottom:360px}
   body>*:not(#print-root){display:none!important}
   #calc,#lock{display:none!important}
   #print-root{display:block!important}
-  .a4{min-width:0;padding:0;font-size:10.5pt}
-  .a4 tr{break-inside:avoid}
-  .a4+.a4{break-before:page;margin-top:0;border-top:0}
-  .a4 td.who{min-width:150px}
-  .a4 td.n.orig{white-space:normal;min-width:90px}
-  .a4 .o2,.a4 td.ty,.a4 th{white-space:normal}
-  .a4 td.ty{min-width:4.6em}
-  .a4 td,.a4 th{padding:4px 4px}
-  .a4 td.n{white-space:nowrap}
-  .a4 thead{display:table-header-group}
+  .a4{width:auto;padding:0;margin:0}
+  .a4+.a4{break-before:page}
 }
 </style>
 
@@ -421,7 +432,9 @@ const TK={
  '没有弹出打印窗口？请用浏览器菜单里的「打印」，或「复制为表格」':'Çap penjiresi açylmadymy? Brauzeriň menýusyndaky «Çap» ulanyň ýa-da «Tablisa hökmünde göçür».',
  '餐饮':'Nahar','交通':'Ulag','住宿':'Ýaşaýyş','门票':'Bilet','通讯':'Aragatnaşyk','购物':'Söwda','杂费':'Beýlekiler','其他':'Beýleki',
  '编号':'Belgi','金额':'Möçber','参与人/分摊':'Gatnaşyjylar / paýy','垫付人':'Tölän adam','照片数':'Surat sany','折合':'Hasabynda ',
- '语言':'Dil','分享 PDF':'PDF paýlaş','分享备份文件':'Ätiýaçlyk faýlyny paýlaş','分享 CSV':'CSV paýlaş','正在生成 PDF…':'PDF taýýarlanýar…',
+ '语言':'Dil','存入':'Goýum','换币':'Çalyşma','共同':'Umumy','存入钱袋':'Gapjyga goýum','按人汇总':'Agzalar boýunça jemi','成员 / 来源':'Agza / çeşme',
+ '余额 = 投入 − 花费':'Galyndy = goýan − sarp edilen','成员账单':'Agzalaryň hasabatlary','只列每人分摊到的花费':'Diňe her kime düşen çykdajylar','本人签字':'Agzanyň goly',
+ '份额（原币）':'Paýy (asyl)','（外部来源）':' (daşky çeşme)','分享 PDF':'PDF paýlaş','分享备份文件':'Ätiýaçlyk faýlyny paýlaş','分享 CSV':'CSV paýlaş','正在生成 PDF…':'PDF taýýarlanýar…',
  'PDF 生成失败，已打开打印界面，请选「另存为 PDF」':'PDF döredip bolmady; çap penjiresi açyldy, «PDF edip sakla» saýlaň','分享':'Paýlaş',
  '网页版：点「打印 / 存为 PDF」，选「另存为 PDF」后，从文件里分享。':'Web wersiýa: «Çap et / PDF sakla» basyň, «PDF edip sakla» saýlaň, soň faýly paýlaşyň.','基准':'Esasy','汇率统一按「1 美元 = 多少该货币」填写。用于外币直接入钱、或账户没有成本时的折算；换汇后自动用实际成本。默认值只是参考，请按实际修改。':'Kurslar «1 ABŞ dollary = näçe şol walýuta» görnüşinde ýazylýar. Daşary ýurt walýutasy göni goşulanda ýa-da hasapda gymmat ýok mahaly ulanylýar; walýuta çalşylandan soň hakyky gymmat awtomatik ulanylýar. Başdaky bahalar diňe salgylanma, hakykysyna görä üýtgediň.',
  '上次汇率':'Öňki kurs','参考汇率':'Salgylanma kursy','完成':'Taýýar',
@@ -1040,47 +1053,80 @@ function stmtParts(t,d){
   return [d];
 }
 function reportDays(t,d){return [...new Set(live(t).map(x=>x.time.slice(0,10)))].filter(x=>(!d.from||x>=d.from)&&(!d.to||x<=d.to)).sort()}
-function dayExtra(t,day){
-  const rows=t.members.map(m=>[m.name,stmtData(t,{scope:'m:'+m.id,from:day,to:day}).totOut]);
-  return `<table class="dsum"><thead><tr><th>当天每人花费</th><th class="n">金额</th></tr></thead><tbody>${rows.map(([n,v])=>`<tr><td>${esc(n)}</td><td class="n out">${v?money(v,t.base):'—'}</td></tr>`).join('')}<tr class="close"><td>合计</td><td class="n out">${money(sum(rows.map(r=>r[1])),t.base)}</td></tr></tbody></table>`;
+const a4Tag=x=>x.type==='deposit'?(x.src==='ext'?['t-in','外部入钱']:['t-in','存入']):x.type==='exchange'?['t-fx','换币']:x.kind==='personal'?['t-me','个人']:['t-sh','共同'];
+function a4Desc(x,tag){
+  let main,rest;
+  if(x.type==='expense'){main=x.category||'';rest=[x.note,x.place]}
+  else{main=x.note||(x.type==='exchange'?'钱袋内换汇':'存入钱袋');rest=[x.place]}
+  rest=rest.filter(Boolean);const [c,l]=a4Tag(x);
+  return `${tag?`<span class="tag ${c}">${l}</span>`:''}${esc(main)}${rest.length?`<span class="m2"> · ${esc(rest.join(' · '))}</span>`:''}${x.photos?.length?` <span class="pic">[图${x.photos.length}]</span>`:''}`;
+}
+const a4When=tm=>`<b>${tm.slice(8,10)}.${tm.slice(5,7)}</b><span>${hm(tm)}</span>`;
+const a4Orig=r=>`${esc(r.orig)}${r.orig2?`<span class="o2">${esc(r.orig2)}</span>`:''}`;
+function a4Range(t,d){if(d.day)return '';if(!d.from&&!d.to)return dateRange(t);if(d.from&&d.from===d.to)return dayLabel(d.from);return `${d.from?dayLabel(d.from):'开始'} 至 ${d.to?dayLabel(d.to):'现在'}`}
+function a4Head(t,title,d,unit,meta){
+  const n=nowLocal();
+  return `<div class="hd"><div><h1>${esc(t.name)}</h1><div class="sub">${esc(title)}${a4Range(t,d)?` · ${esc(a4Range(t,d))}`:''} · ${cname(unit)} (${unit})</div></div><div class="meta">出差钱袋<br>打印时间 ${n.slice(8,10)}.${n.slice(5,7)}.${n.slice(0,4)} ${n.slice(11)}${meta?'<br>'+meta:''}</div></div>`;
+}
+const a4Sig=()=>`<div class="sig"><span>记账人</span><span>核对人</span><span>日期</span></div>`;
+function poolTable(s,d){const u=s.unit;
+  return `<table><colgroup><col style="width:5mm"><col style="width:12mm"><col><col style="width:34mm"><col style="width:26mm"><col style="width:19mm"><col style="width:19mm"><col style="width:20mm"></colgroup>
+  <thead><tr><th>#</th><th>时间</th><th>摘要（类别 · 备注 · 地点）</th><th>相关人</th><th class="n">原币金额</th><th class="n">入</th><th class="n">出</th><th class="n">余额</th></tr></thead><tbody>
+  ${d.from?`<tr class="open"><td></td><td colspan="6">期初余额</td><td class="n">${money(s.open,u)}</td></tr>`:''}
+  ${s.rows.map((r,k)=>`<tr><td class="i">${k+1}</td><td class="w">${a4When(r.time)}</td><td>${a4Desc(r.x,true)}</td><td class="who">${esc(r.who)}</td><td class="n">${a4Orig(r)}</td><td class="n in">${r.inn?money(r.inn,u):''}</td><td class="n out">${r.out?money(r.out,u):''}</td><td class="n">${money(r.bal,u)}</td></tr>`).join('')||`<tr><td colspan="8" class="none">这段时间没有记录</td></tr>`}
+  <tr class="tot"><td></td><td colspan="4">合计</td><td class="n in">${money(s.totIn,u)}</td><td class="n out">${money(s.totOut,u)}</td><td class="n">${money(s.close,u)}</td></tr></tbody></table>`;
+}
+function memberTable(s){const u=s.unit;const sp=s.rows.filter(r=>r.out>0);let cum=0;sp.forEach(r=>{cum+=r.out;r.cum=cum});
+  return `<table><colgroup><col style="width:5mm"><col style="width:12mm"><col><col style="width:36mm"><col style="width:21mm"><col style="width:21mm"></colgroup>
+  <thead><tr><th>#</th><th>时间</th><th>摘要（类别 · 备注 · 地点）</th><th class="n">份额（原币）</th><th class="n">花费</th><th class="n">累计花费</th></tr></thead><tbody>
+  ${sp.map((r,k)=>`<tr><td class="i">${k+1}</td><td class="w">${a4When(r.time)}</td><td>${a4Desc(r.x,r.x.kind==='personal')}</td><td class="n">${a4Orig(r)}</td><td class="n out">${money(r.out,u)}</td><td class="n">${money(r.cum,u)}</td></tr>`).join('')||`<tr><td colspan="6" class="none">这段时间没有花费</td></tr>`}
+  ${sp.length?`<tr class="tot"><td></td><td colspan="3">花费合计</td><td class="n out">${money(s.totOut,u)}</td><td class="n">${money(cum,u)}</td></tr>`:''}</tbody></table>`;
+}
+function memberBlock(t,d,id){const s=stmtData(t,{...d,scope:'m:'+id}),u=s.unit;
+  return `<div class="mem"><div class="mh"><b>${esc(mName(t,id))}</b><span>投入 <i>${money(s.totIn,u)}</i></span><span>花费 <i>${money(s.totOut,u)}</i></span><span>余额 <i>${money(s.close,u,true)}</i></span></div>${memberTable(s)}<div class="mf">本人签字：____________________</div></div>`;
+}
+function sumTable(t,d){const u=t.base;
+  const ms=t.members.map(m=>{const s=stmtData(t,{...d,scope:'m:'+m.id});return [m.name,s.totIn,s.totOut,s.close]});
+  const ext={};stmtData(t,{...d,scope:'pool'}).rows.forEach(r=>{if(r.x.src==='ext'){const k=r.x.srcName||'外部来源';ext[k]=(ext[k]||0)+r.inn}});
+  return `<div class="h2"><h2>按人汇总</h2><span>余额 = 投入 − 花费</span></div><table><colgroup><col><col style="width:30mm"><col style="width:30mm"><col style="width:30mm"></colgroup>
+  <thead><tr><th>成员 / 来源</th><th class="n">投入</th><th class="n">花费</th><th class="n">余额</th></tr></thead><tbody>
+  ${ms.map(([n,a,b,c])=>`<tr><td>${esc(n)}</td><td class="n">${money(a,u)}</td><td class="n out">${b?money(b,u):''}</td><td class="n ${c<0?'out':'in'}">${money(c,u,true)}</td></tr>`).join('')}
+  ${Object.entries(ext).map(([k,v])=>`<tr><td>${esc(k)} <span class="m2">（外部来源）</span></td><td class="n in">${money(v,u)}</td><td class="n"></td><td class="n in">${money(v,u,true)}</td></tr>`).join('')}</tbody></table>`;
+}
+function docPool(t,d,withMembers){
+  const s=stmtData(t,d),u=s.unit;
+  let h=`<div class="a4">${a4Head(t,d.title||s.title,d,u,`${s.rows.length} 笔 · ${t.members.length} 人`)}
+  <div class="kpi"><div><span>期初余额</span><b>${money(s.open,u)}</b></div><div><span>入 合计</span><b class="in">${money(s.totIn,u)}</b></div><div><span>出 合计</span><b class="out">${money(s.totOut,u)}</b></div><div><span>期末余额</span><b>${money(s.close,u)}</b></div></div>
+  ${poolTable(s,d)}
+  ${(d.scope||'pool').startsWith('cur:')?'':`<div class="fine">外币按换汇实际成本折算为${cname(t.base)}。换汇只是钱袋内部换币，不计入、出。</div>`}`;
+  if(withMembers||d.day)h+=sumTable(t,d);
+  if(withMembers){const bl=t.members.map(m=>memberBlock(t,d,m.id));h+=`<div class="keep"><div class="h2"><h2>成员账单</h2><span>只列每人分摊到的花费</span></div>${bl.shift()||''}</div>`+bl.join('')}
+  return h+a4Sig()+'</div>';
+}
+function docMember(t,d){
+  const s=stmtData(t,d),u=s.unit,n=s.rows.filter(r=>r.out>0).length;
+  return `<div class="a4">${a4Head(t,s.title,d,u,`${n} 笔`)}
+  <div class="kpi"><div><span>${d.from?'期初余额':'投入合计'}</span><b>${money(d.from?s.open:s.totIn,u)}</b></div><div><span>${d.from?'本期投入':'花费笔数'}</span><b>${d.from?money(s.totIn,u):n}</b></div><div><span>花费合计</span><b class="out">${money(s.totOut,u)}</b></div><div><span>余额</span><b class="${s.close<0?'out':'in'}">${money(s.close,u,true)}</b></div></div>
+  ${memberTable(s)}
+  <div class="fine">外币按换汇实际成本折算为${cname(t.base)}。只列出本人分摊到的花费；存入和垫付只计入上方「投入合计」。余额 = 投入 − 花费。</div>
+  <div class="mf">本人签字：____________________</div>${a4Sig()}</div>`;
 }
 function photoPages(t,parts){
   const seen=new Set(),items=[];
   for(const p of parts){const sd=stmtData(t,p);for(const r of sd.rows){if(!r.x.photos?.length||seen.has(r.x.id))continue;if(sd.member&&!(r.out>0))continue;seen.add(r.x.id);
-    r.x.photos.forEach((ph,k)=>items.push({ph,cap:`${r.time.slice(5,10).replace('-','/')} ${hm(r.time)} · ${r.desc||txTitle(t,r.x)} · ${r.orig||money(r.x.amount||0,r.x.cur||t.base)}${r.x.photos.length>1?` · ${k+1}/${r.x.photos.length}`:''}`}))}}
-  if(!items.length)return `<div class="a4"><div class="h"><div><h1>${esc(t.name)} · 小票照片</h1></div></div><div class="fine">这些记录没有照片。</div></div>`;
+    r.x.photos.forEach((ph,k)=>items.push({ph,cap:`${r.time.slice(8,10)}.${r.time.slice(5,7)} ${hm(r.time)} · ${[r.desc||txTitle(t,r.x)].join('')} · ${r.orig||money(r.x.amount||0,r.x.cur||t.base)}${r.x.photos.length>1?` · ${k+1}/${r.x.photos.length}`:''}`}))}}
+  if(!items.length)return `<div class="a4"><div class="hd"><div><h1>${esc(t.name)}</h1><div class="sub">小票照片</div></div></div><div class="fine">这些记录没有照片。</div></div>`;
   const pages=[];for(let i=0;i<items.length;i+=4)pages.push(items.slice(i,i+4));
-  return pages.map((pg,n)=>`<div class="a4"><div class="h"><div><h1>${esc(t.name)} · 小票照片</h1></div><div class="meta">${n+1} / ${pages.length}</div></div><div class="pgrid">${pg.map(it=>`<figure><img data-photo="${it.ph}" alt="小票"><figcaption>${esc(it.cap)}</figcaption></figure>`).join('')}</div></div>`).join('');
+  return pages.map((pg,n)=>`<div class="a4"><div class="hd"><div><h1>${esc(t.name)}</h1><div class="sub">小票照片</div></div><div class="meta">${n+1} / ${pages.length}</div></div><div class="pgrid">${pg.map(it=>`<figure><img data-photo="${it.ph}" alt="小票"><figcaption>${esc(it.cap)}</figcaption></figure>`).join('')}</div></div>`).join('');
 }
 function stmtHTML(t,d){
-  const parts=stmtParts(t,d);
-  let h=parts.map(x=>stmtOne(t,x.day?{...x,extra:dayExtra(t,x.day)}:x)).join('')||`<div class="a4"><div class="fine">这段时间没有记录</div></div>`;
-  if(d.withPhotos)h+=photoPages(t,parts);
+  let h;
+  if(d.scope==='all')h=docPool(t,{...d,scope:'pool'},true);
+  else if(d.scope==='days')h=reportDays(t,d).map(day=>docPool(t,{...d,scope:'pool',from:day,to:day,title:'日报 · '+dayLabel(day),day},false)).join('')||`<div class="a4"><div class="fine">这段时间没有记录</div></div>`;
+  else if((d.scope||'').startsWith('m:'))h=docMember(t,d);
+  else h=docPool(t,d,false);
+  if(d.withPhotos)h+=photoPages(t,stmtParts(t,d));
   return h;
-}
-function stmtOne(t,d){
-  const s=stmtData(t,d),u=s.unit,who=!s.member,cols=who?9:8;
-  const range=(d.from||d.to)?`${d.from||'开始'} 至 ${d.to||'现在'}`:dateRange(t);
-  if(s.member)return memberStmt(t,d,s,range);
-  return `<div class="a4"><div class="h"><div><h1>${esc(t.name)} · ${esc(d.title||s.title)}</h1><div style="font-size:11px;color:#55635E">期间 ${esc(range)} · 金额单位 ${u} ${cname(u)}</div></div><div class="meta">出差钱袋<br>打印时间 ${nowLocal().replace('T',' ')}</div></div>
-  <div class="sum"><div><span>期初余额</span><b>${money(s.open,u)}</b></div><div><span>入 合计</span><b>${money(s.totIn,u)}</b></div><div><span>出 合计</span><b>${money(s.totOut,u)}</b></div><div><span>期末余额</span><b>${money(s.close,u)}</b></div></div>
-  <table><thead><tr><th>#</th><th>时间</th><th>类型</th><th>摘要（类别 · 备注 · 地点）</th>${who?'<th>相关人</th>':''}<th class="n">原币金额</th><th class="n">入</th><th class="n">出</th><th class="n">余额</th></tr></thead><tbody>
-  ${d.from?`<tr class="open"><td></td><td colspan="${cols-2}">期初余额</td><td class="n">${money(s.open,u)}</td></tr>`:''}
-  ${s.rows.map((r,k)=>`<tr><td>${k+1}</td><td class="t">${r.time.slice(5,10).replace('-','/')} ${hm(r.time)}</td><td class="ty">${esc(r.type)}</td><td>${esc(r.desc)}${r.x.photos?.length?` <span style="color:#8A6A2A">[图${r.x.photos.length}]</span>`:''}</td>${who?`<td class="who">${esc(r.who)}</td>`:''}<td class="n orig">${esc(r.orig)}${r.orig2?`<div class="o2">${esc(r.orig2)}</div>`:''}</td><td class="n in">${r.inn?money(r.inn,u):''}</td><td class="n out">${r.out?money(r.out,u):''}</td><td class="n">${money(r.bal,u)}</td></tr>`).join('')||`<tr><td colspan="${cols}" style="text-align:center;color:#888;padding:16px">这段时间没有记录</td></tr>`}
-  <tr class="close"><td></td><td colspan="${cols-4}">合计</td><td class="n in">${money(s.totIn,u)}</td><td class="n out">${money(s.totOut,u)}</td><td class="n">${money(s.close,u)}</td></tr></tbody></table>
-  ${(d.scope||'pool').startsWith('cur:')?'':`<div class="fine">外币按换汇实际成本折算为${cname(t.base)}。${s.member?'入 = 本人存入和垫付；出 = 本人分摊到的支出。':'换汇只是钱袋内部换币，不计入、出。'}</div>`}
-  ${d.extra||''}<div class="foot"><span>记账人</span><span>核对人</span><span>日期</span></div></div>`;
-}
-/* 成员账单：只逐笔列出花费；存入、垫付只算进顶部合计 */
-function memberStmt(t,d,s,range){
-  const u=s.unit;const spend=s.rows.filter(r=>r.out>0);let cum=0;spend.forEach(r=>{cum+=r.out;r.cum=cum});
-  return `<div class="a4"><div class="h"><div><h1>${esc(t.name)} · ${esc(d.title||s.title)}</h1><div style="font-size:11px;color:#55635E">期间 ${esc(range)} · 金额单位 ${u} ${cname(u)}</div></div><div class="meta">出差钱袋<br>打印时间 ${nowLocal().replace('T',' ')}</div></div>
-  <div class="sum"><div><span>${d.from?'期初余额':'投入合计'}</span><b>${money(d.from?s.open:s.totIn,u)}</b></div><div><span>${d.from?'本期投入':'花费笔数'}</span><b>${d.from?money(s.totIn,u):spend.length}</b></div><div><span>花费合计</span><b>${money(s.totOut,u)}</b></div><div><span>余额</span><b>${money(s.close,u)}</b></div></div>
-  <table><thead><tr><th>#</th><th>时间</th><th>类型</th><th>摘要（类别 · 备注 · 地点）</th><th class="n">原币金额</th><th class="n">花费</th><th class="n">累计花费</th></tr></thead><tbody>
-  ${spend.map((r,k)=>`<tr><td>${k+1}</td><td class="t">${r.time.slice(5,10).replace('-','/')} ${hm(r.time)}</td><td class="ty">${esc(r.type)}</td><td>${esc(r.desc)}${r.x.photos?.length?` <span style="color:#8A6A2A">[图${r.x.photos.length}]</span>`:''}</td><td class="n orig">${esc(r.orig)}${r.orig2?`<div class="o2">${esc(r.orig2)}</div>`:''}</td><td class="n out">${money(r.out,u)}</td><td class="n">${money(r.cum,u)}</td></tr>`).join('')||`<tr><td colspan="7" style="text-align:center;color:#888;padding:16px">这段时间没有花费</td></tr>`}
-  <tr class="close"><td></td><td colspan="4">花费合计</td><td class="n out">${money(s.totOut,u)}</td><td class="n">${money(cum,u)}</td></tr></tbody></table>
-  <div class="fine">外币按换汇实际成本折算为${cname(t.base)}。只列出本人分摊到的花费；存入和垫付只计入上方「投入合计」。余额 = 投入 − 花费。</div>
-  <div class="foot"><span>记账人</span><span>核对人</span><span>日期</span></div></div>`;
 }
 function stmtTSV(t,d){
   if(d.scope==='all'||d.scope==='days')return stmtParts(t,d).map(x=>stmtTSV(t,{...x,scope:x.scope})).join('\n\n');
