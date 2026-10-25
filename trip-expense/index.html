@@ -378,7 +378,8 @@ const TK={
  '没有弹出打印窗口？请用浏览器菜单里的「打印」，或「复制为表格」':'Çap penjiresi açylmadymy? Brauzeriň menýusyndaky «Çap» ulanyň ýa-da «Tablisa hökmünde göçür».',
  '餐饮':'Nahar','交通':'Ulag','住宿':'Ýaşaýyş','门票':'Bilet','通讯':'Aragatnaşyk','购物':'Söwda','杂费':'Beýlekiler','其他':'Beýleki',
  '编号':'Belgi','金额':'Möçber','参与人/分摊':'Gatnaşyjylar / paýy','垫付人':'Tölän adam','照片数':'Surat sany','折合':'Hasabynda ',
- '语言':'Dil','钱袋总账 + 全部成员账单':'Umumy hasabat + ähli agzalaryň hasabatlary','钱袋内换汇':'Gapjygyň içinde çalyşmak','个人账单':'şahsy hasabat'
+ '语言':'Dil','累计花费':'Jemi sarp edilen','花费合计':'Sarp edilen jemi','投入合计':'Goýan jemi','本期投入':'Döwürde goýan','花费笔数':'Çykdajy sany','花费':'Sarp edilen','这段时间没有花费':'Bu döwürde çykdajy ýok',
+ '外币按换汇实际成本折算为':'Daşary ýurt walýutasy hakyky çalyşma gymmaty boýunça hasaplanýar: ','只列出本人分摊到的花费；存入和垫付只计入上方「投入合计」。余额 = 投入 − 花费。':'Diňe özüne düşen çykdajylar görkezilýär; goýan we tölän pullary diňe ýokardaky «Goýan jemi» hasaplanýar. Galyndy = goýan − sarp edilen.','钱袋总账 + 全部成员账单':'Umumy hasabat + ähli agzalaryň hasabatlary','钱袋内换汇':'Gapjygyň içinde çalyşmak','个人账单':'şahsy hasabat'
 };
 const TKP=[
  [/^共 (\d+) 笔 · 支出合计$/,'Jemi $1 ýazgy · çykdajy jemi'],
@@ -958,6 +959,7 @@ function stmtHTML(t,d){
 function stmtOne(t,d){
   const s=stmtData(t,d),u=s.unit,who=!s.member,cols=who?9:8;
   const range=(d.from||d.to)?`${d.from||'开始'} 至 ${d.to||'现在'}`:dateRange(t);
+  if(s.member)return memberStmt(t,d,s,range);
   return `<div class="a4"><div class="h"><div><h1>${esc(t.name)} · ${esc(s.title)}</h1><div style="font-size:11px;color:#55635E">期间 ${esc(range)} · 金额单位 ${u} ${cname(u)}</div></div><div class="meta">出差钱袋<br>打印时间 ${nowLocal().replace('T',' ')}</div></div>
   <div class="sum"><div><span>期初余额</span><b>${money(s.open,u)}</b></div><div><span>入 合计</span><b>${money(s.totIn,u)}</b></div><div><span>出 合计</span><b>${money(s.totOut,u)}</b></div><div><span>期末余额</span><b>${money(s.close,u)}</b></div></div>
   <table><thead><tr><th>#</th><th>时间</th><th>类型</th><th>摘要（类别 · 备注 · 地点）</th>${who?'<th>相关人</th>':''}<th class="n">原币金额</th><th class="n">入</th><th class="n">出</th><th class="n">余额</th></tr></thead><tbody>
@@ -967,9 +969,24 @@ function stmtOne(t,d){
   ${(d.scope||'pool').startsWith('cur:')?'':`<div class="fine">外币按换汇实际成本折算为${cname(t.base)}。${s.member?'入 = 本人存入和垫付；出 = 本人分摊到的支出。':'换汇只是钱袋内部换币，不计入、出。'}</div>`}
   <div class="foot"><span>记账人</span><span>核对人</span><span>日期</span></div></div>`;
 }
+/* 成员账单：只逐笔列出花费；存入、垫付只算进顶部合计 */
+function memberStmt(t,d,s,range){
+  const u=s.unit;const spend=s.rows.filter(r=>r.out>0);let cum=0;spend.forEach(r=>{cum+=r.out;r.cum=cum});
+  return `<div class="a4"><div class="h"><div><h1>${esc(t.name)} · ${esc(s.title)}</h1><div style="font-size:11px;color:#55635E">期间 ${esc(range)} · 金额单位 ${u} ${cname(u)}</div></div><div class="meta">出差钱袋<br>打印时间 ${nowLocal().replace('T',' ')}</div></div>
+  <div class="sum"><div><span>${d.from?'期初余额':'投入合计'}</span><b>${money(d.from?s.open:s.totIn,u)}</b></div><div><span>${d.from?'本期投入':'花费笔数'}</span><b>${d.from?money(s.totIn,u):spend.length}</b></div><div><span>花费合计</span><b>${money(s.totOut,u)}</b></div><div><span>余额</span><b>${money(s.close,u)}</b></div></div>
+  <table><thead><tr><th>#</th><th>时间</th><th>类型</th><th>摘要（类别 · 备注 · 地点）</th><th class="n">原币金额</th><th class="n">花费</th><th class="n">累计花费</th></tr></thead><tbody>
+  ${spend.map((r,k)=>`<tr><td>${k+1}</td><td class="t">${r.time.slice(5,10).replace('-','/')} ${hm(r.time)}</td><td class="ty">${esc(r.type)}</td><td>${esc(r.desc)}${r.x.photos?.length?` <span style="color:#8A6A2A">[图${r.x.photos.length}]</span>`:''}</td><td class="n orig">${esc(r.orig)}${r.orig2?`<div class="o2">${esc(r.orig2)}</div>`:''}</td><td class="n out">${money(r.out,u)}</td><td class="n">${money(r.cum,u)}</td></tr>`).join('')||`<tr><td colspan="7" style="text-align:center;color:#888;padding:16px">这段时间没有花费</td></tr>`}
+  <tr class="close"><td></td><td colspan="4">花费合计</td><td class="n out">${money(s.totOut,u)}</td><td class="n">${money(cum,u)}</td></tr></tbody></table>
+  <div class="fine">外币按换汇实际成本折算为${cname(t.base)}。只列出本人分摊到的花费；存入和垫付只计入上方「投入合计」。余额 = 投入 − 花费。</div>
+  <div class="foot"><span>记账人</span><span>核对人</span><span>日期</span></div></div>`;
+}
 function stmtTSV(t,d){
   if(d.scope==='all')return [{...d,scope:'pool'},...t.members.map(m=>({...d,scope:'m:'+m.id}))].map(x=>stmtTSV(t,x)).join('\n\n');
-  const s=stmtData(t,d);const rows=[['时间','类型','摘要','相关人','原币金额','入','出','余额'].map(L)];
+  const s=stmtData(t,d);
+  if(s.member){const rows=[['时间','类型','摘要','原币金额','花费','累计花费'].map(L)];let cum=0;
+    s.rows.filter(r=>r.out>0).forEach(r=>{cum+=r.out;rows.push([r.time.replace('T',' '),L(r.type),L(r.desc),r.orig,(r.out/100).toFixed(2),(cum/100).toFixed(2)])});
+    return L(`${t.name} ${s.title}（${s.unit}）投入合计 ${money(s.totIn,s.unit)} · 花费合计 ${money(s.totOut,s.unit)} · 余额 ${money(s.close,s.unit)}`)+'\n'+rows.map(r=>r.map(v=>String(v).replace(/\t|\n/g,' ')).join('\t')).join('\n')}
+  const rows=[['时间','类型','摘要','相关人','原币金额','入','出','余额'].map(L)];
   s.rows.forEach(r=>rows.push([r.time.replace('T',' '),L(r.type),L(r.desc),r.who,r.orig,r.inn?(r.inn/100).toFixed(2):'',r.out?(r.out/100).toFixed(2):'',(r.bal/100).toFixed(2)]));
   return L(`${t.name} ${s.title}（${s.unit}）`)+'\n'+rows.map(r=>r.map(v=>String(v).replace(/\t|\n/g,' ')).join('\t')).join('\n')}
 SHEETS.stmt=d=>{
