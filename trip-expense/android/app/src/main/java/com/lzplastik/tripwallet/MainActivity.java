@@ -10,6 +10,9 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CancellationSignal;
+import android.hardware.biometrics.BiometricManager;
+import android.hardware.biometrics.BiometricPrompt;
 import android.os.Environment;
 import android.print.PrintAttributes;
 import android.print.PrintManager;
@@ -153,11 +156,42 @@ public class MainActivity extends Activity {
         });
     }
 
+    private void bioReply(boolean ok) {
+        web.evaluateJavascript("window.__bio&&window.__bio(" + ok + ")", null);
+    }
+
     private class Bridge {
         @JavascriptInterface
         public void copy(String text) {
             ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             if (cm != null) cm.setPrimaryClip(ClipData.newPlainText("出差钱袋", text));
+        }
+
+        /** 设备是否可以用指纹（Android 10 及以上）。 */
+        @JavascriptInterface
+        public boolean hasBiometric() {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return false;
+            BiometricManager bm = getSystemService(BiometricManager.class);
+            return bm != null && bm.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS;
+        }
+
+        /** 弹出系统指纹验证，结果回调网页里的 window.__bio(true/false)。 */
+        @JavascriptInterface
+        public void biometric(String title, String cancel) {
+            runOnUiThread(() -> {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) { bioReply(false); return; }
+                BiometricPrompt prompt = new BiometricPrompt.Builder(MainActivity.this)
+                        .setTitle(title)
+                        .setNegativeButton(cancel, getMainExecutor(), (d, w) -> bioReply(false))
+                        .build();
+                prompt.authenticate(new CancellationSignal(), getMainExecutor(), new BiometricPrompt.AuthenticationCallback() {
+                    @Override
+                    public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) { bioReply(true); }
+
+                    @Override
+                    public void onAuthenticationError(int code, CharSequence msg) { bioReply(false); }
+                });
+            });
         }
 
         /** 打开系统打印（A4），可选打印机或「另存为 PDF」。 */

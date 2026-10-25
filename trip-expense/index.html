@@ -246,12 +246,49 @@ h4{margin:0 0 8px;font-size:15px}
 .a4 .foot span{flex:1;border-top:1px solid #8A9692;padding-top:4px}
 .a4 .fine{margin-top:10px;font-size:10px;color:#7A8682}
 #print-root{display:none}
+/* 计算器键盘 */
+#calc{position:fixed;left:0;right:0;bottom:0;z-index:35;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -12px 30px -12px rgba(0,0,0,.35);padding:8px max(10px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px))}
+#calc .in-wrap{max-width:560px;margin:0 auto}
+#calc .disp{display:flex;align-items:center;gap:10px;padding:4px 4px 8px}
+#calc .expr{flex:1;min-width:0;font-family:var(--f-display);font-size:15px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
+#calc .res{font-family:var(--f-display);font-size:22px;font-weight:700;white-space:nowrap}
+#calc .done{border:0;border-radius:12px;padding:9px 16px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--g3),var(--g2))}
+#calc .keys{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+#calc .keys button{border:0;border-radius:12px;padding:13px 0;font-size:21px;font-family:var(--f-display);font-weight:600;background:var(--surface2);color:var(--ink);touch-action:manipulation}
+#calc .keys button.op{background:var(--accent-soft);color:var(--accent)}
+#calc .keys button.eq{background:linear-gradient(135deg,var(--accent-2),var(--accent));color:#fff}
+#calc .keys button:active{filter:brightness(.92)}
+body.calc-open .sheet{padding-bottom:330px}
+body.calc-open main.wrap{padding-bottom:360px}
+/* 密码锁 */
+#lock{position:fixed;inset:0;z-index:90;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));color:var(--on-hero);
+  background:radial-gradient(110% 70% at 100% 0%,var(--glow),transparent 55%),linear-gradient(160deg,var(--g1),var(--g2) 60%,var(--g3))}
+#lock h2{margin:0;font-family:var(--f-display);font-size:22px}
+#lock .dots{display:flex;gap:14px;height:16px}
+#lock .dots i{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.7)}
+#lock .dots i.on{background:#F1DDB0;border-color:#F1DDB0}
+#lock .msg{min-height:20px;font-size:14px;color:#FFD2C8}
+#lock .pad{display:grid;grid-template-columns:repeat(3,76px);gap:14px}
+#lock .pad button{height:76px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;font-size:26px;font-family:var(--f-display)}
+#lock .pad button.t{font-size:14px;border:0;background:none}
+#lock .lk-link{background:none;border:0;color:rgba(255,255,255,.8);font-size:13px;text-decoration:underline}
+#lock.shake .dots{animation:shk .35s}
+@keyframes shk{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@media (prefers-reduced-motion:reduce){#lock.shake .dots{animation:none}}
+/* 小票照片附页 */
+.a4 .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.a4 figure{margin:0;border:1px solid #D6DFDB;border-radius:8px;padding:8px;break-inside:avoid}
+.a4 figure img{display:block;width:100%;height:300px;object-fit:contain;background:#F4F6F5}
+.a4 figcaption{font-size:11px;color:#3A4642;margin-top:6px}
+.a4 .dsum{margin-top:12px;width:auto;min-width:50%}
+.fxwarn{color:var(--warn);font-weight:600}
 @media print{
   @page{size:A4;margin:12mm}
   :root{padding:0!important}
   html,body{background:#fff!important;height:auto}
   body::before{display:none}
   body>*:not(#print-root){display:none!important}
+  #calc,#lock{display:none!important}
   #print-root{display:block!important}
   .a4{min-width:0;padding:0;font-size:10.5pt}
   .a4 tr{break-inside:avoid}
@@ -259,6 +296,7 @@ h4{margin:0 0 8px;font-size:15px}
   .a4 td.who{min-width:150px}
   .a4 td.n.orig{white-space:normal;min-width:90px}
   .a4 .o2,.a4 td.ty,.a4 th{white-space:normal}
+  .a4 td.ty{min-width:4.6em}
   .a4 td,.a4 th{padding:4px 4px}
   .a4 td.n{white-space:nowrap}
   .a4 thead{display:table-header-group}
@@ -271,6 +309,8 @@ h4{margin:0 0 8px;font-size:15px}
 <nav class="tabbar"><div class="wrap" id="tabs"></div></nav>
 <div id="sheets"></div>
 <div id="print-root"></div>
+<div id="calc" hidden></div>
+<div id="lock" hidden></div>
 
 <script>
 (()=>{
@@ -378,7 +418,18 @@ const TK={
  '没有弹出打印窗口？请用浏览器菜单里的「打印」，或「复制为表格」':'Çap penjiresi açylmadymy? Brauzeriň menýusyndaky «Çap» ulanyň ýa-da «Tablisa hökmünde göçür».',
  '餐饮':'Nahar','交通':'Ulag','住宿':'Ýaşaýyş','门票':'Bilet','通讯':'Aragatnaşyk','购物':'Söwda','杂费':'Beýlekiler','其他':'Beýleki',
  '编号':'Belgi','金额':'Möçber','参与人/分摊':'Gatnaşyjylar / paýy','垫付人':'Tölän adam','照片数':'Surat sany','折合':'Hasabynda ',
- '语言':'Dil','累计花费':'Jemi sarp edilen','花费合计':'Sarp edilen jemi','投入合计':'Goýan jemi','本期投入':'Döwürde goýan','花费笔数':'Çykdajy sany','花费':'Sarp edilen','这段时间没有花费':'Bu döwürde çykdajy ýok',
+ '语言':'Dil','基准':'Esasy','汇率统一按「1 美元 = 多少该货币」填写。用于外币直接入钱、或账户没有成本时的折算；换汇后自动用实际成本。默认值只是参考，请按实际修改。':'Kurslar «1 ABŞ dollary = näçe şol walýuta» görnüşinde ýazylýar. Daşary ýurt walýutasy göni goşulanda ýa-da hasapda gymmat ýok mahaly ulanylýar; walýuta çalşylandan soň hakyky gymmat awtomatik ulanylýar. Başdaky bahalar diňe salgylanma, hakykysyna görä üýtgediň.',
+ '上次汇率':'Öňki kurs','参考汇率':'Salgylanma kursy','完成':'Taýýar',
+ '应用密码锁':'Programmanyň paroly','修改密码':'Paroly üýtget','关闭密码锁':'Paroly öçür','再点一次：关闭密码锁':'Ýene basyň: parol öçüriler','用指纹解锁':'Barmak yzy bilen açmak',
+ '离开 APP 超过 1 分钟再回来，需要重新输入密码。':'Programmadan 1 minutdan köp çyksaňyz, paroly täzeden girizmeli bolarsyňyz.','设置密码':'Parol goý',
+ '新密码（4–6 位数字）':'Täze parol (4–6 san)','再输一次':'Ýene bir gezek','同时允许指纹解锁':'Barmak yzy bilen hem açmaga rugsat ber',
+ '密码忘了无法找回，只能卸载重装后用备份恢复。设置前建议先备份。':'Parol ýatdan çyksa dikeldip bolmaýar; diňe programmany täzeden gurup, ätiýaçlykdan dikeltmeli. Parol goýmazdan öň ätiýaçlyk nusga alyň.',
+ '保存密码':'Paroly sakla','密码要 4–6 位数字':'Parol 4–6 sandan ybarat bolmaly','两次输入的密码不一样':'Iki parol gabat gelmeýär','密码锁已开启':'Parol açyldy','密码锁已关闭':'Parol öçürildi',
+ '还没有备份过。':'Heniz ätiýaçlyk nusga alnanok. ','手机丢了或清理数据，账就没了。':'Telefon ýitse ýa-da maglumatlar arassalansa, hasaplar ýiter.','去备份':'Ätiýaçlyk al',
+ '按天日报（每天一张）':'Gündelik hasabat (her gün bir sahypa)','当天每人花费':'Şol gün her kimiň çykdajysy','日报':'Gündelik hasabat',
+ '把小票照片附在账单后面（每页 4 张）':'Çek suratlaryny hasabatyň yzyna goş (sahypada 4 sany)','小票照片':'Çek suratlary','这些记录没有照片。':'Bu ýazgylaryň suraty ýok.','小票':'Çek',
+ '打开 APP 要先输入数字密码':'Programma açylanda san parol soralar','（安卓可用指纹）':' (Android-da barmak yzy hem bolýar)','，防止别人看账。':', başgalar hasaby görmez ýaly.',
+'累计花费':'Jemi sarp edilen','花费合计':'Sarp edilen jemi','投入合计':'Goýan jemi','本期投入':'Döwürde goýan','花费笔数':'Çykdajy sany','花费':'Sarp edilen','这段时间没有花费':'Bu döwürde çykdajy ýok',
  '外币按换汇实际成本折算为':'Daşary ýurt walýutasy hakyky çalyşma gymmaty boýunça hasaplanýar: ','只列出本人分摊到的花费；存入和垫付只计入上方「投入合计」。余额 = 投入 − 花费。':'Diňe özüne düşen çykdajylar görkezilýär; goýan we tölän pullary diňe ýokardaky «Goýan jemi» hasaplanýar. Galyndy = goýan − sarp edilen.','钱袋总账 + 全部成员账单':'Umumy hasabat + ähli agzalaryň hasabatlary','钱袋内换汇':'Gapjygyň içinde çalyşmak','个人账单':'şahsy hasabat'
 };
 const TKP=[
@@ -407,7 +458,11 @@ const TKP=[
  [/^外币按换汇实际成本折算为(.+?)。入 = 本人存入和垫付；出 = 本人分摊到的支出。$/,'Daşary ýurt walýutasy hakyky çalyşma gymmaty boýunça $1 hasaplanýar. Giriş = özüniň goýany we tölänleri; Çykyş = özüne düşen çykdajylar.'],
  [/^外币按换汇实际成本折算为(.+?)。换汇只是钱袋内部换币，不计入、出。$/,'Daşary ýurt walýutasy hakyky çalyşma gymmaty boýunça $1 hasaplanýar. Walýuta çalyşmak diňe gapjygyň içinde, giriş-çykyşa girmeýär.'],
  [/^已添加 (\d+) 张$/,'$1 surat goşuldy'],
- [/^已添加 (\w+)，请填写参考汇率$/,'$1 goşuldy, salgylanma kursuny ýazyň'],
+ [/^已添加 (\w+)，请核对 1 USD 汇率$/,'$1 goşuldy, 1 USD kursuny barlaň'],
+ [/^已经 (\d+) 天没有备份了。/,'Eýýäm $1 gün bäri ätiýaçlyk nusga alnanok. '],
+ [/^与上次汇率相差 (\d+)%，请核对金额是否填错$/,'Öňki kursdan $1% tapawutly, möçberleri barlaň'],
+ [/^与参考汇率相差 (\d+)%，请核对金额是否填错$/,'Salgylanma kursundan $1% tapawutly, möçberleri barlaň'],
+ [/^汇率 1 USD = \? (\w+)$/,'Kurs: 1 USD = ? $1'],
  [/^成员 (\d+)$/,'$1-nji agza'],
  [/^如 (\d+) 胡志明出差$/,'mysal: $1 Aşgabat iş sapary'],
 ];
@@ -464,7 +519,22 @@ function splitAmounts(total,ids,shares,cur){
 const T=()=>S.trips.find(t=>t.id===S.cur)||S.trips[0];
 const live=t=>t.txs.filter(x=>!x.deleted);
 const byTime=(a,b)=>a.time<b.time?-1:a.time>b.time?1:(a.created||0)-(b.created||0);
-const rateOf=(t,c)=>c===t.base?1:(Number(t.currencies.find(x=>x.code===c)?.rate)||1);
+// 参考汇率统一按「1 USD = 多少该货币」保存在 t.usd
+const DEFAULT_USD={USD:1,CNY:7.1,TMT:3.5,INR:84,EUR:0.92,GBP:0.78,JPY:150,KRW:1380,THB:34,HKD:7.8,MOP:8.05,TWD:32,SGD:1.34,MYR:4.4,VND:25000,IDR:15800,PHP:57,LAK:21000,KHR:4100,MMK:2100,AUD:1.5,CAD:1.37,AED:3.67,RUB:95,TRY:34,KZT:480,UZS:12700};
+const usdOf=(t,c)=>c==='USD'?1:(Number(t.usd?.[c])||DEFAULT_USD[c]||1);
+const rateOf=(t,c)=>c===t.base?1:usdOf(t,t.base)/usdOf(t,c);
+function migrateRates(t){
+  if(t.usd)return;
+  const old=c=>Number(t.currencies.find(x=>x.code===c)?.rate)||0;
+  const ub=t.base==='USD'?1:(old('USD')||DEFAULT_USD[t.base]||1);
+  t.usd={USD:1,[t.base]:ub};
+  t.currencies.forEach(c=>{if(c.code!==t.base&&c.code!=='USD'){const r=old(c.code);t.usd[c.code]=r>0?ub/r:(DEFAULT_USD[c.code]||1)}});
+}
+const fmtRate=v=>!isFinite(v)?'—':v>=100?v.toFixed(2):v>=1?v.toFixed(4):v.toPrecision(4);
+// 汇率按 1 USD 显示：b 每 1 a 为 rate
+function fxLine(a,b,rate){if(a==='USD')return `1 USD = ${fmtRate(rate)} ${b}`;if(b==='USD')return `1 USD = ${fmtRate(1/rate)} ${a}`;return `1 ${a} = ${fmtRate(rate)} ${b}`}
+// 入钱时填写的汇率（1 USD = ? 该币；若存的就是 USD，则 1 USD = ? 本位币）→ 每 1 单位折合本位币
+function depRate(t,d){if(d.cur===t.base)return 1;const v=Number(d.rate);if(d.cur==='USD')return v>0?v:usdOf(t,t.base);return usdOf(t,t.base)/(v>0?v:usdOf(t,d.cur))}
 const mOf=(t,id)=>t.members.find(m=>m.id===id);
 const mName=(t,id)=>mOf(t,id)?.name??'(已删除)';
 const mColor=(t,id)=>PAL[(mOf(t,id)?.color??0)%PAL.length];
@@ -519,7 +589,7 @@ function seed(lang){
   const ms=(K?['Aman','Maral','Merdan','Ýazgül','Döwlet']:['阿强','小美','老陈','阿杰','小林']).map((n,i)=>({id:'m'+(i+1),name:n,color:i}));
   const all=ms.map(m=>m.id);
   const t={id:'demo',name:Z('曼谷出差','Bangkok iş sapary'),demo:true,base:'CNY',members:ms,
-    currencies:[{code:'CNY',rate:1},{code:'THB',rate:0.2},{code:'USD',rate:7.1}],categories:[...CATS],budget:2000000,txs:[]};
+    currencies:[{code:'CNY'},{code:'THB'},{code:'USD'}],usd:{USD:1,CNY:7.1,THB:35.5},categories:[...CATS],budget:2000000,txs:[]};
   let n=0;const add=o=>t.txs.push(Object.assign({id:'d'+(++n),created:n,photos:[],place:'',note:''},o));
   const eq=(v,ids,c)=>splitAmounts(v,ids,null,c);
   add({type:'deposit',kind:'deposit',time:'2026-10-20T08:30',cur:'CNY',amount:1000000,splits:all.map(m=>({m,amt:200000})),per:true,note:Z('出发前每人 2000 入钱','Ugramazdan öň her kim 2000 goýdy')});
@@ -592,6 +662,8 @@ function vHome(t){
   let h='';
   if(t.demo)h+=`<div class="banner"><b>这是示例行程，随便点、随便改。准备好后新建你自己的行程。</b><button data-a="trips">新建行程</button></div>`;
   if(!persistOK)h+=`<div class="banner"><b>此浏览器无法保存数据，关闭后会丢失。请定期导出备份。</b></div>`;
+  {const since=S.lastBackup||S.firstUse||Date.now();const days=Math.floor((Date.now()-since)/864e5);
+   if(!t.demo&&live(t).length&&days>=3)h+=`<div class="banner"><b>${S.lastBackup?`已经 ${days} 天没有备份了。`:'还没有备份过。'}手机丢了或清理数据，账就没了。</b><button data-a="backup">去备份</button></div>`}
   const pct=t.budget?C.spent/t.budget*100:0;
   const srcs=[...t.members.filter(m=>C.mem[m.id].in>0).map(m=>[m.name,C.mem[m.id].in]),...Object.entries(C.ext).map(([k,v])=>[k+'（外部）',v])];
   h+=`<section class="hero"><div><div class="lbl">钱袋余额 · 折合${cname(t.base)}</div><div class="big num">${money(C.pool,t.base)}</div></div>
@@ -661,14 +733,15 @@ function vSettings(t){
   const used=id=>t.txs.some(x=>(x.splits||[]).some(s=>s.m===id)||x.advBy===id);
   const curUsed=c=>t.txs.some(x=>x.cur===c||x.fromCur===c||x.toCur===c);
   return `<div class="card" translate="no"><h4>语言 / Dil</h4><div class="seg">${[['zh','中文'],['tk','Türkmençe']].map(([k,l])=>`<button data-a="lang" data-v="${k}" class="${LANG===k?'on':''}">${l}</button>`).join('')}</div></div>
+  <div class="card"><h4>应用密码锁</h4>${S.lock?`<div class="btns"><button class="btn2" data-a="pin-set">修改密码</button><button class="btn2 danger" data-a="pin-off" data-confirm="再点一次：关闭密码锁">关闭密码锁</button></div>${bioOK()?`<label class="sw" style="margin-top:10px"><input type="checkbox" id="s-bio" data-a="bio-toggle" ${S.lock.bio?'checked':''}>用指纹解锁</label>`:''}<p class="note">离开 APP 超过 1 分钟再回来，需要重新输入密码。</p>`:`<p class="note" style="margin:0 0 8px">打开 APP 要先输入数字密码${window.AndroidBridge?'（安卓可用指纹）':''}，防止别人看账。</p><button class="btn2" data-a="pin-set">设置密码</button>`}</div>
   <div class="card"><h4>行程</h4><div style="display:flex;flex-direction:column;gap:10px">
    <label class="fl">行程名称<input class="in" id="s-name" data-s="name" value="${esc(t.name)}"></label>
-   <label class="fl">预算（${t.base}，可不填）<input class="in" id="s-budget" data-s="budget" inputmode="decimal" value="${t.budget?t.budget/100:''}" placeholder="例如 20000"></label>
+   <label class="fl">预算（${t.base}，可不填）<input class="in" id="s-budget" data-s="budget" inputmode="none" data-calc autocomplete="off" value="${t.budget?t.budget/100:''}" placeholder="例如 20000"></label>
    <div class="hint">本位币：${t.base} ${cname(t.base)}（新建行程时选择）</div></div></div>
   <div class="card"><h4>成员</h4>${t.members.map(m=>`<div class="set-row">${av(t,m.id)}<input class="in grow" id="s-m-${m.id}" data-s="member" data-id="${m.id}" value="${esc(m.name)}" aria-label="成员名称"><button class="mini" data-a="m-del" data-id="${m.id}" ${used(m.id)?'disabled title="已有记账，不能删除"':''}>${used(m.id)?'已记账':'删除'}</button></div>`).join('')}
    <div class="set-row"><input class="in grow" id="s-m-new" placeholder="新成员名字"><button class="mini" data-a="m-add">添加</button></div></div>
-  <div class="card"><h4>币种与参考汇率</h4><p class="note" style="margin:0 0 6px">参考汇率用于外币直接入钱、或账户没有成本时的折算。换汇后会自动用实际成本。</p>
-   ${t.currencies.map(c=>`<div class="set-row"><span class="grow"><b>${c.code}</b> <span class="muted">${cname(c.code)}</span></span>${c.code===t.base?'<span class="muted" style="font-size:13px">本位币</span>':`<span class="muted" style="font-size:13px">1${c.code}=</span><input class="in" style="width:96px" id="s-r-${c.code}" data-s="rate" data-id="${c.code}" inputmode="decimal" value="${c.rate}"><span class="muted" style="font-size:13px">${t.base}</span><button class="mini" data-a="c-del" data-id="${c.code}" ${curUsed(c.code)?'disabled':''}>${curUsed(c.code)?'已用':'删除'}</button>`}</div>`).join('')}
+  <div class="card"><h4>币种与参考汇率</h4><p class="note" style="margin:0 0 6px">汇率统一按「1 美元 = 多少该货币」填写。用于外币直接入钱、或账户没有成本时的折算；换汇后自动用实际成本。默认值只是参考，请按实际修改。</p>
+   ${t.currencies.map(c=>`<div class="set-row"><span class="grow"><b>${c.code}</b> <span class="muted">${cname(c.code)}</span>${c.code===t.base?' <span class="pill">本位币</span>':''}</span>${c.code==='USD'?'<span class="muted" style="font-size:13px">基准</span>':`<span class="muted num" style="font-size:13px">1 USD =</span><input class="in num" style="width:104px" id="s-r-${c.code}" data-s="usd" data-id="${c.code}" inputmode="none" data-calc autocomplete="off" value="${usdOf(t,c.code)}"><span class="muted" style="font-size:13px">${c.code}</span>`}${c.code===t.base?'':`<button class="mini" data-a="c-del" data-id="${c.code}" ${curUsed(c.code)?'disabled':''}>${curUsed(c.code)?'已用':'删除'}</button>`}</div>`).join('')}
    <div class="set-row"><select class="in grow" id="s-c-new"><option value="">添加币种…</option>${Object.keys(CUR).filter(c=>!t.currencies.some(x=>x.code===c)).map(c=>`<option value="${c}">${c} ${cname(c)}</option>`).join('')}</select><button class="mini" data-a="c-add">添加</button></div></div>
   <div class="card"><h4>费用类别</h4><div class="chips">${t.categories.map(c=>`<span class="chip">${esc(c)}<button class="mini" style="padding:0 6px;background:none" data-a="cat-del" data-v="${esc(c)}" aria-label="删除类别${esc(c)}">×</button></span>`).join('')}</div>
    <div class="set-row" style="margin-top:8px"><input class="in grow" id="s-cat-new" placeholder="新类别，如 洗衣"><button class="mini" data-a="cat-add">添加</button></div></div>
@@ -720,7 +793,7 @@ function draftFromTx(x,copy){
     d.cur=x.cur;d.ids=new Set(x.splits.map(s=>s.m));d.mode=x.mode||'equal';d.shares={...(x.shares||{})};
     d.per=!!(x.per&&x.splits.length);d.src=x.src||'member';d.srcName=x.srcName||'';d.amountStr=String((d.per?x.splits[0].amt:x.amount)/100);
     if(d.mode==='custom')x.splits.forEach(s=>d.custom[s.m]=String(s.amt/100));
-    d.rate=x.rate?String(x.rate):'';d.category=x.category||d.category;d.advOn=!!x.advBy;if(x.advBy)d.advBy=x.advBy;
+    d.rate=x.usdIn?String(x.usdIn):x.rate&&x.cur!==T().base?String(+(x.cur==='USD'?x.rate:usdOf(T(),T().base)/x.rate).toFixed(4)):'';d.category=x.category||d.category;d.advOn=!!x.advBy;if(x.advBy)d.advBy=x.advBy;
   }
   d.place=x.place||'';d.note=x.note||'';
   if(!copy){d.editId=x.id;d.time=x.time;d.photos=[...(x.photos||[])]}
@@ -743,17 +816,23 @@ function previewHTML(d){
   const t=T();const r=draftCalc(d);
   if(d.type==='exchange'){
     if(r.err)return `<div class="hint" style="padding:10px 0">${r.err}</div>`;
-    const rate=r.to/r.f;const cost=C.avg(d.fromCur);
-    return `<div class="kv"><div><span>汇率</span><span class="num">1 ${d.fromCur} = ${rate.toFixed(4)} ${d.toCur}</span></div><div><span>反向</span><span class="num">1 ${d.toCur} = ${(1/rate).toFixed(4)} ${d.fromCur}</span></div><div><span>折合成本</span><span class="num">${money(r.f*cost,t.base)}</span></div></div>`;
+    const rate=r.to/r.f;const cost=C.avg(d.fromCur);const usdTerms=d.fromCur==='USD'||d.toCur==='USD';
+    const prev=live(t).filter(x=>x.type==='exchange'&&x.id!==d.editId&&((x.fromCur===d.fromCur&&x.toCur===d.toCur)||(x.fromCur===d.toCur&&x.toCur===d.fromCur))).sort(byTime).pop();
+    const pr=prev?(prev.fromCur===d.fromCur?prev.toAmt/prev.fromAmt:prev.fromAmt/prev.toAmt):0;
+    const ref=usdOf(t,d.toCur)/usdOf(t,d.fromCur);const dp=pr?Math.abs(rate/pr-1):0,dr=Math.abs(rate/ref-1);
+    let warn='';if(pr&&dp>0.05)warn=`与上次汇率相差 ${(dp*100).toFixed(0)}%，请核对金额是否填错`;else if(!pr&&dr>0.1)warn=`与参考汇率相差 ${(dr*100).toFixed(0)}%，请核对金额是否填错`;
+    return `<div class="kv"><div><span>汇率</span><span class="num">${fxLine(d.fromCur,d.toCur,rate)}</span></div>${usdTerms?'':`<div><span>反向</span><span class="num">1 ${d.toCur} = ${fmtRate(1/rate)} ${d.fromCur}</span></div>`}
+    ${pr?`<div><span>上次汇率</span><span class="num">${fxLine(d.fromCur,d.toCur,pr)} · ${prev.time.slice(5,10).replace('-','/')}</span></div>`:`<div><span>参考汇率</span><span class="num">${fxLine(d.fromCur,d.toCur,ref)}</span></div>`}
+    <div><span>折合成本</span><span class="num">${money(r.f*cost,t.base)}</span></div>${warn?`<div class="fxwarn"><span>⚠</span><span>${warn}</span></div>`:''}</div>`;
   }
-  if(r.ext){const rt=d.cur===t.base?1:(Number(d.rate)||rateOf(t,d.cur));return r.err?`<div class="hint" style="padding:10px 0">${r.err}</div>`:`<div class="pr"><span class="nm">${esc(d.srcName)} 存入钱袋</span><span class="num" style="font-weight:700">${money(r.total,d.cur)}${d.cur!==t.base?` <span class="hint">≈${money(r.total*rt,t.base)}</span>`:''}</span></div><div class="pr hint">外部来源的钱不算任何成员的投入；结算时钱袋剩下的钱先还给它。</div>`}
+  if(r.ext){const rt=depRate(t,d);return r.err?`<div class="hint" style="padding:10px 0">${r.err}</div>`:`<div class="pr"><span class="nm">${esc(d.srcName)} 存入钱袋</span><span class="num" style="font-weight:700">${money(r.total,d.cur)}${d.cur!==t.base?` <span class="hint">≈${money(r.total*rt,t.base)}</span>`:''}</span></div><div class="pr hint">外部来源的钱不算任何成员的投入；结算时钱袋剩下的钱先还给它。</div>`}
   if(!r.ids.length)return `<div class="hint" style="padding:10px 0">${r.err}</div>`;
-  const rate=d.type==='deposit'?(d.cur===t.base?1:(Number(d.rate)||rateOf(t,d.cur))):C.avg(d.cur);
+  const rate=d.type==='deposit'?depRate(t,d):C.avg(d.cur);
   const rows=r.ids.map(id=>{const s=r.splits.find(x=>x.m===id);const amt=s?s.amt:0;
     let ctl='';
     if(d.type!=='personal'&&!(d.type==='deposit'&&d.per)){
-      if(d.mode==='shares')ctl=`<input class="in num" id="sh-${id}" data-f="shares.${id}" inputmode="decimal" style="width:64px;text-align:center" value="${esc(d.shares[id]??1)}" aria-label="${esc(mName(t,id))}的份数"><span class="hint">份</span>`;
-      if(d.mode==='custom')ctl=`<input class="in num" id="cu-${id}" data-f="custom.${id}" inputmode="decimal" value="${esc(d.custom[id]??'')}" placeholder="0" aria-label="${esc(mName(t,id))}的金额">`;
+      if(d.mode==='shares')ctl=`<input class="in num" id="sh-${id}" data-f="shares.${id}" inputmode="none" data-calc autocomplete="off" style="width:64px;text-align:center" value="${esc(d.shares[id]??1)}" aria-label="${esc(mName(t,id))}的份数"><span class="hint">份</span>`;
+      if(d.mode==='custom')ctl=`<input class="in num" id="cu-${id}" data-f="custom.${id}" inputmode="none" data-calc autocomplete="off" value="${esc(d.custom[id]??'')}" placeholder="0" aria-label="${esc(mName(t,id))}的金额">`;
     }
     return `<div class="pr">${av(t,id)}<span class="nm">${esc(mName(t,id))}</span>${ctl}<span class="num" style="min-width:90px;text-align:right" data-pv="${id}">${d.mode==='custom'&&d.type!=='personal'&&!(d.type==='deposit'&&d.per)?'':money(amt,d.cur)}</span></div>`}).join('');
   const totalLine=r.total>0?`<div class="pr"><span class="nm muted">合计</span><span class="num" style="font-weight:700">${money(r.total,d.cur)}${d.cur!==t.base?` <span class="hint">≈${money(r.total*rate,t.base)}</span>`:''}</span></div>`:'';
@@ -771,19 +850,19 @@ SHEETS.form=d=>{
   const curOpts=sel=>t.currencies.map(c=>`<option value="${c.code}" ${sel===c.code?'selected':''}>${c.code}</option>`).join('');
   let h=head(d.editId?'编辑 · '+ttl:ttl)+(d.type==='personal'||d.type==='shared'?`<div class="seg">${types.map(([k,l])=>`<button data-a="ftype" data-v="${k}" class="${d.type===k?'on':''}">${l}</button>`).join('')}</div>`:'');
   if(d.type==='exchange'){
-    h+=`<label class="fl">付出（从钱袋拿出）<div class="amt"><select class="in" id="f-fc" data-f="fromCur">${curOpts(d.fromCur)}</select><input class="in" id="f-fa" data-f="fromStr" inputmode="decimal" placeholder="0.00" value="${esc(d.fromStr)}"></div></label>
+    h+=`<label class="fl">付出（从钱袋拿出）<div class="amt"><select class="in" id="f-fc" data-f="fromCur">${curOpts(d.fromCur)}</select><input class="in" id="f-fa" data-f="fromStr" inputmode="none" data-calc autocomplete="off" placeholder="0.00" value="${esc(d.fromStr)}"></div></label>
     <div class="hint">钱袋 ${d.fromCur} 余额 ${money(C.acc[d.fromCur]?.bal||0,d.fromCur)}</div>
-    <label class="fl">得到（放回钱袋）<div class="amt"><select class="in" id="f-tc" data-f="toCur">${curOpts(d.toCur)}</select><input class="in" id="f-ta" data-f="toStr" inputmode="decimal" placeholder="0.00" value="${esc(d.toStr)}"></div></label>
+    <label class="fl">得到（放回钱袋）<div class="amt"><select class="in" id="f-tc" data-f="toCur">${curOpts(d.toCur)}</select><input class="in" id="f-ta" data-f="toStr" inputmode="none" data-calc autocomplete="off" placeholder="0.00" value="${esc(d.toStr)}"></div></label>
     <div class="prev" id="preview">${previewHTML(d)}</div>`;
   }else{
     if(d.type==='deposit')h+=`<div class="fl">钱从哪来</div><div class="seg">${[['member','成员存入'],['ext','外部来源（公司等）']].map(([k,l])=>`<button data-a="f-src" data-v="${k}" class="${d.src===k?'on':''}">${l}</button>`).join('')}</div>`;
     const ext=d.type==='deposit'&&d.src==='ext';
     const perLbl=ext?'存入金额':d.type==='deposit'&&d.per?'每人存入':d.type==='deposit'?'总共存入':'总金额';
-    h+=`<label class="fl">${perLbl} <span class="hint">可直接输入算式，如 120+35×2</span><div class="amt"><select class="in" id="f-cur" data-f="cur">${curOpts(d.cur)}</select><input class="in" id="f-amt" data-f="amountStr" inputmode="decimal" placeholder="0.00" value="${esc(d.amountStr)}" autocomplete="off"></div></label>`;
+    h+=`<label class="fl">${perLbl} <span class="hint">可直接输入算式，如 120+35×2</span><div class="amt"><select class="in" id="f-cur" data-f="cur">${curOpts(d.cur)}</select><input class="in" id="f-amt" data-f="amountStr" inputmode="none" data-calc autocomplete="off" placeholder="0.00" value="${esc(d.amountStr)}" autocomplete="off"></div></label>`;
     if(d.type==='deposit'){
       if(ext)h+=`<label class="fl">来源名称<input class="in" id="f-srcname" data-f="srcName" list="dl-src" value="${esc(d.srcName)}" placeholder="如 公司备用金、报销款"></label>`;
       else h+=`<label class="sw"><input type="checkbox" id="f-per" data-f="per" ${d.per?'checked':''}>按每人金额输入（每个被选的人存同样多）</label>`;
-      if(d.cur!==t.base)h+=`<label class="fl">汇率 1 ${d.cur} = ? ${t.base}<input class="in" id="f-rate" data-f="rate" inputmode="decimal" value="${esc(d.rate)}" placeholder="${rateOf(t,d.cur)}（参考汇率）"></label>`;
+      if(d.cur!==t.base){const q=d.cur==='USD'?t.base:d.cur;h+=`<label class="fl">汇率 1 USD = ? ${q}<input class="in num" id="f-rate" data-f="rate" inputmode="none" data-calc autocomplete="off" value="${esc(d.rate)}" placeholder="${usdOf(t,q)}（参考汇率）"></label>`}
     }
     if(!ext){const lbl={shared:'谁一起用（点头像取消，不一定 5 人）',personal:'是谁的支出',deposit:'谁存入'}[d.type];
     h+=`<div class="fl">${lbl}${d.type!=='personal'?` <span><button class="link" data-a="f-all">全选</button><button class="link" data-a="f-none">全不选</button></span>`:''}</div>
@@ -824,7 +903,7 @@ function saveDraft(s){
   const base={id:old?.id||uid(),created:old?.created||Date.now(),time:d.time||nowLocal(),place:d.place.trim(),note:d.note.trim(),photos:[...d.photos]};
   let x;
   if(d.type==='exchange')x={...base,type:'exchange',fromCur:d.fromCur,toCur:d.toCur,fromAmt:r.f,toAmt:r.to};
-  else if(d.type==='deposit')x={...base,type:'deposit',kind:'deposit',src:r.ext?'ext':undefined,srcName:r.ext?d.srcName.trim():undefined,cur:d.cur,amount:r.total,splits:r.splits,per:!r.ext&&d.per,mode:d.per?'equal':d.mode,shares:d.mode==='shares'?{...d.shares}:undefined,rate:d.cur!==t.base?(Number(d.rate)||rateOf(t,d.cur)):undefined};
+  else if(d.type==='deposit')x={...base,type:'deposit',kind:'deposit',src:r.ext?'ext':undefined,srcName:r.ext?d.srcName.trim():undefined,cur:d.cur,amount:r.total,splits:r.splits,per:!r.ext&&d.per,mode:d.per?'equal':d.mode,shares:d.mode==='shares'?{...d.shares}:undefined,rate:d.cur!==t.base?depRate(t,d):undefined,usdIn:d.cur!==t.base&&Number(d.rate)>0?Number(d.rate):undefined};
   else x={...base,type:'expense',kind:d.type,cur:d.cur,amount:r.total,splits:r.splits,mode:d.type==='personal'?'equal':d.mode,shares:d.mode==='shares'?{...d.shares}:undefined,category:d.category,advBy:d.advOn?d.advBy:undefined};
   if(old){old.photos.filter(p=>!x.photos.includes(p)).forEach(delPhoto);Object.keys(old).forEach(k=>delete old[k]);Object.assign(old,x)}else t.txs.push(x);
   S.last=S.last||{};S.last[t.id]={cur:x.cur||S.last[t.id]?.cur,person:x.kind==='personal'?x.splits[0].m:S.last[t.id]?.person};
@@ -838,7 +917,7 @@ SHEETS.tx=({id})=>{
   let h=head(esc(txTitle(t,x)),`<span class="pill ${x.deleted?'grey':''}">${x.deleted?'已删除':typeL}</span>`);
   if(x.type==='exchange'){
     h+=`<div class="d-amt"><div class="v num">${money(x.fromAmt,x.fromCur)}</div><div class="muted">↓</div><div class="v num">${money(x.toAmt,x.toCur)}</div></div>
-    <div class="card kv"><div><span>实际汇率</span><span class="num">1 ${x.fromCur} = ${(x.toAmt/x.fromAmt).toFixed(4)} ${x.toCur}</span></div><div><span>反向</span><span class="num">1 ${x.toCur} = ${(x.fromAmt/x.toAmt).toFixed(4)} ${x.fromCur}</span></div><div><span>成本转移</span><span class="num">${money(i.base||0,t.base)}</span></div></div>`;
+    <div class="card kv"><div><span>实际汇率</span><span class="num">${fxLine(x.fromCur,x.toCur,x.toAmt/x.fromAmt)}</span></div><div><span>反向</span><span class="num">1 ${x.toCur} = ${(x.fromAmt/x.toAmt).toFixed(4)} ${x.fromCur}</span></div><div><span>成本转移</span><span class="num">${money(i.base||0,t.base)}</span></div></div>`;
   }else{
     h+=`<div class="d-amt"><div class="v num ${x.type==='deposit'?'pos':''}">${x.type==='deposit'?'+':'−'}${money(x.amount,x.cur)}</div>${x.cur!==t.base&&i.base!=null?`<div class="muted num">≈ ${money(i.base,t.base)} · 按 1${x.cur}=${i.rate.toFixed(4)}${t.base}</div>`:''}</div>
     ${x.src==='ext'?`<div class="card kv"><div><span>钱从哪来</span><span>${esc(x.srcName||'外部来源')}（外部，不算成员投入）</span></div></div>`:''}<div class="card" ${x.src==='ext'?'hidden':''}><h4>${x.type==='deposit'?'谁存入':'分摊明细'}${x.mode==='shares'?'（按份数）':x.mode==='custom'?'（各填金额）':x.splits.length>1&&x.type!=='deposit'?'（平分）':''}</h4><div class="rows">${x.splits.map(s=>`<button class="mrow" data-a="member" data-id="${s.m}">${av(t,s.m)}<span class="nm">${esc(mName(t,s.m))}${x.mode==='shares'?`<span class="sub"> · ${x.shares?.[s.m]??1}份</span>`:''}</span><span style="text-align:right"><div class="num">${money(s.amt,x.cur)}</div>${x.cur!==t.base&&i.rate?`<div class="sub num">≈${money(s.amt*i.rate,t.base)}</div>`:''}</span></button>`).join('')}</div>
@@ -952,27 +1031,47 @@ function stmtData(t,d){
   let bal=open;list.forEach(r=>{bal+=r.inn-r.out;r.bal=bal});
   return {title,unit,rows:list,open,totIn:sum(list.map(r=>r.inn)),totOut:sum(list.map(r=>r.out)),close:bal,member:sc.startsWith('m:')};
 }
+function stmtParts(t,d){
+  if(d.scope==='all')return [{...d,scope:'pool'},...t.members.map(m=>({...d,scope:'m:'+m.id}))];
+  if(d.scope==='days')return reportDays(t,d).map(day=>({...d,scope:'pool',from:day,to:day,title:'日报 · '+dayLabel(day),day}));
+  return [d];
+}
+function reportDays(t,d){return [...new Set(live(t).map(x=>x.time.slice(0,10)))].filter(x=>(!d.from||x>=d.from)&&(!d.to||x<=d.to)).sort()}
+function dayExtra(t,day){
+  const rows=t.members.map(m=>[m.name,stmtData(t,{scope:'m:'+m.id,from:day,to:day}).totOut]);
+  return `<table class="dsum"><thead><tr><th>当天每人花费</th><th class="n">金额</th></tr></thead><tbody>${rows.map(([n,v])=>`<tr><td>${esc(n)}</td><td class="n out">${v?money(v,t.base):'—'}</td></tr>`).join('')}<tr class="close"><td>合计</td><td class="n out">${money(sum(rows.map(r=>r[1])),t.base)}</td></tr></tbody></table>`;
+}
+function photoPages(t,parts){
+  const seen=new Set(),items=[];
+  for(const p of parts){const sd=stmtData(t,p);for(const r of sd.rows){if(!r.x.photos?.length||seen.has(r.x.id))continue;if(sd.member&&!(r.out>0))continue;seen.add(r.x.id);
+    r.x.photos.forEach((ph,k)=>items.push({ph,cap:`${r.time.slice(5,10).replace('-','/')} ${hm(r.time)} · ${r.desc||txTitle(t,r.x)} · ${r.orig||money(r.x.amount||0,r.x.cur||t.base)}${r.x.photos.length>1?` · ${k+1}/${r.x.photos.length}`:''}`}))}}
+  if(!items.length)return `<div class="a4"><div class="h"><div><h1>${esc(t.name)} · 小票照片</h1></div></div><div class="fine">这些记录没有照片。</div></div>`;
+  const pages=[];for(let i=0;i<items.length;i+=4)pages.push(items.slice(i,i+4));
+  return pages.map((pg,n)=>`<div class="a4"><div class="h"><div><h1>${esc(t.name)} · 小票照片</h1></div><div class="meta">${n+1} / ${pages.length}</div></div><div class="pgrid">${pg.map(it=>`<figure><img data-photo="${it.ph}" alt="小票"><figcaption>${esc(it.cap)}</figcaption></figure>`).join('')}</div></div>`).join('');
+}
 function stmtHTML(t,d){
-  if(d.scope==='all')return [{...d,scope:'pool'},...t.members.map(m=>({...d,scope:'m:'+m.id}))].map(x=>stmtOne(t,x)).join('');
-  return stmtOne(t,d);
+  const parts=stmtParts(t,d);
+  let h=parts.map(x=>stmtOne(t,x.day?{...x,extra:dayExtra(t,x.day)}:x)).join('')||`<div class="a4"><div class="fine">这段时间没有记录</div></div>`;
+  if(d.withPhotos)h+=photoPages(t,parts);
+  return h;
 }
 function stmtOne(t,d){
   const s=stmtData(t,d),u=s.unit,who=!s.member,cols=who?9:8;
   const range=(d.from||d.to)?`${d.from||'开始'} 至 ${d.to||'现在'}`:dateRange(t);
   if(s.member)return memberStmt(t,d,s,range);
-  return `<div class="a4"><div class="h"><div><h1>${esc(t.name)} · ${esc(s.title)}</h1><div style="font-size:11px;color:#55635E">期间 ${esc(range)} · 金额单位 ${u} ${cname(u)}</div></div><div class="meta">出差钱袋<br>打印时间 ${nowLocal().replace('T',' ')}</div></div>
+  return `<div class="a4"><div class="h"><div><h1>${esc(t.name)} · ${esc(d.title||s.title)}</h1><div style="font-size:11px;color:#55635E">期间 ${esc(range)} · 金额单位 ${u} ${cname(u)}</div></div><div class="meta">出差钱袋<br>打印时间 ${nowLocal().replace('T',' ')}</div></div>
   <div class="sum"><div><span>期初余额</span><b>${money(s.open,u)}</b></div><div><span>入 合计</span><b>${money(s.totIn,u)}</b></div><div><span>出 合计</span><b>${money(s.totOut,u)}</b></div><div><span>期末余额</span><b>${money(s.close,u)}</b></div></div>
   <table><thead><tr><th>#</th><th>时间</th><th>类型</th><th>摘要（类别 · 备注 · 地点）</th>${who?'<th>相关人</th>':''}<th class="n">原币金额</th><th class="n">入</th><th class="n">出</th><th class="n">余额</th></tr></thead><tbody>
   ${d.from?`<tr class="open"><td></td><td colspan="${cols-2}">期初余额</td><td class="n">${money(s.open,u)}</td></tr>`:''}
   ${s.rows.map((r,k)=>`<tr><td>${k+1}</td><td class="t">${r.time.slice(5,10).replace('-','/')} ${hm(r.time)}</td><td class="ty">${esc(r.type)}</td><td>${esc(r.desc)}${r.x.photos?.length?` <span style="color:#8A6A2A">[图${r.x.photos.length}]</span>`:''}</td>${who?`<td class="who">${esc(r.who)}</td>`:''}<td class="n orig">${esc(r.orig)}${r.orig2?`<div class="o2">${esc(r.orig2)}</div>`:''}</td><td class="n in">${r.inn?money(r.inn,u):''}</td><td class="n out">${r.out?money(r.out,u):''}</td><td class="n">${money(r.bal,u)}</td></tr>`).join('')||`<tr><td colspan="${cols}" style="text-align:center;color:#888;padding:16px">这段时间没有记录</td></tr>`}
   <tr class="close"><td></td><td colspan="${cols-4}">合计</td><td class="n in">${money(s.totIn,u)}</td><td class="n out">${money(s.totOut,u)}</td><td class="n">${money(s.close,u)}</td></tr></tbody></table>
   ${(d.scope||'pool').startsWith('cur:')?'':`<div class="fine">外币按换汇实际成本折算为${cname(t.base)}。${s.member?'入 = 本人存入和垫付；出 = 本人分摊到的支出。':'换汇只是钱袋内部换币，不计入、出。'}</div>`}
-  <div class="foot"><span>记账人</span><span>核对人</span><span>日期</span></div></div>`;
+  ${d.extra||''}<div class="foot"><span>记账人</span><span>核对人</span><span>日期</span></div></div>`;
 }
 /* 成员账单：只逐笔列出花费；存入、垫付只算进顶部合计 */
 function memberStmt(t,d,s,range){
   const u=s.unit;const spend=s.rows.filter(r=>r.out>0);let cum=0;spend.forEach(r=>{cum+=r.out;r.cum=cum});
-  return `<div class="a4"><div class="h"><div><h1>${esc(t.name)} · ${esc(s.title)}</h1><div style="font-size:11px;color:#55635E">期间 ${esc(range)} · 金额单位 ${u} ${cname(u)}</div></div><div class="meta">出差钱袋<br>打印时间 ${nowLocal().replace('T',' ')}</div></div>
+  return `<div class="a4"><div class="h"><div><h1>${esc(t.name)} · ${esc(d.title||s.title)}</h1><div style="font-size:11px;color:#55635E">期间 ${esc(range)} · 金额单位 ${u} ${cname(u)}</div></div><div class="meta">出差钱袋<br>打印时间 ${nowLocal().replace('T',' ')}</div></div>
   <div class="sum"><div><span>${d.from?'期初余额':'投入合计'}</span><b>${money(d.from?s.open:s.totIn,u)}</b></div><div><span>${d.from?'本期投入':'花费笔数'}</span><b>${d.from?money(s.totIn,u):spend.length}</b></div><div><span>花费合计</span><b>${money(s.totOut,u)}</b></div><div><span>余额</span><b>${money(s.close,u)}</b></div></div>
   <table><thead><tr><th>#</th><th>时间</th><th>类型</th><th>摘要（类别 · 备注 · 地点）</th><th class="n">原币金额</th><th class="n">花费</th><th class="n">累计花费</th></tr></thead><tbody>
   ${spend.map((r,k)=>`<tr><td>${k+1}</td><td class="t">${r.time.slice(5,10).replace('-','/')} ${hm(r.time)}</td><td class="ty">${esc(r.type)}</td><td>${esc(r.desc)}${r.x.photos?.length?` <span style="color:#8A6A2A">[图${r.x.photos.length}]</span>`:''}</td><td class="n orig">${esc(r.orig)}${r.orig2?`<div class="o2">${esc(r.orig2)}</div>`:''}</td><td class="n out">${money(r.out,u)}</td><td class="n">${money(r.cum,u)}</td></tr>`).join('')||`<tr><td colspan="7" style="text-align:center;color:#888;padding:16px">这段时间没有花费</td></tr>`}
@@ -981,7 +1080,7 @@ function memberStmt(t,d,s,range){
   <div class="foot"><span>记账人</span><span>核对人</span><span>日期</span></div></div>`;
 }
 function stmtTSV(t,d){
-  if(d.scope==='all')return [{...d,scope:'pool'},...t.members.map(m=>({...d,scope:'m:'+m.id}))].map(x=>stmtTSV(t,x)).join('\n\n');
+  if(d.scope==='all'||d.scope==='days')return stmtParts(t,d).map(x=>stmtTSV(t,{...x,scope:x.scope})).join('\n\n');
   const s=stmtData(t,d);
   if(s.member){const rows=[['时间','类型','摘要','原币金额','花费','累计花费'].map(L)];let cum=0;
     s.rows.filter(r=>r.out>0).forEach(r=>{cum+=r.out;rows.push([r.time.replace('T',' '),L(r.type),L(r.desc),r.orig,(r.out/100).toFixed(2),(cum/100).toFixed(2)])});
@@ -991,9 +1090,10 @@ function stmtTSV(t,d){
   return L(`${t.name} ${s.title}（${s.unit}）`)+'\n'+rows.map(r=>r.map(v=>String(v).replace(/\t|\n/g,' ')).join('\t')).join('\n')}
 SHEETS.stmt=d=>{
   const t=T();
-  const opts=[['all','钱袋总账 + 全部成员账单'],['pool',`钱袋总账（折合 ${t.base}）`],...t.currencies.map(c=>['cur:'+c.code,`钱袋 ${c.code} ${cname(c.code)} 账户`]),...t.members.map(m=>['m:'+m.id,`${m.name} 个人账单`])];
+  const opts=[['all','钱袋总账 + 全部成员账单'],['days','按天日报（每天一张）'],['pool',`钱袋总账（折合 ${t.base}）`],...t.currencies.map(c=>['cur:'+c.code,`钱袋 ${c.code} ${cname(c.code)} 账户`]),...t.members.map(m=>['m:'+m.id,`${m.name} 个人账单`])];
   return head('A4 账单')+`<label class="fl">打印哪一本账<select class="in" id="st-scope" data-st="scope">${opts.map(([k,l])=>`<option value="${k}" ${d.scope===k?'selected':''}>${esc(l)}</option>`).join('')}</select></label>
   <div class="frow"><label class="fl">从（可不填）<input class="in" type="date" id="st-from" data-st="from" value="${d.from||''}"></label><label class="fl">到（可不填）<input class="in" type="date" id="st-to" data-st="to" value="${d.to||''}"></label></div>
+  <label class="sw"><input type="checkbox" id="st-ph" data-st="withPhotos" ${d.withPhotos?'checked':''}>把小票照片附在账单后面（每页 4 张）</label>
   <button class="btn" data-a="print">打印 / 存为 PDF</button>
   <div class="paper-wrap">${stmtHTML(t,d)}</div>
   <button class="btn2" data-a="stmt-copy">复制为表格（可粘贴到 Excel）</button>`;
@@ -1017,6 +1117,12 @@ function step(k){if(!viewer)return;const n=viewer.idx+k;if(n<0||n>=viewer.list.l
 let toastT;function toast(m){m=trText(m);let e=$('.toast');if(!e){e=document.createElement('div');e.className='toast';e.setAttribute('role','status');document.body.appendChild(e)}e.textContent=m;e.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>e.hidden=true,2200)}
 function armed(b){if(!b.dataset.confirm)return true;if(b.classList.contains('armed'))return true;b.dataset.orig=b.textContent;b.textContent=b.dataset.confirm;b.classList.add('armed');setTimeout(()=>{if(b.isConnected){b.classList.remove('armed');b.textContent=b.dataset.orig}},3500);return false}
 const ACT={
+  'pin-set':()=>openSheet('pin-set',{}),
+  'pin-save':async()=>{const a=$('#pin1').value.trim(),b=$('#pin2').value.trim();
+    if(!/^\d{4,6}$/.test(a)){toast('密码要 4–6 位数字');return}if(a!==b){toast('两次输入的密码不一样');return}
+    const salt=uid();S.lock={salt,len:a.length,hash:await pinHash(a,salt),bio:!!$('#pin-bio')?.checked};save(true);closeSheet();render();toast('密码锁已开启')},
+  'pin-off':b=>{if(!armed(b))return;delete S.lock;save(true);render();toast('密码锁已关闭')},
+  'bio-toggle':b=>{if(S.lock){S.lock.bio=b.checked;save(true)}},
   lang:b=>{const v=b.dataset.v;if(v===LANG)return;LANG=v;S.lang=v;
     if(S.trips.length===1&&S.trips[0].demo&&!S.trips[0].touched){const n=seed(v);S.trips=n.trips;S.cur=n.cur}
     save(true);filt.m='';refresh();toast(v==='tk'?'Dil: Türkmençe':'语言：中文')},
@@ -1039,8 +1145,10 @@ const ACT={
   'f-mode':b=>{const s=topForm(),d=s.data;d.mode=b.dataset.v;if(d.mode==='custom'){const r=draftCalc({...d,mode:'equal'});(r.splits||[]).forEach(x=>{if(d.custom[x.m]==null||d.custom[x.m]==='')d.custom[x.m]=String(x.amt/100)})}renderSheet(s)},
   'f-src':b=>{const s=topForm();s.data.src=b.dataset.v;renderSheet(s)},
   stmt:b=>{const s=openSheet('stmt',{scope:b.dataset.v||'all'});s.body.classList.add('wide')},
-  print:()=>{const s=[...sheets].reverse().find(x=>x.kind==='stmt');const t=T();$('#print-root').innerHTML=stmtHTML(t,s.data);tr($('#print-root'));
-    if(window.AndroidBridge&&AndroidBridge.print){AndroidBridge.print(`${t.name}-${trText(s.data.scope==='all'?'钱袋总账 + 全部成员账单':stmtData(t,s.data).title)}`);return}
+  print:async()=>{const s=[...sheets].reverse().find(x=>x.kind==='stmt');const t=T();const pr=$('#print-root');pr.innerHTML=stmtHTML(t,s.data);tr(pr);
+    await Promise.all([...pr.querySelectorAll('img[data-photo]')].map(async img=>{const v=await getPhoto(img.dataset.photo);if(v){img.src=v;try{await img.decode()}catch(e){}}}));
+    const ttl=s.data.scope==='all'?'钱袋总账 + 全部成员账单':s.data.scope==='days'?'按天日报':stmtData(t,s.data).title;
+    if(window.AndroidBridge&&AndroidBridge.print){AndroidBridge.print(`${t.name}-${trText(ttl)}`);return}
     const t0=Date.now();try{window.print()}catch(e){}if(Date.now()-t0<300)toast('没有弹出打印窗口？请用浏览器菜单里的「打印」，或「复制为表格」')},
   'stmt-copy':()=>{const s=[...sheets].reverse().find(x=>x.kind==='stmt');copyText(stmtTSV(T(),s.data))},
   'f-cat':b=>{const s=topForm();s.data.category=b.dataset.v;renderSheet(s)},
@@ -1058,12 +1166,12 @@ const ACT={
   'nt-more':()=>{const s=sheets[sheets.length-1];syncNT(s);s.data.rows.push('');renderSheet(s)},
   'trip-create':()=>{const s=sheets[sheets.length-1];syncNT(s);const d=s.data;const names=d.rows.map(v=>v.trim()).filter(Boolean);
     if(!d.name?.trim()){toast('请填写行程名称');return}if(!names.length){toast('请至少填一个成员');return}
-    const base=d.base;const t={id:uid(),name:d.name.trim(),base,members:names.map((n,i)=>({id:uid()+i,name:n,color:i})),currencies:[{code:base,rate:1}],categories:[...CATS],budget:0,txs:[]};
+    const base=d.base;const t={id:uid(),name:d.name.trim(),base,members:names.map((n,i)=>({id:uid()+i,name:n,color:i})),currencies:[{code:base}],usd:{USD:1,[base]:DEFAULT_USD[base]||1},categories:[...CATS],budget:0,txs:[]};
     S.trips.push(t);S.cur=t.id;save();closeSheet();tab='home';render();toast('行程已创建，可在「设置」里添加外币')},
   'trip-del':b=>{if(!armed(b))return;const t=T();t.txs.forEach(x=>(x.photos||[]).forEach(delPhoto));S.trips=S.trips.filter(x=>x!==t);if(!S.trips.length){const n=seed();S.trips=n.trips}S.cur=S.trips[0].id;save();tab='home';render();toast('行程已删除')},
   'm-add':()=>{const i=$('#s-m-new');const n=i.value.trim();if(!n)return;const t=T();t.members.push({id:uid(),name:n,color:t.members.length});save();render()},
   'm-del':b=>{const t=T();t.members=t.members.filter(m=>m.id!==b.dataset.id);save();render()},
-  'c-add':()=>{const c=$('#s-c-new').value;if(!c)return;T().currencies.push({code:c,rate:1});save();render();toast(`已添加 ${c}，请填写参考汇率`)},
+  'c-add':()=>{const c=$('#s-c-new').value;if(!c)return;const t=T();t.usd=t.usd||{USD:1};if(!t.usd[c])t.usd[c]=DEFAULT_USD[c]||1;t.currencies.push({code:c});save();render();toast(`已添加 ${c}，请核对 1 USD 汇率`)},
   'c-del':b=>{const t=T();t.currencies=t.currencies.filter(c=>c.code!==b.dataset.id);save();render()},
   'cat-add':()=>{const v=$('#s-cat-new').value.trim();const t=T();if(v&&!t.categories.includes(v)){t.categories.push(v);save();render()}},
   'cat-del':b=>{const t=T();t.categories=t.categories.filter(c=>c!==b.dataset.v);save();render()},
@@ -1074,11 +1182,11 @@ const ACT={
   'csv-dl':()=>tryDownload(`${T().name}.csv`,csvOf(T()),'text/csv;charset=utf-8'),
   'bk-ph':b=>{sheets[sheets.length-1].data.withPhotos=b.checked},
   'bk-make':async()=>{const s=sheets[sheets.length-1];const photos={};if(s.data.withPhotos!==false){for(const id of await allPhotoIds()){const v=await getPhoto(id);if(v)photos[id]=v}}
-    s.data.json=JSON.stringify({app:'出差钱袋',version:1,exported:nowLocal(),data:S,photos});renderSheet(s)},
+    S.lastBackup=Date.now();save(true);s.data.json=JSON.stringify({app:'出差钱袋',version:1,exported:nowLocal(),data:S,photos});renderSheet(s);render()},
   'bk-copy':()=>copyText($('#bk-out').value),
   'bk-dl':()=>tryDownload(`出差钱袋备份-${nowLocal().slice(0,10)}.json`,$('#bk-out').value,'application/json'),
   'bk-import':async b=>{const raw=$('#bk-in').value.trim();if(!raw){toast('请先选择备份文件或粘贴内容');return}if(!armed(b))return;
-    try{const o=JSON.parse(raw);if(!o.data?.trips?.length)throw 0;S=o.data;for(const[k,v]of Object.entries(o.photos||{}))await putPhoto(k,v);if(!S.trips.some(t=>t.id===S.cur))S.cur=S.trips[0].id;save();closeSheet();tab='home';render();toast('已恢复备份')}catch(e){toast('备份内容无法识别，请检查是否完整')}},
+    try{const o=JSON.parse(raw);if(!o.data?.trips?.length)throw 0;S=o.data;S.trips.forEach(migrateRates);for(const[k,v]of Object.entries(o.photos||{}))await putPhoto(k,v);if(!S.trips.some(t=>t.id===S.cur))S.cur=S.trips[0].id;save();closeSheet();tab='home';render();toast('已恢复备份')}catch(e){toast('备份内容无法识别，请检查是否完整')}},
 };
 function syncNT(s){s.data.name=$('#nt-name',s.body).value;s.data.base=$('#nt-base',s.body).value;s.body.querySelectorAll('[data-nt]').forEach(i=>s.data.rows[+i.dataset.nt]=i.value)}
 document.addEventListener('click',e=>{
@@ -1092,7 +1200,7 @@ document.addEventListener('input',e=>{
   if(el.dataset.f){const s=topForm();if(!s)return;const d=s.data,f=el.dataset.f;const v=el.type==='checkbox'?el.checked:el.value;
     if(f.includes('.')){const[a,k]=f.split('.');d[a][k]=v}else d[f]=v;
     if(['cur','fromCur','toCur','advOn','per','advBy'].includes(f)){if(f==='cur')d.rate='';renderSheet(s)}else updatePreview(s);return}
-  if(el.dataset.st){const s=[...sheets].reverse().find(x=>x.kind==='stmt');if(s){s.data[el.dataset.st]=el.value;renderSheet(s)}return}
+  if(el.dataset.st){const s=[...sheets].reverse().find(x=>x.kind==='stmt');if(s){s.data[el.dataset.st]=el.type==='checkbox'?el.checked:el.value;renderSheet(s)}return}
   if(el.dataset.q){filt[el.dataset.q]=el.value;if(el.dataset.q==='q'){$('#list-res').innerHTML=listRes(T());tr($('#list-res'))}else render()}
 });
 document.addEventListener('change',async e=>{
@@ -1101,7 +1209,7 @@ document.addEventListener('change',async e=>{
     if(k==='name'&&el.value.trim())t.name=el.value.trim();
     if(k==='budget'){const v=toCents(el.value);t.budget=v>0?v:0}
     if(k==='member'&&el.value.trim())mOf(t,el.dataset.id).name=el.value.trim();
-    if(k==='rate'){const v=Number(el.value);if(v>0)t.currencies.find(c=>c.code===el.dataset.id).rate=v}
+    if(k==='usd'){const v=toCents(el.value)/100;if(v>0){t.usd=t.usd||{USD:1};t.usd[el.dataset.id]=v}}
     save();render();toast('已保存');return}
   if(el.dataset.file==='1'){const s=topForm();const files=[...el.files];if(!files.length)return;toast('正在压缩照片…');
     for(const f of files){const d=await compress(f);if(!d)continue;const id='p'+uid();await putPhoto(id,d);s.data.photos.push(id)}
@@ -1109,12 +1217,84 @@ document.addEventListener('change',async e=>{
   if(el.dataset.file==='bk'){const f=el.files[0];if(!f)return;$('#bk-in').value=await f.text();toast('已读取，点「恢复」确认')}
 });
 
+/* ---------- 计算器键盘 ---------- */
+let calcEl=null;
+const CALC_KEYS=[['C','(',')','⌫'],['7','8','9','÷'],['4','5','6','×'],['1','2','3','-'],['.','0','=','+']];
+function calcShow(el){
+  calcEl=el;const c=$('#calc');
+  c.innerHTML=`<div class="in-wrap" translate="no"><div class="disp"><span class="expr" id="c-expr"></span><span class="res num" id="c-res"></span><button class="done" data-ck="ok">${LANG==='tk'?'Taýýar':'完成'}</button></div><div class="keys">${CALC_KEYS.flat().map(k=>`<button data-ck="${k}" class="${'+-×÷()'.includes(k)?'op':k==='='?'eq':''}">${k==='-'?'−':k}</button>`).join('')}</div></div>`;
+  c.hidden=false;document.body.classList.add('calc-open');calcUpd();
+  setTimeout(()=>el.scrollIntoView({block:'center',behavior:'smooth'}),60);
+}
+function calcHide(){$('#calc').hidden=true;document.body.classList.remove('calc-open');calcEl=null}
+function calcVal(v){const c=toCents(v);return Number.isFinite(c)?c/100:NaN}
+function calcUpd(){if(!calcEl)return;const v=calcEl.value;const r=calcVal(v);$('#c-expr').textContent=v||'0';$('#c-res').textContent=/[+\-×÷*/()]/.test(v)?(Number.isFinite(r)?'= '+(+r.toFixed(2)).toLocaleString('en-US',{maximumFractionDigits:2}):'= ?'):''}
+function calcFire(el,change){el.dispatchEvent(new Event('input',{bubbles:true}));if(change)el.dispatchEvent(new Event('change',{bubbles:true}))}
+function calcKey(k){
+  const el=calcEl;if(!el)return;
+  if(k==='ok'){const r=calcVal(el.value);if(el.value&&/[+\-×÷*/()]/.test(el.value)&&Number.isFinite(r)){el.value=String(+r.toFixed(2));calcFire(el)}calcFire(el,true);el.blur();calcHide();return}
+  let v=el.value,a=el.selectionStart??v.length,b=el.selectionEnd??v.length;
+  if(k==='C'){v='';a=b=0}
+  else if(k==='⌫'){if(a===b&&a>0)a--;v=v.slice(0,a)+v.slice(b);b=a}
+  else if(k==='='){const r=calcVal(v);if(Number.isFinite(r)){v=String(+r.toFixed(2));a=b=v.length}}
+  else{v=v.slice(0,a)+k+v.slice(b);a=b=a+k.length}
+  el.value=v;try{el.setSelectionRange(a,a)}catch(e){}
+  calcFire(el);calcEl=document.getElementById(el.id)||el;if(calcEl!==el){calcEl.focus();try{calcEl.setSelectionRange(a,a)}catch(e){}}
+  calcUpd();
+}
+document.addEventListener('focusin',e=>{const el=e.target;if(el.matches?.('input[data-calc]')){if(calcEl!==el)calcShow(el);else calcUpd()}});
+document.addEventListener('focusout',()=>setTimeout(()=>{if(calcEl&&document.activeElement!==calcEl&&!document.activeElement?.matches?.('input[data-calc]')){calcFire(calcEl,true);calcHide()}},120));
+$('#calc').addEventListener('pointerdown',e=>{if(e.target.closest('[data-ck]'))e.preventDefault()});
+$('#calc').addEventListener('click',e=>{const b=e.target.closest('[data-ck]');if(b)calcKey(b.dataset.ck)});
+document.addEventListener('input',e=>{if(e.target===calcEl)calcUpd()});
+
+/* ---------- 密码锁 ---------- */
+let pinBuf='',pinFails=0,pinWait=0,hiddenAt=0;
+const bioOK=()=>!!(window.AndroidBridge&&AndroidBridge.hasBiometric&&AndroidBridge.hasBiometric());
+async function pinHash(pin,salt){
+  const txt=salt+':'+pin;
+  try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(txt));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+  catch(e){let h=2166136261;for(const ch of txt){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)>>>0}return 'f'+h.toString(16)}
+}
+function lockDraw(msg=''){
+  const L2=(zh,tk)=>LANG==='tk'?tk:zh;
+  $('#lock').innerHTML=`<h2>${L2('出差钱袋','Iş sapary gapjygy')}</h2><div>${L2('请输入密码','Paroly giriziň')}</div>
+  <div class="dots">${[0,1,2,3,4,5].slice(0,Math.max(4,S.lock.len||4)).map(i=>`<i class="${i<pinBuf.length?'on':''}"></i>`).join('')}</div><div class="msg">${msg}</div>
+  <div class="pad">${['1','2','3','4','5','6','7','8','9','bio','0','del'].map(k=>k==='bio'?(S.lock.bio&&bioOK()?`<button class="t" data-pk="bio">${L2('指纹','Barmak yzy')}</button>`:'<span></span>'):k==='del'?`<button class="t" data-pk="del">${L2('删除','Poz')}</button>`:`<button data-pk="${k}">${k}</button>`).join('')}</div>
+  <button class="lk-link" data-pk="forgot">${L2('忘记密码？','Paroly ýatdan çykardyňyzmy?')}</button>`;
+}
+function lockShow(){if(!S.lock)return;pinBuf='';const l=$('#lock');l.hidden=false;lockDraw();if(S.lock.bio&&bioOK())setTimeout(()=>AndroidBridge.biometric(LANG==='tk'?'Gapjygy açmak':'解锁出差钱袋',LANG==='tk'?'Parol bilen':'用密码'),300)}
+function lockHide(){$('#lock').hidden=true;pinBuf=''}
+window.__bio=ok=>{if(ok)lockHide()};
+$('#lock').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-pk]');if(!b)return;const k=b.dataset.pk;const tk=LANG==='tk';
+  if(k==='bio'){AndroidBridge.biometric(tk?'Gapjygy açmak':'解锁出差钱袋',tk?'Parol bilen':'用密码');return}
+  if(k==='forgot'){lockDraw(tk?'Paroly dikeldip bolmaýar. Diňe programmany pozup täzeden gurmaly (maglumatlar pozular), soň ätiýaçlykdan dikeldiň.':'密码无法找回。只能卸载重装（账目会清空），再用备份恢复。');return}
+  if(Date.now()<pinWait){lockDraw(tk?'Biraz garaşyň…':'请稍等再试…');return}
+  if(k==='del')pinBuf=pinBuf.slice(0,-1);else if(pinBuf.length<6)pinBuf+=k;
+  lockDraw();
+  if(pinBuf.length===(S.lock.len||4)){
+    if(await pinHash(pinBuf,S.lock.salt)===S.lock.hash){pinFails=0;lockHide()}
+    else{pinFails++;pinBuf='';const l=$('#lock');l.classList.remove('shake');void l.offsetWidth;l.classList.add('shake');
+      if(pinFails>=5){pinWait=Date.now()+30000;pinFails=0;lockDraw(tk?'Köp ýalňyş: 30 sekunt garaşyň':'错误太多，请 30 秒后再试')}else lockDraw(tk?'Parol nädogry':'密码不对')}
+  }
+});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)hiddenAt=Date.now();else if(S?.lock&&hiddenAt&&Date.now()-hiddenAt>60000)lockShow()});
+SHEETS['pin-set']=d=>head(S.lock?'修改密码':'设置密码')+`<div class="card" style="display:flex;flex-direction:column;gap:10px">
+  <label class="fl">新密码（4–6 位数字）<input class="in num" type="password" inputmode="numeric" maxlength="6" id="pin1" autocomplete="new-password"></label>
+  <label class="fl">再输一次<input class="in num" type="password" inputmode="numeric" maxlength="6" id="pin2" autocomplete="new-password"></label>
+  ${bioOK()?`<label class="sw"><input type="checkbox" id="pin-bio" checked>同时允许指纹解锁</label>`:''}
+  <p class="note">密码忘了无法找回，只能卸载重装后用备份恢复。设置前建议先备份。</p>
+  <button class="btn" data-a="pin-save">保存密码</button></div>`;
+
 /* ---------- 启动 ---------- */
 async function boot(){
   S=load();LANG=S?.lang||'zh';
-  if(!S){S=seed('zh');save(true);putPhoto('demo-receipt',demoReceipt())}
+  if(S){S.trips.forEach(migrateRates);if(!S.firstUse){S.firstUse=Date.now();save(true)}}
+  if(!S){S=seed('zh');S.firstUse=Date.now();save(true);putPhoto('demo-receipt',demoReceipt())}
   else if(S.trips.some(t=>t.txs.some(x=>x.photos?.includes('demo-receipt')))&&!(await getPhoto('demo-receipt')))putPhoto('demo-receipt',demoReceipt());
   render();
+  if(S.lock)lockShow();
   const h=location.hash.slice(1);if(h){const x=T().txs.find(y=>y.id===h);if(x)openSheet('tx',{id:h})}
 }
 window.__back=()=>{if(viewer){ACT['v-close']();return true}if(sheets.length){closeSheet();return true}if(tab!=='home'){tab='home';render();return true}return false};
