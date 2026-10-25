@@ -282,6 +282,9 @@ body.calc-open main.wrap{padding-bottom:360px}
 .a4 figcaption{font-size:11px;color:#3A4642;margin-top:6px}
 .a4 .dsum{margin-top:12px;width:auto;min-width:50%}
 .fxwarn{color:var(--warn);font-weight:600}
+.sugs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0 0;font-weight:400}
+.sugs button{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 11px;font-size:13px;max-width:70vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sugs button b{color:var(--accent)}
 @media print{
   @page{size:A4;margin:12mm}
   :root{padding:0!important}
@@ -418,7 +421,9 @@ const TK={
  '没有弹出打印窗口？请用浏览器菜单里的「打印」，或「复制为表格」':'Çap penjiresi açylmadymy? Brauzeriň menýusyndaky «Çap» ulanyň ýa-da «Tablisa hökmünde göçür».',
  '餐饮':'Nahar','交通':'Ulag','住宿':'Ýaşaýyş','门票':'Bilet','通讯':'Aragatnaşyk','购物':'Söwda','杂费':'Beýlekiler','其他':'Beýleki',
  '编号':'Belgi','金额':'Möçber','参与人/分摊':'Gatnaşyjylar / paýy','垫付人':'Tölän adam','照片数':'Surat sany','折合':'Hasabynda ',
- '语言':'Dil','基准':'Esasy','汇率统一按「1 美元 = 多少该货币」填写。用于外币直接入钱、或账户没有成本时的折算；换汇后自动用实际成本。默认值只是参考，请按实际修改。':'Kurslar «1 ABŞ dollary = näçe şol walýuta» görnüşinde ýazylýar. Daşary ýurt walýutasy göni goşulanda ýa-da hasapda gymmat ýok mahaly ulanylýar; walýuta çalşylandan soň hakyky gymmat awtomatik ulanylýar. Başdaky bahalar diňe salgylanma, hakykysyna görä üýtgediň.',
+ '语言':'Dil','分享 PDF':'PDF paýlaş','分享备份文件':'Ätiýaçlyk faýlyny paýlaş','分享 CSV':'CSV paýlaş','正在生成 PDF…':'PDF taýýarlanýar…',
+ 'PDF 生成失败，已打开打印界面，请选「另存为 PDF」':'PDF döredip bolmady; çap penjiresi açyldy, «PDF edip sakla» saýlaň','分享':'Paýlaş',
+ '网页版：点「打印 / 存为 PDF」，选「另存为 PDF」后，从文件里分享。':'Web wersiýa: «Çap et / PDF sakla» basyň, «PDF edip sakla» saýlaň, soň faýly paýlaşyň.','基准':'Esasy','汇率统一按「1 美元 = 多少该货币」填写。用于外币直接入钱、或账户没有成本时的折算；换汇后自动用实际成本。默认值只是参考，请按实际修改。':'Kurslar «1 ABŞ dollary = näçe şol walýuta» görnüşinde ýazylýar. Daşary ýurt walýutasy göni goşulanda ýa-da hasapda gymmat ýok mahaly ulanylýar; walýuta çalşylandan soň hakyky gymmat awtomatik ulanylýar. Başdaky bahalar diňe salgylanma, hakykysyna görä üýtgediň.',
  '上次汇率':'Öňki kurs','参考汇率':'Salgylanma kursy','完成':'Taýýar',
  '应用密码锁':'Programmanyň paroly','修改密码':'Paroly üýtget','关闭密码锁':'Paroly öçür','再点一次：关闭密码锁':'Ýene basyň: parol öçüriler','用指纹解锁':'Barmak yzy bilen açmak',
  '离开 APP 超过 1 分钟再回来，需要重新输入密码。':'Programmadan 1 minutdan köp çyksaňyz, paroly täzeden girizmeli bolarsyňyz.','设置密码':'Parol goý',
@@ -860,7 +865,7 @@ SHEETS.form=d=>{
     const perLbl=ext?'存入金额':d.type==='deposit'&&d.per?'每人存入':d.type==='deposit'?'总共存入':'总金额';
     h+=`<label class="fl">${perLbl} <span class="hint">可直接输入算式，如 120+35×2</span><div class="amt"><select class="in" id="f-cur" data-f="cur">${curOpts(d.cur)}</select><input class="in" id="f-amt" data-f="amountStr" inputmode="none" data-calc autocomplete="off" placeholder="0.00" value="${esc(d.amountStr)}" autocomplete="off"></div></label>`;
     if(d.type==='deposit'){
-      if(ext)h+=`<label class="fl">来源名称<input class="in" id="f-srcname" data-f="srcName" list="dl-src" value="${esc(d.srcName)}" placeholder="如 公司备用金、报销款"></label>`;
+      if(ext)h+=`<label class="fl">来源名称<input class="in" id="f-srcname" data-f="srcName" data-sug="srcName" autocomplete="off" value="${esc(d.srcName)}" placeholder="如 公司备用金、报销款"></label>`;
       else h+=`<label class="sw"><input type="checkbox" id="f-per" data-f="per" ${d.per?'checked':''}>按每人金额输入（每个被选的人存同样多）</label>`;
       if(d.cur!==t.base){const q=d.cur==='USD'?t.base:d.cur;h+=`<label class="fl">汇率 1 USD = ? ${q}<input class="in num" id="f-rate" data-f="rate" inputmode="none" data-calc autocomplete="off" value="${esc(d.rate)}" placeholder="${usdOf(t,q)}（参考汇率）"></label>`}
     }
@@ -877,14 +882,12 @@ SHEETS.form=d=>{
     }
   }
   h+=`<div class="frow"><label class="fl">时间<input class="in" type="datetime-local" id="f-time" data-f="time" value="${esc(d.time)}"></label>
-  <label class="fl">地点<input class="in" id="f-place" data-f="place" list="dl-place" value="${esc(d.place)}" placeholder="如 酒店前台"></label></div>
-  <label class="fl">备注<input class="in" id="f-note" data-f="note" list="dl-note" value="${esc(d.note)}" placeholder="如 晚饭、打车去机场"></label>
+  <label class="fl">地点<input class="in" id="f-place" data-f="place" data-sug="place" autocomplete="off" value="${esc(d.place)}" placeholder="如 酒店前台"></label></div>
+  <label class="fl">备注<input class="in" id="f-note" data-f="note" data-sug="note" autocomplete="off" value="${esc(d.note)}" placeholder="如 晚饭、打车去机场"></label>
   <div class="fl">照片（小票、发票）</div><div id="f-photos">${photosHTML(d)}</div>
-  ${datalists(t)}
   <button class="btn" data-a="save" id="f-save" ${draftCalc(d).err?'disabled':''}>${d.editId?'保存修改':'保存'}</button>`;
   return h;
 };
-function datalists(t){const u=k=>[...new Set(t.txs.map(x=>x[k]).filter(Boolean).reverse())].slice(0,40).map(v=>`<option value="${esc(v)}">`).join('');return `<datalist id="dl-place">${u('place')}</datalist><datalist id="dl-note">${u('note')}</datalist><datalist id="dl-src">${u('srcName')}</datalist>`}
 function updatePreview(s){
   const p=$('#preview',s.body);
   const ae=document.activeElement;const aid=ae&&ae.id;const pos=ae&&ae.selectionStart;
@@ -979,12 +982,12 @@ SHEETS.trash=()=>{const t=T();const xs=t.txs.filter(x=>x.deleted);
 SHEETS.backup=(d)=>head('备份 / 恢复')+`<div class="card" style="display:flex;flex-direction:column;gap:10px"><h4 style="margin:0">导出备份</h4>
   <label class="sw"><input type="checkbox" id="bk-ph" data-a="bk-ph" ${d.withPhotos!==false?'checked':''}>包含照片（文件会大一些）</label>
   <div class="btns"><button class="btn2" data-a="bk-make">生成备份</button></div>
-  ${d.json!=null?`<textarea class="in mono" id="bk-out" readonly>${esc(d.json)}</textarea><div class="hint">${(d.json.length/1024).toFixed(0)} KB</div><div class="btns"><button class="btn2" data-a="bk-copy">复制</button><button class="btn2" data-a="bk-dl">下载文件</button></div><p class="note">若「下载文件」没反应，用「复制」后粘贴到备忘录或发给自己保存。</p>`:''}</div>
+  ${d.json!=null?`<textarea class="in mono" id="bk-out" readonly>${esc(d.json)}</textarea><div class="hint">${(d.json.length/1024).toFixed(0)} KB</div><div class="btns"><button class="btn2" data-a="bk-copy">复制</button><button class="btn2" data-a="bk-dl">下载文件</button>${canShare()?'<button class="btn2" data-a="bk-share">分享备份文件</button>':''}</div><p class="note">若「下载文件」没反应，用「复制」后粘贴到备忘录或发给自己保存。</p>`:''}</div>
   <div class="card" style="display:flex;flex-direction:column;gap:10px"><h4 style="margin:0">从备份恢复</h4>
   <input type="file" accept=".json,application/json,text/plain" class="in" id="bk-file" data-file="bk">
   <textarea class="in mono" id="bk-in" placeholder="或把备份内容粘贴到这里"></textarea>
   <button class="btn2 danger" data-a="bk-import" data-confirm="再点一次：用备份覆盖本机全部数据">恢复（会覆盖本机现有数据）</button></div>`;
-SHEETS.csv=()=>{const t=T();const txt=csvOf(t);return head('导出表格')+`<div class="card" style="display:flex;flex-direction:column;gap:10px"><textarea class="in mono" id="csv-out" readonly>${esc(txt)}</textarea><div class="btns"><button class="btn2" data-a="csv-copy">复制</button><button class="btn2" data-a="csv-dl">下载 CSV</button></div><p class="note">每笔一行，包含分摊明细，可直接用 Excel / Numbers 打开。</p></div>`};
+SHEETS.csv=()=>{const t=T();const txt=csvOf(t);return head('导出表格')+`<div class="card" style="display:flex;flex-direction:column;gap:10px"><textarea class="in mono" id="csv-out" readonly>${esc(txt)}</textarea><div class="btns"><button class="btn2" data-a="csv-copy">复制</button><button class="btn2" data-a="csv-dl">下载 CSV</button>${canShare()?'<button class="btn2" data-a="csv-share">分享 CSV</button>':''}</div><p class="note">每笔一行，包含分摊明细，可直接用 Excel / Numbers 打开。</p></div>`};
 function csvOf(t){
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
   const rows=[['编号','时间','类型','类别','币种','金额','折合'+t.base,'参与人/分摊','垫付人','地点','备注','照片数'].map(L)];
@@ -1094,10 +1097,18 @@ SHEETS.stmt=d=>{
   return head('A4 账单')+`<label class="fl">打印哪一本账<select class="in" id="st-scope" data-st="scope">${opts.map(([k,l])=>`<option value="${k}" ${d.scope===k?'selected':''}>${esc(l)}</option>`).join('')}</select></label>
   <div class="frow"><label class="fl">从（可不填）<input class="in" type="date" id="st-from" data-st="from" value="${d.from||''}"></label><label class="fl">到（可不填）<input class="in" type="date" id="st-to" data-st="to" value="${d.to||''}"></label></div>
   <label class="sw"><input type="checkbox" id="st-ph" data-st="withPhotos" ${d.withPhotos?'checked':''}>把小票照片附在账单后面（每页 4 张）</label>
-  <button class="btn" data-a="print">打印 / 存为 PDF</button>
+  <div class="btns"><button class="btn" data-a="print">打印 / 存为 PDF</button>${canShare()?'<button class="btn" data-a="pdf-share">分享 PDF</button>':''}</div>${canShare()?'':'<p class="note">网页版：点「打印 / 存为 PDF」，选「另存为 PDF」后，从文件里分享。</p>'}
   <div class="paper-wrap">${stmtHTML(t,d)}</div>
   <button class="btn2" data-a="stmt-copy">复制为表格（可粘贴到 Excel）</button>`;
 };
+
+async function preparePrint(){
+  const s=[...sheets].reverse().find(x=>x.kind==='stmt');const t=T();const pr=$('#print-root');pr.innerHTML=stmtHTML(t,s.data);tr(pr);
+  await Promise.all([...pr.querySelectorAll('img[data-photo]')].map(async img=>{const v=await getPhoto(img.dataset.photo);if(v){img.src=v;try{await img.decode()}catch(e){}}}));
+  return {t,ttl:s.data.scope==='all'?'钱袋总账 + 全部成员账单':s.data.scope==='days'?'按天日报':stmtData(t,s.data).title};
+}
+const canShare=()=>!!(window.AndroidBridge&&AndroidBridge.sharePdf);
+window.__toast=m=>toast(m);
 
 /* ----- 照片查看 ----- */
 let viewer=null;
@@ -1145,11 +1156,13 @@ const ACT={
   'f-mode':b=>{const s=topForm(),d=s.data;d.mode=b.dataset.v;if(d.mode==='custom'){const r=draftCalc({...d,mode:'equal'});(r.splits||[]).forEach(x=>{if(d.custom[x.m]==null||d.custom[x.m]==='')d.custom[x.m]=String(x.amt/100)})}renderSheet(s)},
   'f-src':b=>{const s=topForm();s.data.src=b.dataset.v;renderSheet(s)},
   stmt:b=>{const s=openSheet('stmt',{scope:b.dataset.v||'all'});s.body.classList.add('wide')},
-  print:async()=>{const s=[...sheets].reverse().find(x=>x.kind==='stmt');const t=T();const pr=$('#print-root');pr.innerHTML=stmtHTML(t,s.data);tr(pr);
-    await Promise.all([...pr.querySelectorAll('img[data-photo]')].map(async img=>{const v=await getPhoto(img.dataset.photo);if(v){img.src=v;try{await img.decode()}catch(e){}}}));
-    const ttl=s.data.scope==='all'?'钱袋总账 + 全部成员账单':s.data.scope==='days'?'按天日报':stmtData(t,s.data).title;
+  print:async()=>{const {t,ttl}=await preparePrint();
     if(window.AndroidBridge&&AndroidBridge.print){AndroidBridge.print(`${t.name}-${trText(ttl)}`);return}
     const t0=Date.now();try{window.print()}catch(e){}if(Date.now()-t0<300)toast('没有弹出打印窗口？请用浏览器菜单里的「打印」，或「复制为表格」')},
+  'pdf-share':async()=>{const {t,ttl}=await preparePrint();toast('正在生成 PDF…');
+    AndroidBridge.sharePdf(`${t.name}-${trText(ttl)}`,`${t.name}-${trText(ttl)}-${nowLocal().slice(0,10)}.pdf`)},
+  'bk-share':()=>AndroidBridge.shareText(`出差钱袋备份-${nowLocal().slice(0,10)}.json`,'application/json',$('#bk-out').value),
+  'csv-share':()=>AndroidBridge.shareText(`${T().name}.csv`,'text/csv',csvOf(T())),
   'stmt-copy':()=>{const s=[...sheets].reverse().find(x=>x.kind==='stmt');copyText(stmtTSV(T(),s.data))},
   'f-cat':b=>{const s=topForm();s.data.category=b.dataset.v;renderSheet(s)},
   'ph-rm':b=>{const s=topForm();const id=s.data.photos.splice(+b.dataset.i,1)[0];if(!s.data.editId||!T().txs.find(x=>x.id===s.data.editId)?.photos.includes(id))delPhoto(id);$('#f-photos',s.body).innerHTML=photosHTML(s.data);hydrate(s.body)},
@@ -1247,6 +1260,24 @@ document.addEventListener('focusout',()=>setTimeout(()=>{if(calcEl&&document.act
 $('#calc').addEventListener('pointerdown',e=>{if(e.target.closest('[data-ck]'))e.preventDefault()});
 $('#calc').addEventListener('click',e=>{const b=e.target.closest('[data-ck]');if(b)calcKey(b.dataset.ck)});
 document.addEventListener('input',e=>{if(e.target===calcEl)calcUpd()});
+
+/* ---------- 以前填过的内容：显示在输入框下方，不盖住键盘 ---------- */
+let sugEl=null;
+function sugList(key,q){const t=T();q=(q||'').trim().toLowerCase();
+  return [...new Set(t.txs.slice().sort(byTime).reverse().map(x=>x[key]).filter(Boolean))].filter(v=>v.toLowerCase()!==q&&(!q||v.toLowerCase().includes(q))).slice(0,8)}
+function sugShow(el){
+  sugEl=el;let box=el.parentElement.querySelector('.sugs');
+  const vals=sugList(el.dataset.sug,el.value);
+  if(!vals.length){box&&box.remove();return}
+  if(!box){box=document.createElement('div');box.className='sugs';box.setAttribute('translate','no');el.after(box)}
+  box.innerHTML=vals.map(v=>`<button type="button" data-sv="${esc(v)}">${esc(v)}</button>`).join('');
+}
+function sugHide(){document.querySelectorAll('.sugs').forEach(b=>b.remove());sugEl=null}
+document.addEventListener('focusin',e=>{const el=e.target;if(el.matches?.('input[data-sug]')){sugShow(el);setTimeout(()=>el.scrollIntoView({block:'center',behavior:'smooth'}),350)}});
+document.addEventListener('input',e=>{if(e.target===sugEl)sugShow(sugEl)});
+document.addEventListener('focusout',e=>{if(e.target===sugEl)setTimeout(()=>{if(document.activeElement!==sugEl)sugHide()},150)});
+document.addEventListener('pointerdown',e=>{if(e.target.closest('.sugs [data-sv]'))e.preventDefault()});
+document.addEventListener('click',e=>{const b=e.target.closest('.sugs [data-sv]');if(!b||!sugEl)return;sugEl.value=b.dataset.sv;sugEl.dispatchEvent(new Event('input',{bubbles:true}));sugHide()});
 
 /* ---------- 密码锁 ---------- */
 let pinBuf='',pinFails=0,pinWait=0,hiddenAt=0;

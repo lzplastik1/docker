@@ -14,6 +14,7 @@ import android.os.CancellationSignal;
 import android.hardware.biometrics.BiometricManager;
 import android.hardware.biometrics.BiometricPrompt;
 import android.os.Environment;
+import android.print.PdfExporter;
 import android.print.PrintAttributes;
 import android.print.PrintManager;
 import android.provider.MediaStore;
@@ -156,6 +157,39 @@ public class MainActivity extends Activity {
         });
     }
 
+    private static String safeName(String n) {
+        String s = n == null ? "file" : n.replaceAll("[\\\\/:*?\"<>|\\s]+", "_");
+        return s.isEmpty() ? "file" : s;
+    }
+
+    private void shareFile(File f, String mime, String title) {
+        Uri uri = Uri.parse("content://" + ShareProvider.AUTHORITY + "/" + Uri.encode(f.getName()));
+        Intent send = new Intent(Intent.ACTION_SEND);
+        send.setType(mime);
+        send.putExtra(Intent.EXTRA_STREAM, uri);
+        send.putExtra(Intent.EXTRA_SUBJECT, title);
+        send.setClipData(ClipData.newRawUri(f.getName(), uri));
+        send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        Intent chooser = Intent.createChooser(send, title);
+        chooser.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        try {
+            startActivity(chooser);
+        } catch (Exception e) {
+            toastJs("分享失败");
+        }
+    }
+
+    private void pdfFallback(String title) {
+        toastJs("PDF 生成失败，已打开打印界面，请选「另存为 PDF」");
+        PrintManager pm = (PrintManager) getSystemService(Context.PRINT_SERVICE);
+        if (pm != null) pm.print(title, web.createPrintDocumentAdapter(title),
+                new PrintAttributes.Builder().setMediaSize(PrintAttributes.MediaSize.ISO_A4).build());
+    }
+
+    private void toastJs(String msg) {
+        web.evaluateJavascript("window.__toast&&window.__toast(" + org.json.JSONObject.quote(msg) + ")", null);
+    }
+
     private void bioReply(boolean ok) {
         web.evaluateJavascript("window.__bio&&window.__bio(" + ok + ")", null);
     }
@@ -165,6 +199,38 @@ public class MainActivity extends Activity {
         public void copy(String text) {
             ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             if (cm != null) cm.setPrimaryClip(ClipData.newPlainText("出差钱袋", text));
+        }
+
+        /** 生成 PDF 并打开系统分享菜单；失败时退回打印界面。 */
+        @JavascriptInterface
+        public void sharePdf(String title, String fileName) {
+            runOnUiThread(() -> {
+                File out = new File(ShareProvider.dir(MainActivity.this), safeName(fileName));
+                try {
+                    PdfExporter.export(web.createPrintDocumentAdapter(title), out, ok -> {
+                        if (ok) shareFile(out, "application/pdf", title);
+                        else pdfFallback(title);
+                    });
+                } catch (Throwable t) {
+                    pdfFallback(title);
+                }
+            });
+        }
+
+        /** 把文本内容（备份 JSON、CSV）存成文件并分享。 */
+        @JavascriptInterface
+        public void shareText(String fileName, String mime, String text) {
+            runOnUiThread(() -> {
+                try {
+                    File out = new File(ShareProvider.dir(MainActivity.this), safeName(fileName));
+                    try (FileOutputStream os = new FileOutputStream(out)) {
+                        os.write(text.getBytes(StandardCharsets.UTF_8));
+                    }
+                    shareFile(out, mime, fileName);
+                } catch (Exception e) {
+                    toastJs("分享失败");
+                }
+            });
         }
 
         /** 设备是否可以用指纹（Android 10 及以上）。 */
