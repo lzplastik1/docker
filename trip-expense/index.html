@@ -1100,15 +1100,6 @@ function sumTable(t,d){const u=t.base;
 /* 按币种分开记账：每种货币用自己的钱记入、出、余额；换汇在两个账户各记一笔 */
 const numC=(v,c)=>(Math.round(v)<0?'−':'')+fmtN(Math.round(v),c);
 function usedCurs(t,d){const set=new Set();live(t).forEach(x=>{const day=x.time.slice(0,10);if(d.to&&day>d.to)return;[x.cur,x.fromCur,x.toCur].forEach(c=>c&&set.add(c))});return t.currencies.map(c=>c.code).filter(c=>set.has(c))}
-function curSummary(t,d){
-  const rows=usedCurs(t,d).map(c=>{const s=stmtData(t,{...d,scope:'cur:'+c});const a={dep:0,xin:0,exp:0,xout:0};
-    s.rows.forEach(r=>{if(r.x.type==='exchange'){a.xin+=r.inn;a.xout+=r.out}else{a.dep+=r.inn;a.exp+=r.out}});
-    return {c,open:s.open,...a,close:s.close,base:s.close*C.avg(c)}});
-  if(!rows.length)return '';
-  return `<div class="h2"><h2>币种汇总</h2><span>各币种按原币计算</span></div><table><colgroup><col style="width:30mm"><col><col><col><col><col><col><col style="width:22mm"></colgroup>
-  <thead><tr><th>币种</th><th class="n">期初</th><th class="n">存入</th><th class="n">换入</th><th class="n">支出</th><th class="n">换出</th><th class="n">余额</th><th class="n">≈ ${t.base}</th></tr></thead><tbody>
-  ${rows.map(r=>`<tr><td><b>${r.c}</b> <span class="m2">${esc(cname(r.c))}</span></td><td class="n">${numC(r.open,r.c)}</td><td class="n in">${r.dep?numC(r.dep,r.c):''}</td><td class="n in">${r.xin?numC(r.xin,r.c):''}</td><td class="n out">${r.exp?numC(r.exp,r.c):''}</td><td class="n out">${r.xout?numC(r.xout,r.c):''}</td><td class="n"><b>${numC(r.close,r.c)}</b></td><td class="n m2">${r.c===t.base?'':money(r.base,t.base)}</td></tr>`).join('')}</tbody></table>`;
-}
 function curLedgers(t,d){
   return usedCurs(t,d).map(c=>{const s=stmtData(t,{...d,scope:'cur:'+c});
     return `<div class="keep"><div class="h2"><h2>钱袋 ${c} ${esc(cname(c))} 账户</h2><span>期末余额 ${money(s.close,c)}</span></div>
@@ -1122,7 +1113,6 @@ function docPool(t,d,withMembers){
   const s=stmtData(t,d),u=s.unit;
   let h=`<div class="a4">${a4Head(t,d.title||s.title,d,u,`${s.rows.length} 笔 · ${t.members.length} 人`)}
   <div class="kpi"><div><span>期初余额</span><b>${money(s.open,u)}</b></div><div><span>入 合计</span><b class="in">${money(s.totIn,u)}</b></div><div><span>出 合计</span><b class="out">${money(s.totOut,u)}</b></div><div><span>期末余额</span><b>${money(s.close,u)}</b></div></div>
-  ${(d.scope||'pool')==='pool'?curSummary(t,d):''}
   ${withMembers?`<div class="fine">各币种原币记账，换汇在两个账户里各记一笔。折合 ${t.base} 按换汇实际成本计算。</div>`+curLedgers(t,d):poolTable(s,d)}
   ${(d.scope||'pool').startsWith('cur:')||withMembers?'':`<div class="fine">外币按换汇实际成本折算为${cname(t.base)}。换汇只是钱袋内部换币，不计入、出。</div>`}`;
   if(withMembers||d.day)h+=sumTable(t,d);
