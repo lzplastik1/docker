@@ -1562,7 +1562,11 @@ async function boot(){
   if(S.lock)lockShow();
   const h=location.hash.slice(1);if(h){const x=T().txs.find(y=>y.id===h);if(x)openSheet('tx',{id:h})}
 }
-window.__back=()=>{if(viewer){ACT['v-close']();return true}if(sheets.length){closeSheet();return true}if(tab!=='home'){tab='home';render();return true}return false};
+window.__back=()=>{
+  // 先收键盘：计算器键盘或正在输入的文字框，只收起键盘，不关页面
+  if(calcEl){calcFire(calcEl,true);calcEl.blur();calcHide();return true}
+  const ae=document.activeElement;if(ae&&ae.matches?.('input:not([type=checkbox]):not([type=file]),textarea,select')){ae.blur();sugHide();return true}
+  if(viewer){ACT['v-close']();return true}if(sheets.length){closeSheet();return true}if(tab!=='home'){tab='home';render();return true}return false};
 boot();
 })();
 if('serviceWorker' in navigator&&location.protocol==='https:'&&!window.AndroidBridge)navigator.serviceWorker.register('sw.js').catch(()=>{});
