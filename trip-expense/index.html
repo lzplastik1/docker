@@ -2,8 +2,19 @@
 <title>出差钱袋</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&display=swap">
 <style>
+/* 数字字体 Barlow（随 APP 打包，没网也能用；网页版再从 Google Fonts 取） */
+@font-face{font-family:'BarlowApp';font-style:normal;font-weight:300;font-display:swap;src:url(fonts/barlow-300-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'BarlowApp';font-style:normal;font-weight:300;font-display:swap;src:url(fonts/barlow-300-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'BarlowApp';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/barlow-400-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'BarlowApp';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/barlow-400-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'BarlowApp';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/barlow-500-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'BarlowApp';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/barlow-500-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'BarlowApp';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/barlow-600-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'BarlowApp';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/barlow-600-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'BarlowApp';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/barlow-700-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'BarlowApp';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/barlow-700-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
 /* Layout: one phone-width column; sticky trip header, glass tab bar, bottom sheets. Deep emerald gradients with champagne-gold highlights. */
 :root{
   --bg:#EDF1EF; --bg2:#E3EBE7; --surface:#FFFFFF; --surface2:#F3F6F5; --ink:#0F1F1A; --muted:#5B6B65; --line:#DCE4E0;
@@ -15,7 +26,7 @@
   --scrim:rgba(6,20,16,.5);
   --shadow:0 1px 1px rgba(10,40,30,.04),0 2px 6px rgba(10,40,30,.05),0 12px 28px -12px rgba(10,40,30,.14);
   --shadow-hero:0 22px 44px -22px rgba(5,42,36,.75),0 8px 18px -10px rgba(5,42,36,.4);
-  --f-display:"Sora",-apple-system,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+  --f-display:"BarlowApp","Barlow",-apple-system,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
   --f-body:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei","Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
@@ -352,7 +363,7 @@ button{transition:transform .12s ease,background-color .12s ease}
 .hero-top .brand{font-size:11px;letter-spacing:.14em;color:var(--muted);font-weight:500}
 .hero-top svg{display:none}
 .hero .lbl{color:var(--muted);letter-spacing:.02em;font-size:12px}
-.hero .big{font-size:42px;font-weight:300;letter-spacing:-.04em;line-height:1.05;background:none;color:var(--ink);-webkit-text-fill-color:currentColor}
+.hero .big{font-size:44px;font-weight:500;letter-spacing:-.04em;line-height:1.05;background:none;color:var(--ink);-webkit-text-fill-color:currentColor}
 .hero .row{color:var(--muted)}
 .hero .row b{color:var(--ink);font-weight:600}
 .src span{background:var(--surface2);border:0;color:var(--muted)}

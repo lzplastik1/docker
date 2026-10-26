@@ -6,7 +6,7 @@ plugins {
 def webOut = layout.buildDirectory.dir('generated/web').get().asFile
 def copyWeb = tasks.register('copyWeb', Copy) {
     from(rootProject.file('..')) {
-        include 'index.html', '*.png', 'manifest.webmanifest'
+        include 'index.html', '*.png', 'manifest.webmanifest', 'fonts/*.woff2'
     }
     into new File(webOut, 'www')
 }

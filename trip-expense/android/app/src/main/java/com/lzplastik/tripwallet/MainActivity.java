@@ -120,6 +120,7 @@ public class MainActivity extends Activity {
                     : name.endsWith(".png") ? "image/png"
                     : name.endsWith(".js") ? "application/javascript"
                     : name.endsWith(".webmanifest") ? "application/manifest+json"
+                    : name.endsWith(".woff2") ? "font/woff2"
                     : "application/octet-stream";
             return new WebResourceResponse(mime, "UTF-8", in);
         } catch (Exception e) {
