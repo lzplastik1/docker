@@ -315,6 +315,96 @@ body.calc-open main.wrap{padding-bottom:360px}
   .a4{width:auto;padding:0;margin:0}
   .a4+.a4{break-before:page}
 }
+
+/* ===== 高级版：墨绿黑卡 + 香槟金，浮动底栏 ===== */
+:root{--bg:#F1F3F2;--bg2:#E5ECE8;--surface:#FFFFFF;--surface2:#F4F6F5;--ink:#0B1512;--muted:#66736E;--line:#E3E9E6;
+  --accent:#0F5C4A;--accent-2:#1B8A6F;--accent-soft:#E2F0EA;--gold:#A9823D;--gold-soft:#F5ECDA;
+  --card1:#0F221C;--card2:#061310;--champ:#EBD6A6;--champ2:#C29A55;
+  --glass:rgba(255,255,255,.74);--glass-line:rgba(11,21,18,.07);
+  --shadow:0 1px 2px rgba(11,21,18,.04),0 12px 32px -16px rgba(11,21,18,.20)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#050807;--bg2:#0B1310;--surface:#0D1412;--surface2:#131C19;--ink:#ECF2EF;--muted:#8B9B95;--line:#1C2723;
+  --accent:#5DCFAA;--accent-2:#2FA585;--accent-soft:#11302A;--gold:#DDBE78;--gold-soft:#29220F;
+  --card1:#15271F;--card2:#050C0A;--glass:rgba(9,14,12,.80);--glass-line:rgba(255,255,255,.07);
+  --shadow:0 16px 36px -18px rgba(0,0,0,.85);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#050807;--bg2:#0B1310;--surface:#0D1412;--surface2:#131C19;--ink:#ECF2EF;--muted:#8B9B95;--line:#1C2723;
+  --accent:#5DCFAA;--accent-2:#2FA585;--accent-soft:#11302A;--gold:#DDBE78;--gold-soft:#29220F;
+  --card1:#15271F;--card2:#050C0A;--glass:rgba(9,14,12,.80);--glass-line:rgba(255,255,255,.07);
+  --shadow:0 16px 36px -18px rgba(0,0,0,.85);color-scheme:dark}
+body{background-image:radial-gradient(130% 55% at 50% -12%,var(--bg2),transparent 70%)}
+header.top .wrap{padding-block:14px 12px}
+.trip-btn b{font-size:21px;font-weight:600;letter-spacing:-.025em}
+main.wrap{padding-block:16px 170px;gap:16px}
+.sec-t h3{font-size:11px;letter-spacing:.16em}
+.card{border-radius:24px}
+button{transition:transform .12s ease,filter .12s ease}
+.quick button:active,.btn:active,.btn2:active,.chip:active,.hero .acts button:active,.acct:active,.fab:active{transform:scale(.97)}
+@media (prefers-reduced-motion:reduce){button{transition:none}button:active{transform:none!important}}
+/* 黑卡 */
+.hero{border-radius:30px;padding:20px 22px 20px;gap:16px;
+  background:radial-gradient(120% 90% at 105% -5%,rgba(235,214,166,.24),transparent 52%),radial-gradient(90% 80% at -5% 105%,rgba(27,138,111,.38),transparent 60%),linear-gradient(152deg,var(--card1),var(--card2));
+  box-shadow:0 34px 60px -32px rgba(3,18,14,.9),inset 0 0 0 1px rgba(235,214,166,.20)}
+.hero::after{opacity:1;background:repeating-radial-gradient(circle at 115% -25%,rgba(235,214,166,.09) 0 1px,transparent 1px 10px);-webkit-mask-image:linear-gradient(210deg,#000 10%,transparent 70%);mask-image:linear-gradient(210deg,#000 10%,transparent 70%)}
+.hero-top{display:flex;justify-content:space-between;align-items:center}
+.hero-top .brand{font-family:var(--f-display);font-size:11px;font-weight:600;letter-spacing:.22em;color:var(--champ)}
+.hero-top svg{width:34px;height:26px}
+.hero .lbl{color:rgba(235,214,166,.78);letter-spacing:.12em;font-size:11px}
+.hero .big{font-size:44px;font-weight:300;letter-spacing:-.04em;line-height:1.05;background:linear-gradient(96deg,#FFFFFF 25%,var(--champ) 72%,var(--champ2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .row{color:rgba(243,251,248,.62)}
+.src span{background:rgba(255,255,255,.05);border-color:rgba(235,214,166,.18)}
+.bar{background:rgba(255,255,255,.10);height:5px}
+.bar i{background:linear-gradient(90deg,var(--champ),var(--champ2))}
+.hero .acts button{border-radius:18px;padding:12px 8px;background:rgba(255,255,255,.05);border:1px solid rgba(235,214,166,.26);color:#F6F1E4}
+.hero .acts button i{width:28px;height:28px;border-radius:10px;background:linear-gradient(140deg,var(--champ),var(--champ2));color:#2A1E07}
+.hero .acts button i svg,.quick .ic svg,.ic-sq svg{width:18px;height:18px}
+/* 快捷按钮 */
+.quick{gap:12px}
+.quick button{border-radius:22px;padding:16px 14px;gap:12px;border:1px solid var(--glass-line)}
+.quick .ic{width:44px;height:44px;border-radius:50%;background:linear-gradient(150deg,var(--card1),var(--card2));color:var(--champ);box-shadow:inset 0 0 0 1px rgba(235,214,166,.25)}
+.quick .ic.gold{background:linear-gradient(140deg,var(--champ),var(--champ2));color:#2A1E07;box-shadow:none}
+.quick .ic svg{width:21px;height:21px}
+/* 币种卡 */
+.acct{border-radius:20px;background:var(--surface)}
+.acct::before{height:2px;background:linear-gradient(90deg,var(--champ2),var(--champ),transparent)}
+/* 流水图标：圆形淡色底 + 线条图标 */
+.ic-sq{width:40px;height:40px;border-radius:50%;background-image:none;box-shadow:none;color:var(--c,var(--accent));background:var(--surface2);background:color-mix(in srgb,var(--c,var(--accent)) 14%,var(--surface))}
+.ic-sq svg{width:19px;height:19px}
+.txr{padding:12px 0}
+.av{background-image:linear-gradient(150deg,rgba(255,255,255,.28),rgba(0,0,0,.22))}
+/* 分段、按钮 */
+.seg{border-radius:16px}
+.seg button{border-radius:13px}
+.seg button.on{background:linear-gradient(152deg,var(--card1),var(--card2));color:var(--champ);box-shadow:0 8px 16px -10px rgba(3,18,14,.9),inset 0 0 0 1px rgba(235,214,166,.32)}
+.btn{border-radius:18px;color:var(--champ);background:radial-gradient(90% 140% at 100% 0%,rgba(235,214,166,.18),transparent 60%),linear-gradient(152deg,var(--card1),var(--card2));box-shadow:0 14px 26px -16px rgba(3,18,14,.9),inset 0 0 0 1px rgba(235,214,166,.22)}
+.btn2{border-radius:14px}
+.chip{border-radius:999px}
+.chip.on{background:var(--accent-soft);border-color:var(--accent)}
+/* 浮动底栏 + 记一笔 */
+.tabbar{left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));max-width:536px;margin:0 auto;border-radius:26px;border:1px solid var(--glass-line);padding-bottom:0;box-shadow:0 18px 40px -20px rgba(3,18,14,.45)}
+.tabbar .wrap{padding:0 4px}
+.tabbar button{padding:10px 0 9px;font-size:11px}
+.tabbar button.on::before{display:none}
+.tabbar button.on svg{color:var(--accent)}
+.tabbar button.on{color:var(--ink)}
+.fab{bottom:calc(92px + env(safe-area-inset-bottom,0px));height:58px;border-radius:29px;padding:0 22px 0 18px;color:var(--champ);
+  background:radial-gradient(90% 120% at 100% 0%,rgba(235,214,166,.25),transparent 60%),linear-gradient(152deg,var(--card1),var(--card2));
+  border:1px solid rgba(235,214,166,.32);box-shadow:0 18px 34px -14px rgba(3,18,14,.75)}
+.sheet{border-radius:28px 28px 0 0}
+.toast{bottom:calc(170px + env(safe-area-inset-bottom,0px));border-radius:14px}
+/* 计算器键盘 */
+#calc{background:var(--glass);-webkit-backdrop-filter:saturate(160%) blur(22px);backdrop-filter:saturate(160%) blur(22px);border-top:1px solid var(--glass-line);border-radius:24px 24px 0 0}
+#calc .keys{gap:8px}
+#calc .keys button{border-radius:16px;padding:14px 0;background:var(--surface);box-shadow:0 1px 0 var(--glass-line),0 6px 14px -10px rgba(11,21,18,.35)}
+#calc .keys button.op{background:var(--gold-soft);color:var(--gold)}
+#calc .keys button.eq,#calc .done{background:linear-gradient(152deg,var(--card1),var(--card2));color:var(--champ)}
+#calc .keys button:active{transform:scale(.94);filter:brightness(.95)}
+/* 密码锁 */
+#lock{background:radial-gradient(110% 70% at 100% 0%,rgba(235,214,166,.22),transparent 55%),linear-gradient(160deg,var(--card1),var(--card2))}
+#lock h2{color:var(--champ);letter-spacing:.06em}
+#lock .pad button{border-color:rgba(235,214,166,.25);background:rgba(255,255,255,.05)}
+#lock .pad button:active{transform:scale(.93);background:rgba(235,214,166,.15)}
+#lock .dots i.on{background:var(--champ);border-color:var(--champ)}
 </style>
 
 <header class="top"><div class="wrap" id="hdr"></div></header>
@@ -432,7 +522,7 @@ const TK={
  '没有弹出打印窗口？请用浏览器菜单里的「打印」，或「复制为表格」':'Çap penjiresi açylmadymy? Brauzeriň menýusyndaky «Çap» ulanyň ýa-da «Tablisa hökmünde göçür».',
  '餐饮':'Nahar','交通':'Ulag','住宿':'Ýaşaýyş','门票':'Bilet','通讯':'Aragatnaşyk','购物':'Söwda','杂费':'Beýlekiler','其他':'Beýleki',
  '编号':'Belgi','金额':'Möçber','参与人/分摊':'Gatnaşyjylar / paýy','垫付人':'Tölän adam','照片数':'Surat sany','折合':'Hasabynda ',
- '语言':'Dil','币种汇总':'Walýutalar boýunça jemi','各币种按原币计算':'Her walýuta öz pulunda','期初':'Başy','换入':'Çalşyp alnan','换出':'Çalşyp berlen',
+ '语言':'Dil','按键震动':'Düwme titremesi','按键盘、按钮时手机轻轻震一下':'Düwmä basanyňyzda telefon ýeňil titrär','币种汇总':'Walýutalar boýunça jemi','各币种按原币计算':'Her walýuta öz pulunda','期初':'Başy','换入':'Çalşyp alnan','换出':'Çalşyp berlen',
  '各币种原币记账，换汇在两个账户里各记一笔。':'Her walýuta öz pulunda ýazylýar; walýuta çalyşmak iki hasapda hem görkezilýär. ','按换汇实际成本计算。':'hakyky çalyşma gymmaty boýunça hasaplanýar.','存入':'Goýum','换币':'Çalyşma','共同':'Umumy','存入钱袋':'Gapjyga goýum','按人汇总':'Agzalar boýunça jemi','成员 / 来源':'Agza / çeşme',
  '余额 = 投入 − 花费':'Galyndy = goýan − sarp edilen','成员账单':'Agzalaryň hasabatlary','只列每人分摊到的花费':'Diňe her kime düşen çykdajylar','本人签字':'Agzanyň goly',
  '份额（原币）':'Paýy (asyl)','（外部来源）':' (daşky çeşme)','分享 PDF':'PDF paýlaş','分享备份文件':'Ätiýaçlyk faýlyny paýlaş','分享 CSV':'CSV paýlaş','正在生成 PDF…':'PDF taýýarlanýar…',
@@ -644,6 +734,22 @@ function demoReceipt(){
 
 /* ---------- 视图 ---------- */
 let tab='home'; const filt={type:'all',m:'',cur:'',q:'',day:''};
+const SVG=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const GLYPH={
+ food:'<path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10"/><path d="M17 21V3c-2 1.5-3 4-3 7h3"/>',
+ car:'<path d="M5 16V11l2-5h10l2 5v5"/><path d="M3 16h18v3H3z"/><circle cx="7.5" cy="13" r=".8"/><circle cx="16.5" cy="13" r=".8"/>',
+ bed:'<path d="M3 18V6M3 14h18v4M21 18v-4a3 3 0 0 0-3-3h-8v3"/><circle cx="6.5" cy="11" r="1.6"/>',
+ ticket:'<path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10" stroke-dasharray="2 2"/>',
+ phone:'<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>',
+ bag:'<path d="M5 8h14l-1 13H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+ dots:'<circle cx="6" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="18" cy="12" r="1.2"/>',
+ in:'<path d="M12 4v12M7 11l5 5 5-5"/><path d="M5 20h14"/>',
+ swap:'<path d="M7 7h12l-3-3M17 17H5l3 3"/>',
+ person:'<circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/>',
+ people:'<circle cx="9" cy="8.5" r="3"/><path d="M3.5 19c.8-3.3 3-5 5.5-5s4.7 1.7 5.5 5"/><circle cx="16.5" cy="9" r="2.4"/><path d="M15.5 14.2c2.4.2 4.2 1.9 5 4.8"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>'};
+const CAT_ICON={'餐饮':'food','Nahar':'food','交通':'car','Ulag':'car','住宿':'bed','Ýaşaýyş':'bed','门票':'ticket','Bilet':'ticket','通讯':'phone','Aragatnaşyk':'phone','购物':'bag','Söwda':'bag','杂费':'dots','Beýlekiler':'dots','其他':'dots'};
+const CARD_CHIP='<svg viewBox="0 0 34 26" aria-hidden="true"><defs><linearGradient id="chipg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F3E2B6"/><stop offset="1" stop-color="#B98E45"/></linearGradient></defs><rect x="1" y="1" width="32" height="24" rx="5" fill="url(#chipg)"/><path d="M1 9h10M1 17h10M23 9h10M23 17h10M11 1v24M23 1v24" stroke="#8A6526" stroke-opacity=".45" fill="none"/></svg>';
 const ICON={
  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8.5h16v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 8.5 7 4h10l3 4.5"/><path d="M15 13.5h5"/></svg>',
  list:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>',
@@ -660,9 +766,10 @@ function txTitle(t,x){
   return x.note||x.category||'支出';
 }
 function txIcon(x){
-  if(x.type==='deposit')return `<span class="ic-sq" style="background-color:var(--pos)" translate="no">${LANG==='tk'?'+':'入'}</span>`;
-  if(x.type==='exchange')return `<span class="ic-sq" style="background-color:#6B7C76" translate="no">⇄</span>`;
-  return `<span class="ic-sq" style="background-color:${catColor(x.category)}">${esc(L(x.category||'支').slice(0,1))}</span>`;
+  if(x.type==='deposit')return `<span class="ic-sq" style="--c:var(--pos)">${SVG(GLYPH.in)}</span>`;
+  if(x.type==='exchange')return `<span class="ic-sq" style="--c:var(--gold)">${SVG(GLYPH.swap)}</span>`;
+  const g=CAT_ICON[x.category]||CAT_ICON[L(x.category||'')];
+  return `<span class="ic-sq" style="--c:${catColor(x.category)}">${g?SVG(GLYPH[g]):esc(L(x.category||'支').slice(0,1))}</span>`;
 }
 function txRow(t,x){
   const t2=[];t2.push(hm(x.time));
@@ -688,12 +795,12 @@ function vHome(t){
    if(!t.demo&&live(t).length&&days>=3)h+=`<div class="banner"><b>${S.lastBackup?`已经 ${days} 天没有备份了。`:'还没有备份过。'}手机丢了或清理数据，账就没了。</b><button data-a="backup">去备份</button></div>`}
   const pct=t.budget?C.spent/t.budget*100:0;
   const srcs=[...t.members.filter(m=>C.mem[m.id].in>0).map(m=>[m.name,C.mem[m.id].in]),...Object.entries(C.ext).map(([k,v])=>[k+'（外部）',v])];
-  h+=`<section class="hero"><div><div class="lbl">钱袋余额 · 折合${cname(t.base)}</div><div class="big num">${money(C.pool,t.base)}</div></div>
+  h+=`<section class="hero"><div class="hero-top"><span class="brand" translate="no">${LANG==='tk'?'IŞ SAPARY GAPJYGY':'出差钱袋 · TRIP WALLET'}</span>${CARD_CHIP}</div><div><div class="lbl">钱袋余额 · 折合${cname(t.base)}</div><div class="big num">${money(C.pool,t.base)}</div></div>
   <div class="row"><span>累计入钱 <b>${money(C.deposited,t.base)}</b></span><span>累计支出 <b>${money(C.spent,t.base)}</b></span></div>
   ${srcs.length?`<div><div class="lbl" style="margin-bottom:6px">钱的来源</div><div class="src">${srcs.map(([n,v])=>`<span>${esc(n)} <b class="num">${money(v,t.base)}</b></span>`).join('')}</div></div>`:'<div class="row">钱袋还是空的，先点「入钱」把钱放进来。</div>'}
   ${t.budget?`<div><div class="row" style="justify-content:space-between;margin-bottom:6px"><span>预算 <b>${money(t.budget,t.base)}</b></span><span>已用 ${pct.toFixed(0)}%</span></div><div class="bar ${pct>100?'over':''}"><i style="width:${Math.min(100,pct)}%"></i></div></div>`:''}
-  <div class="acts"><button data-a="add" data-v="deposit"><i translate="no">${LANG==='tk'?'+':'入'}</i>入钱</button><button data-a="add" data-v="exchange"><i translate="no">⇄</i>换汇</button></div></section>`;
-  h+=`<div class="quick"><button data-a="add" data-v="personal"><span class="ic" translate="no">${LANG==='tk'?'Ş':'个'}</span><span>个人支出<small>只算一个人</small></span></button><button data-a="add" data-v="shared"><span class="ic gold" translate="no">${LANG==='tk'?'U':'共'}</span><span>共同支出<small>总额自动分摊</small></span></button></div>`;
+  <div class="acts"><button data-a="add" data-v="deposit"><i>${SVG(GLYPH.in)}</i>入钱</button><button data-a="add" data-v="exchange"><i>${SVG(GLYPH.swap)}</i>换汇</button></div></section>`;
+  h+=`<div class="quick"><button data-a="add" data-v="personal"><span class="ic">${SVG(GLYPH.person)}</span><span>个人支出<small>只算一个人</small></span></button><button data-a="add" data-v="shared"><span class="ic gold">${SVG(GLYPH.people)}</span><span>共同支出<small>总额自动分摊</small></span></button></div>`;
   const codes=t.currencies.map(c=>c.code).filter(c=>c===t.base||Math.abs(C.acc[c]?.bal||0)>0||live(t).some(x=>x.cur===c||x.fromCur===c||x.toCur===c));
   h+=`<div class="sec-t"><h3>币种账户（点开看账单）</h3><button class="link" data-a="stmt" data-v="all">打印总账</button></div><div class="accts">${codes.map(c=>{const a=C.acc[c]||{bal:0,cost:0};return `<button class="acct ${a.bal<0?'neg-b':''}" data-a="stmt" data-v="cur:${c}"><div class="c"><span>${cname(c)}</span><span>${c}</span></div><div class="v num ${a.bal<0?'neg':''}">${money(a.bal,c)}</div><div class="r num">${c===t.base?'本位币':`成本 1${c} ≈ ${sym(t.base)}${C.avg(c).toFixed(4)}`}</div></button>`}).join('')}</div>`;
   if(codes.some(c=>(C.acc[c]?.bal||0)<0))h+=`<div class="banner"><b>有币种账户是负数：钱不够了，请补记入钱或换汇。</b><button data-a="add" data-v="deposit">入钱</button></div>`;
@@ -755,6 +862,7 @@ function vSettings(t){
   const used=id=>t.txs.some(x=>(x.splits||[]).some(s=>s.m===id)||x.advBy===id);
   const curUsed=c=>t.txs.some(x=>x.cur===c||x.fromCur===c||x.toCur===c);
   return `<div class="card" translate="no"><h4>语言 / Dil</h4><div class="seg">${[['zh','中文'],['tk','Türkmençe']].map(([k,l])=>`<button data-a="lang" data-v="${k}" class="${LANG===k?'on':''}">${l}</button>`).join('')}</div></div>
+  <div class="card"><label class="sw" style="justify-content:space-between"><span><b>按键震动</b><br><span class="hint">按键盘、按钮时手机轻轻震一下</span></span><input type="checkbox" id="s-haptic" data-a="haptic-toggle" ${S.haptic===false?'':'checked'}></label></div>
   <div class="card"><h4>应用密码锁</h4>${S.lock?`<div class="btns"><button class="btn2" data-a="pin-set">修改密码</button><button class="btn2 danger" data-a="pin-off" data-confirm="再点一次：关闭密码锁">关闭密码锁</button></div>${bioOK()?`<label class="sw" style="margin-top:10px"><input type="checkbox" id="s-bio" data-a="bio-toggle" ${S.lock.bio?'checked':''}>用指纹解锁</label>`:''}<p class="note">离开 APP 超过 1 分钟再回来，需要重新输入密码。</p>`:`<p class="note" style="margin:0 0 8px">打开 APP 要先输入数字密码${window.AndroidBridge?'（安卓可用指纹）':''}，防止别人看账。</p><button class="btn2" data-a="pin-set">设置密码</button>`}</div>
   <div class="card"><h4>行程</h4><div style="display:flex;flex-direction:column;gap:10px">
    <label class="fl">行程名称<input class="in" id="s-name" data-s="name" value="${esc(t.name)}"></label>
@@ -1190,6 +1298,7 @@ function step(k){if(!viewer)return;const n=viewer.idx+k;if(n<0||n>=viewer.list.l
 let toastT;function toast(m){m=trText(m);let e=$('.toast');if(!e){e=document.createElement('div');e.className='toast';e.setAttribute('role','status');document.body.appendChild(e)}e.textContent=m;e.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>e.hidden=true,2200)}
 function armed(b){if(!b.dataset.confirm)return true;if(b.classList.contains('armed'))return true;b.dataset.orig=b.textContent;b.textContent=b.dataset.confirm;b.classList.add('armed');setTimeout(()=>{if(b.isConnected){b.classList.remove('armed');b.textContent=b.dataset.orig}},3500);return false}
 const ACT={
+  'haptic-toggle':b=>{S.haptic=b.checked;save(true);if(b.checked)buzz(true)},
   'pin-set':()=>openSheet('pin-set',{}),
   'pin-save':async()=>{const a=$('#pin1').value.trim(),b=$('#pin2').value.trim();
     if(!/^\d{4,6}$/.test(a)){toast('密码要 4–6 位数字');return}if(a!==b){toast('两次输入的密码不一样');return}
@@ -1291,6 +1400,10 @@ document.addEventListener('change',async e=>{
     $('#f-photos',s.body).innerHTML=photosHTML(s.data);hydrate(s.body);toast(`已添加 ${files.length} 张`);return}
   if(el.dataset.file==='bk'){const f=el.files[0];if(!f)return;$('#bk-in').value=await f.text();toast('已读取，点「恢复」确认')}
 });
+
+/* ---------- 按键震动 ---------- */
+function buzz(force){if(S?.haptic===false&&!force)return;try{if(window.AndroidBridge&&AndroidBridge.haptic)AndroidBridge.haptic();else if(navigator.vibrate)navigator.vibrate(8)}catch(e){}}
+document.addEventListener('pointerdown',e=>{if(e.target.closest('[data-ck],[data-pk],[data-a],.sugs [data-sv]'))buzz()},true);
 
 /* ---------- 计算器键盘 ---------- */
 let calcEl=null;
