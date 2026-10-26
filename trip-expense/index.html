@@ -333,26 +333,26 @@ body.calc-open main.wrap{padding-bottom:360px}
   --pos:#14895F;--neg:#E0453F;--warn:#A2581A;--warn-soft:#FFF3E8;
   --glass:rgba(255,255,255,.62);--glass-line:rgba(255,255,255,.85);--scrim:rgba(16,19,24,.35);
   --shadow:0 1px 0 #EEF0F4,0 12px 28px -18px rgba(30,40,80,.28);
-  --au1:rgba(150,228,205,.85);--au2:rgba(196,180,255,.85);--au3:rgba(255,204,176,.75)}
+  --au1:rgba(96,214,180,1);--au2:rgba(170,146,255,1);--au3:rgba(255,172,128,.95)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#07080C;--bg2:#07080C;--surface:#111319;--surface2:#181B23;--ink:#F1F3F7;--muted:#8E95A3;--line:#20242E;
   --accent:#F1F3F7;--accent-2:#D7DBE3;--accent-soft:#1A1E27;--gold:#B7A6FF;--gold-soft:#221C3D;
   --pos:#3FC28C;--neg:#FF6B66;--warn:#E8A35E;--warn-soft:#2A2116;
   --glass:rgba(17,19,25,.62);--glass-line:rgba(255,255,255,.08);--scrim:rgba(0,0,0,.6);
-  --shadow:0 14px 30px -18px rgba(0,0,0,.85);--au1:rgba(40,140,115,.45);--au2:rgba(110,80,220,.45);--au3:rgba(200,110,70,.32);color-scheme:dark}}
+  --shadow:0 14px 30px -18px rgba(0,0,0,.85);--au1:rgba(40,160,125,.6);--au2:rgba(120,85,235,.6);--au3:rgba(215,115,70,.45);color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#07080C;--bg2:#07080C;--surface:#111319;--surface2:#181B23;--ink:#F1F3F7;--muted:#8E95A3;--line:#20242E;
   --accent:#F1F3F7;--accent-2:#D7DBE3;--accent-soft:#1A1E27;--gold:#B7A6FF;--gold-soft:#221C3D;
   --pos:#3FC28C;--neg:#FF6B66;--warn:#E8A35E;--warn-soft:#2A2116;
   --glass:rgba(17,19,25,.62);--glass-line:rgba(255,255,255,.08);--scrim:rgba(0,0,0,.6);
-  --shadow:0 14px 30px -18px rgba(0,0,0,.85);--au1:rgba(40,140,115,.45);--au2:rgba(110,80,220,.45);--au3:rgba(200,110,70,.32);color-scheme:dark}
+  --shadow:0 14px 30px -18px rgba(0,0,0,.85);--au1:rgba(40,160,125,.6);--au2:rgba(120,85,235,.6);--au3:rgba(215,115,70,.45);color-scheme:dark}
 body{background:var(--bg);background-image:none}
-.aurora{position:absolute;left:0;right:0;top:0;height:480px;z-index:-1;pointer-events:none;overflow:hidden}
-.aurora::before{content:"";position:absolute;inset:-40px;filter:blur(18px);background:
-  radial-gradient(38% 46% at 12% 18%,var(--au1),transparent 70%),
-  radial-gradient(42% 52% at 88% 8%,var(--au2),transparent 70%),
-  radial-gradient(48% 42% at 62% 58%,var(--au3),transparent 72%)}
-.aurora::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,var(--bg) 100%)}
+.aurora{position:absolute;left:0;right:0;top:0;height:560px;z-index:-1;pointer-events:none;overflow:hidden}
+.aurora::before{content:"";position:absolute;inset:-40px;filter:blur(14px);background:
+  radial-gradient(48% 52% at 10% 16%,var(--au1),transparent 72%),
+  radial-gradient(52% 58% at 90% 6%,var(--au2),transparent 72%),
+  radial-gradient(58% 48% at 60% 56%,var(--au3),transparent 74%)}
+.aurora::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,var(--bg) 100%)}
 body::before{background:var(--glass);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
 header.top{background:transparent;border-bottom:0;-webkit-backdrop-filter:none;backdrop-filter:none;transition:background-color .2s}
 body.scrolled header.top{background:var(--glass);-webkit-backdrop-filter:saturate(180%) blur(18px);backdrop-filter:saturate(180%) blur(18px);box-shadow:0 1px 0 var(--line)}
@@ -377,7 +377,7 @@ button{transition:transform .14s ease,background-color .14s ease}
 .hero::after{display:none}
 .hero-top{display:none}
 .hero .lbl{color:var(--muted);letter-spacing:0;font-size:13px}
-.hero .big{font-size:48px;font-weight:600;letter-spacing:-.025em;line-height:1.04;background:none;color:var(--ink);-webkit-text-fill-color:currentColor;margin-top:2px}
+.hero .big{font-size:48px;font-weight:700;letter-spacing:-.025em;line-height:1.04;background:none;color:var(--ink);-webkit-text-fill-color:currentColor;margin-top:2px}
 .hero .row{color:var(--muted)}
 .hero .row b{color:var(--ink);font-weight:600}
 .src span{background:var(--surface2);border:0;color:var(--muted)}
@@ -450,6 +450,11 @@ input.in:focus,select.in:focus,textarea.in:focus{border-color:var(--ink);box-sha
 #lock .pad button:active{transform:scale(.93)}
 #lock .lk-link{color:var(--muted)}
 .sugs button{border-color:var(--line)}
+/* 数字加粗 */
+.num{font-weight:600}
+.txr .a1,.acct .v,.mrow .num,.prev .num,.d-amt .v,.kv .num,.sb .num,.xfer .v{font-weight:700}
+.hero .row b,.src span b{font-weight:700}
+#calc .res,#calc .keys button{font-weight:700}
 </style>
 
 <div class="aurora" aria-hidden="true"></div>
