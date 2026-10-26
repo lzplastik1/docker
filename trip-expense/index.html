@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0C6A56"><meta name="apple-mobile-web-app-title" content="出差钱袋"><meta name="apple-mobile-web-app-status-bar-style" content="default"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#FFFFFF"><meta name="apple-mobile-web-app-title" content="出差钱袋"><meta name="apple-mobile-web-app-status-bar-style" content="default"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
 <title>出差钱袋</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -316,95 +316,110 @@ body.calc-open main.wrap{padding-bottom:360px}
   .a4+.a4{break-before:page}
 }
 
-/* ===== 高级版：墨绿黑卡 + 香槟金，浮动底栏 ===== */
-:root{--bg:#F1F3F2;--bg2:#E5ECE8;--surface:#FFFFFF;--surface2:#F4F6F5;--ink:#0B1512;--muted:#66736E;--line:#E3E9E6;
-  --accent:#0F5C4A;--accent-2:#1B8A6F;--accent-soft:#E2F0EA;--gold:#A9823D;--gold-soft:#F5ECDA;
-  --card1:#0F221C;--card2:#061310;--champ:#EBD6A6;--champ2:#C29A55;
-  --glass:rgba(255,255,255,.74);--glass-line:rgba(11,21,18,.07);
-  --shadow:0 1px 2px rgba(11,21,18,.04),0 12px 32px -16px rgba(11,21,18,.20)}
+/* ===== 简约白：白底黑字，细线分隔，只在金额上用颜色 ===== */
+:root{--bg:#FFFFFF;--bg2:#FFFFFF;--surface:#FFFFFF;--surface2:#F5F6F5;--ink:#111413;--muted:#7B827F;--line:#ECEEED;
+  --accent:#111413;--accent-2:#2C3230;--accent-soft:#F2F3F2;--gold:#111413;--gold-soft:#F2F3F2;
+  --pos:#13805B;--neg:#D2423E;--warn:#9A5A12;--warn-soft:#FBF4EA;
+  --glass:rgba(255,255,255,.94);--glass-line:#ECEEED;--shadow:none;--scrim:rgba(17,20,19,.35)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#050807;--bg2:#0B1310;--surface:#0D1412;--surface2:#131C19;--ink:#ECF2EF;--muted:#8B9B95;--line:#1C2723;
-  --accent:#5DCFAA;--accent-2:#2FA585;--accent-soft:#11302A;--gold:#DDBE78;--gold-soft:#29220F;
-  --card1:#15271F;--card2:#050C0A;--glass:rgba(9,14,12,.80);--glass-line:rgba(255,255,255,.07);
-  --shadow:0 16px 36px -18px rgba(0,0,0,.85);color-scheme:dark}}
+  --bg:#0B0C0C;--bg2:#0B0C0C;--surface:#121414;--surface2:#1A1D1C;--ink:#F2F4F3;--muted:#8C9490;--line:#232726;
+  --accent:#F2F4F3;--accent-2:#D9DDDB;--accent-soft:#1E2221;--gold:#F2F4F3;--gold-soft:#1E2221;
+  --pos:#3FC28C;--neg:#FF6B66;--warn:#E8A35E;--warn-soft:#2A2116;--glass:rgba(11,12,12,.94);--glass-line:#232726;--scrim:rgba(0,0,0,.6);color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#050807;--bg2:#0B1310;--surface:#0D1412;--surface2:#131C19;--ink:#ECF2EF;--muted:#8B9B95;--line:#1C2723;
-  --accent:#5DCFAA;--accent-2:#2FA585;--accent-soft:#11302A;--gold:#DDBE78;--gold-soft:#29220F;
-  --card1:#15271F;--card2:#050C0A;--glass:rgba(9,14,12,.80);--glass-line:rgba(255,255,255,.07);
-  --shadow:0 16px 36px -18px rgba(0,0,0,.85);color-scheme:dark}
-body{background-image:radial-gradient(130% 55% at 50% -12%,var(--bg2),transparent 70%)}
+  --bg:#0B0C0C;--bg2:#0B0C0C;--surface:#121414;--surface2:#1A1D1C;--ink:#F2F4F3;--muted:#8C9490;--line:#232726;
+  --accent:#F2F4F3;--accent-2:#D9DDDB;--accent-soft:#1E2221;--gold:#F2F4F3;--gold-soft:#1E2221;
+  --pos:#3FC28C;--neg:#FF6B66;--warn:#E8A35E;--warn-soft:#2A2116;--glass:rgba(11,12,12,.94);--glass-line:#232726;--scrim:rgba(0,0,0,.6);color-scheme:dark}
+body{background:var(--bg);background-image:none}
+header.top{background:var(--glass);border-bottom:1px solid var(--line)}
 header.top .wrap{padding-block:14px 12px}
 .trip-btn b{font-size:21px;font-weight:600;letter-spacing:-.025em}
-main.wrap{padding-block:16px 170px;gap:16px}
-.sec-t h3{font-size:11px;letter-spacing:.16em}
-.card{border-radius:24px}
-button{transition:transform .12s ease,filter .12s ease}
+main.wrap{padding-block:18px 160px;gap:18px}
+.sec-t{margin:10px 2px -6px}
+.sec-t h3{font-size:12px;letter-spacing:.04em;font-weight:500}
+.link{color:var(--ink);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.card,.acct,.quick button,.prev{border:1px solid var(--line);box-shadow:none;background:var(--surface)}
+.card{border-radius:18px}
+.pill{background:var(--surface2);color:var(--ink)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.gold{background:var(--surface2);color:var(--ink)}
+button{transition:transform .12s ease,background-color .12s ease}
 .quick button:active,.btn:active,.btn2:active,.chip:active,.hero .acts button:active,.acct:active,.fab:active{transform:scale(.97)}
 @media (prefers-reduced-motion:reduce){button{transition:none}button:active{transform:none!important}}
-/* 黑卡 */
-.hero{border-radius:30px;padding:20px 22px 20px;gap:16px;
-  background:radial-gradient(120% 90% at 105% -5%,rgba(235,214,166,.24),transparent 52%),radial-gradient(90% 80% at -5% 105%,rgba(27,138,111,.38),transparent 60%),linear-gradient(152deg,var(--card1),var(--card2));
-  box-shadow:0 34px 60px -32px rgba(3,18,14,.9),inset 0 0 0 1px rgba(235,214,166,.20)}
-.hero::after{opacity:1;background:repeating-radial-gradient(circle at 115% -25%,rgba(235,214,166,.09) 0 1px,transparent 1px 10px);-webkit-mask-image:linear-gradient(210deg,#000 10%,transparent 70%);mask-image:linear-gradient(210deg,#000 10%,transparent 70%)}
+/* 钱袋：白卡细线，大号细体数字 */
+.hero{color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:none;padding:20px;gap:16px}
+.hero::after{display:none}
 .hero-top{display:flex;justify-content:space-between;align-items:center}
-.hero-top .brand{font-family:var(--f-display);font-size:11px;font-weight:600;letter-spacing:.22em;color:var(--champ)}
-.hero-top svg{width:34px;height:26px}
-.hero .lbl{color:rgba(235,214,166,.78);letter-spacing:.12em;font-size:11px}
-.hero .big{font-size:44px;font-weight:300;letter-spacing:-.04em;line-height:1.05;background:linear-gradient(96deg,#FFFFFF 25%,var(--champ) 72%,var(--champ2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero .row{color:rgba(243,251,248,.62)}
-.src span{background:rgba(255,255,255,.05);border-color:rgba(235,214,166,.18)}
-.bar{background:rgba(255,255,255,.10);height:5px}
-.bar i{background:linear-gradient(90deg,var(--champ),var(--champ2))}
-.hero .acts button{border-radius:18px;padding:12px 8px;background:rgba(255,255,255,.05);border:1px solid rgba(235,214,166,.26);color:#F6F1E4}
-.hero .acts button i{width:28px;height:28px;border-radius:10px;background:linear-gradient(140deg,var(--champ),var(--champ2));color:#2A1E07}
+.hero-top .brand{font-size:11px;letter-spacing:.14em;color:var(--muted);font-weight:500}
+.hero-top svg{display:none}
+.hero .lbl{color:var(--muted);letter-spacing:.02em;font-size:12px}
+.hero .big{font-size:42px;font-weight:300;letter-spacing:-.04em;line-height:1.05;background:none;color:var(--ink);-webkit-text-fill-color:currentColor}
+.hero .row{color:var(--muted)}
+.hero .row b{color:var(--ink);font-weight:600}
+.src span{background:var(--surface2);border:0;color:var(--muted)}
+.src span b{color:var(--ink)}
+.bar{background:var(--surface2);height:4px}
+.bar i{background:var(--ink)}
+.bar.over i{background:var(--neg)}
+.hero .acts{gap:10px}
+.hero .acts button{border-radius:14px;padding:11px 8px;background:var(--surface);border:1px solid var(--line);color:var(--ink);backdrop-filter:none;-webkit-backdrop-filter:none;font-weight:600}
+.hero .acts button i{width:26px;height:26px;border-radius:50%;background:var(--surface2);color:var(--ink)}
 .hero .acts button i svg,.quick .ic svg,.ic-sq svg{width:18px;height:18px}
 /* 快捷按钮 */
-.quick{gap:12px}
-.quick button{border-radius:22px;padding:16px 14px;gap:12px;border:1px solid var(--glass-line)}
-.quick .ic{width:44px;height:44px;border-radius:50%;background:linear-gradient(150deg,var(--card1),var(--card2));color:var(--champ);box-shadow:inset 0 0 0 1px rgba(235,214,166,.25)}
-.quick .ic.gold{background:linear-gradient(140deg,var(--champ),var(--champ2));color:#2A1E07;box-shadow:none}
-.quick .ic svg{width:21px;height:21px}
+.quick{gap:10px}
+.quick button{border-radius:18px;padding:14px;gap:12px}
+.quick .ic,.quick .ic.gold{width:40px;height:40px;border-radius:50%;background:var(--surface2);color:var(--ink);box-shadow:none}
 /* 币种卡 */
-.acct{border-radius:20px;background:var(--surface)}
-.acct::before{height:2px;background:linear-gradient(90deg,var(--champ2),var(--champ),transparent)}
-/* 流水图标：圆形淡色底 + 线条图标 */
-.ic-sq{width:40px;height:40px;border-radius:50%;background-image:none;box-shadow:none;color:var(--c,var(--accent));background:var(--surface2);background:color-mix(in srgb,var(--c,var(--accent)) 14%,var(--surface))}
-.ic-sq svg{width:19px;height:19px}
-.txr{padding:12px 0}
-.av{background-image:linear-gradient(150deg,rgba(255,255,255,.28),rgba(0,0,0,.22))}
-/* 分段、按钮 */
-.seg{border-radius:16px}
-.seg button{border-radius:13px}
-.seg button.on{background:linear-gradient(152deg,var(--card1),var(--card2));color:var(--champ);box-shadow:0 8px 16px -10px rgba(3,18,14,.9),inset 0 0 0 1px rgba(235,214,166,.32)}
-.btn{border-radius:18px;color:var(--champ);background:radial-gradient(90% 140% at 100% 0%,rgba(235,214,166,.18),transparent 60%),linear-gradient(152deg,var(--card1),var(--card2));box-shadow:0 14px 26px -16px rgba(3,18,14,.9),inset 0 0 0 1px rgba(235,214,166,.22)}
-.btn2{border-radius:14px}
-.chip{border-radius:999px}
-.chip.on{background:var(--accent-soft);border-color:var(--accent)}
-/* 浮动底栏 + 记一笔 */
-.tabbar{left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));max-width:536px;margin:0 auto;border-radius:26px;border:1px solid var(--glass-line);padding-bottom:0;box-shadow:0 18px 40px -20px rgba(3,18,14,.45)}
-.tabbar .wrap{padding:0 4px}
-.tabbar button{padding:10px 0 9px;font-size:11px}
+.acct{border-radius:16px}
+.acct::before{display:none}
+.acct.neg-b{border-color:var(--neg)}
+/* 流水：灰底圆形线条图标 */
+.ic-sq{width:40px;height:40px;border-radius:50%;background:var(--surface2);background-image:none;box-shadow:none;color:var(--ink)}
+.txr{padding:12px 0;border-bottom-color:var(--line)}
+.mrow{border-bottom-color:var(--line)}
+.av{background-image:none}
+.tag{background:var(--surface2);color:var(--muted)}
+.tag.adv,.tag.ext,.tag.ph{background:var(--surface2);color:var(--ink)}
+/* 分段、按钮、输入框 */
+.seg{background:var(--surface2);border:0;border-radius:12px}
+.seg button{border-radius:10px}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.10),0 0 0 1px var(--line);font-weight:600}
+.btn{background:var(--ink);color:var(--bg);border-radius:14px;box-shadow:none}
+.btn2{border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.chip{border:1px solid var(--line)}
+.chip.on{background:var(--surface2);border-color:var(--ink);color:var(--ink)}
+input.in,select.in,textarea.in{border:1px solid var(--line);border-radius:12px}
+input.in:focus,select.in:focus,textarea.in:focus{border-color:var(--ink);box-shadow:0 0 0 3px var(--surface2)}
+.amt input{font-weight:500}
+.x{background:var(--surface2)}
+.banner{border-radius:14px}
+/* 底栏、记一笔 */
+.tabbar{left:0;right:0;bottom:0;max-width:none;margin:0;border-radius:0;border:0;border-top:1px solid var(--line);background:var(--glass);box-shadow:none;padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabbar .wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.tabbar button{padding:9px 0 8px;font-size:11px;color:var(--muted)}
+.tabbar button.on{color:var(--ink);font-weight:600}
 .tabbar button.on::before{display:none}
-.tabbar button.on svg{color:var(--accent)}
-.tabbar button.on{color:var(--ink)}
-.fab{bottom:calc(92px + env(safe-area-inset-bottom,0px));height:58px;border-radius:29px;padding:0 22px 0 18px;color:var(--champ);
-  background:radial-gradient(90% 120% at 100% 0%,rgba(235,214,166,.25),transparent 60%),linear-gradient(152deg,var(--card1),var(--card2));
-  border:1px solid rgba(235,214,166,.32);box-shadow:0 18px 34px -14px rgba(3,18,14,.75)}
-.sheet{border-radius:28px 28px 0 0}
-.toast{bottom:calc(170px + env(safe-area-inset-bottom,0px));border-radius:14px}
+.fab{bottom:calc(72px + env(safe-area-inset-bottom,0px));height:54px;border-radius:27px;padding:0 20px 0 16px;background:var(--ink);color:var(--bg);border:0;box-shadow:0 10px 24px -12px rgba(0,0,0,.45)}
+.sheet{background:var(--bg);border-radius:22px 22px 0 0}
+.sh-head{background:var(--bg)}
+.toast{background:var(--ink);color:var(--bg);border-radius:12px;bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 /* 计算器键盘 */
-#calc{background:var(--glass);-webkit-backdrop-filter:saturate(160%) blur(22px);backdrop-filter:saturate(160%) blur(22px);border-top:1px solid var(--glass-line);border-radius:24px 24px 0 0}
+#calc{background:var(--surface2);backdrop-filter:none;-webkit-backdrop-filter:none;border-top:1px solid var(--line);border-radius:18px 18px 0 0;box-shadow:0 -10px 30px -16px rgba(0,0,0,.25)}
 #calc .keys{gap:8px}
-#calc .keys button{border-radius:16px;padding:14px 0;background:var(--surface);box-shadow:0 1px 0 var(--glass-line),0 6px 14px -10px rgba(11,21,18,.35)}
-#calc .keys button.op{background:var(--gold-soft);color:var(--gold)}
-#calc .keys button.eq,#calc .done{background:linear-gradient(152deg,var(--card1),var(--card2));color:var(--champ)}
-#calc .keys button:active{transform:scale(.94);filter:brightness(.95)}
+#calc .keys button{border-radius:12px;background:var(--surface);color:var(--ink);box-shadow:0 1px 0 var(--line)}
+#calc .keys button.op{background:var(--line);color:var(--ink)}
+#calc .keys button.eq,#calc .done{background:var(--ink);color:var(--bg)}
+#calc .keys button:active{transform:scale(.95);background:var(--line)}
 /* 密码锁 */
-#lock{background:radial-gradient(110% 70% at 100% 0%,rgba(235,214,166,.22),transparent 55%),linear-gradient(160deg,var(--card1),var(--card2))}
-#lock h2{color:var(--champ);letter-spacing:.06em}
-#lock .pad button{border-color:rgba(235,214,166,.25);background:rgba(255,255,255,.05)}
-#lock .pad button:active{transform:scale(.93);background:rgba(235,214,166,.15)}
-#lock .dots i.on{background:var(--champ);border-color:var(--champ)}
+#lock{background:var(--bg);color:var(--ink)}
+#lock h2{color:var(--ink)}
+#lock .msg{color:var(--neg)}
+#lock .dots i{border-color:var(--ink)}
+#lock .dots i.on{background:var(--ink);border-color:var(--ink)}
+#lock .pad button{border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+#lock .pad button.t{color:var(--muted)}
+#lock .pad button:active{transform:scale(.94);background:var(--surface2)}
+#lock .lk-link{color:var(--muted)}
+.sugs button{border-color:var(--line)}
 </style>
 
 <header class="top"><div class="wrap" id="hdr"></div></header>
@@ -522,7 +537,7 @@ const TK={
  '没有弹出打印窗口？请用浏览器菜单里的「打印」，或「复制为表格」':'Çap penjiresi açylmadymy? Brauzeriň menýusyndaky «Çap» ulanyň ýa-da «Tablisa hökmünde göçür».',
  '餐饮':'Nahar','交通':'Ulag','住宿':'Ýaşaýyş','门票':'Bilet','通讯':'Aragatnaşyk','购物':'Söwda','杂费':'Beýlekiler','其他':'Beýleki',
  '编号':'Belgi','金额':'Möçber','参与人/分摊':'Gatnaşyjylar / paýy','垫付人':'Tölän adam','照片数':'Surat sany','折合':'Hasabynda ',
- '语言':'Dil','按键震动':'Düwme titremesi','按键盘、按钮时手机轻轻震一下':'Düwmä basanyňyzda telefon ýeňil titrär','币种汇总':'Walýutalar boýunça jemi','各币种按原币计算':'Her walýuta öz pulunda','期初':'Başy','换入':'Çalşyp alnan','换出':'Çalşyp berlen',
+ '语言':'Dil','外观':'Görnüş','白色':'Ak','深色':'Garaňky','跟随系统':'Ulgam boýunça','按键震动':'Düwme titremesi','按键盘、按钮时手机轻轻震一下':'Düwmä basanyňyzda telefon ýeňil titrär','币种汇总':'Walýutalar boýunça jemi','各币种按原币计算':'Her walýuta öz pulunda','期初':'Başy','换入':'Çalşyp alnan','换出':'Çalşyp berlen',
  '各币种原币记账，换汇在两个账户里各记一笔。':'Her walýuta öz pulunda ýazylýar; walýuta çalyşmak iki hasapda hem görkezilýär. ','按换汇实际成本计算。':'hakyky çalyşma gymmaty boýunça hasaplanýar.','存入':'Goýum','换币':'Çalyşma','共同':'Umumy','存入钱袋':'Gapjyga goýum','按人汇总':'Agzalar boýunça jemi','成员 / 来源':'Agza / çeşme',
  '余额 = 投入 − 花费':'Galyndy = goýan − sarp edilen','成员账单':'Agzalaryň hasabatlary','只列每人分摊到的花费':'Diňe her kime düşen çykdajylar','本人签字':'Agzanyň goly',
  '份额（原币）':'Paýy (asyl)','（外部来源）':' (daşky çeşme)','分享 PDF':'PDF paýlaş','分享备份文件':'Ätiýaçlyk faýlyny paýlaş','分享 CSV':'CSV paýlaş','正在生成 PDF…':'PDF taýýarlanýar…',
@@ -862,6 +877,7 @@ function vSettings(t){
   const used=id=>t.txs.some(x=>(x.splits||[]).some(s=>s.m===id)||x.advBy===id);
   const curUsed=c=>t.txs.some(x=>x.cur===c||x.fromCur===c||x.toCur===c);
   return `<div class="card" translate="no"><h4>语言 / Dil</h4><div class="seg">${[['zh','中文'],['tk','Türkmençe']].map(([k,l])=>`<button data-a="lang" data-v="${k}" class="${LANG===k?'on':''}">${l}</button>`).join('')}</div></div>
+  <div class="card"><h4>外观</h4><div class="seg">${[['light','白色'],['dark','深色'],['system','跟随系统']].map(([k,l])=>`<button data-a="skin" data-v="${k}" class="${(S.theme||'light')===k?'on':''}">${l}</button>`).join('')}</div></div>
   <div class="card"><label class="sw" style="justify-content:space-between"><span><b>按键震动</b><br><span class="hint">按键盘、按钮时手机轻轻震一下</span></span><input type="checkbox" id="s-haptic" data-a="haptic-toggle" ${S.haptic===false?'':'checked'}></label></div>
   <div class="card"><h4>应用密码锁</h4>${S.lock?`<div class="btns"><button class="btn2" data-a="pin-set">修改密码</button><button class="btn2 danger" data-a="pin-off" data-confirm="再点一次：关闭密码锁">关闭密码锁</button></div>${bioOK()?`<label class="sw" style="margin-top:10px"><input type="checkbox" id="s-bio" data-a="bio-toggle" ${S.lock.bio?'checked':''}>用指纹解锁</label>`:''}<p class="note">离开 APP 超过 1 分钟再回来，需要重新输入密码。</p>`:`<p class="note" style="margin:0 0 8px">打开 APP 要先输入数字密码${window.AndroidBridge?'（安卓可用指纹）':''}，防止别人看账。</p><button class="btn2" data-a="pin-set">设置密码</button>`}</div>
   <div class="card"><h4>行程</h4><div style="display:flex;flex-direction:column;gap:10px">
@@ -1298,6 +1314,7 @@ function step(k){if(!viewer)return;const n=viewer.idx+k;if(n<0||n>=viewer.list.l
 let toastT;function toast(m){m=trText(m);let e=$('.toast');if(!e){e=document.createElement('div');e.className='toast';e.setAttribute('role','status');document.body.appendChild(e)}e.textContent=m;e.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>e.hidden=true,2200)}
 function armed(b){if(!b.dataset.confirm)return true;if(b.classList.contains('armed'))return true;b.dataset.orig=b.textContent;b.textContent=b.dataset.confirm;b.classList.add('armed');setTimeout(()=>{if(b.isConnected){b.classList.remove('armed');b.textContent=b.dataset.orig}},3500);return false}
 const ACT={
+  skin:b=>{S.theme=b.dataset.v;save(true);applyTheme();render()},
   'haptic-toggle':b=>{S.haptic=b.checked;save(true);if(b.checked)buzz(true)},
   'pin-set':()=>openSheet('pin-set',{}),
   'pin-save':async()=>{const a=$('#pin1').value.trim(),b=$('#pin2').value.trim();
@@ -1401,6 +1418,10 @@ document.addEventListener('change',async e=>{
   if(el.dataset.file==='bk'){const f=el.files[0];if(!f)return;$('#bk-in').value=await f.text();toast('已读取，点「恢复」确认')}
 });
 
+/* ---------- 外观：默认白色 ---------- */
+function applyTheme(){const v=S?.theme||'light';if(v==='system')delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=v;
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content',v==='dark'?'#0B0C0C':'#FFFFFF')}
+
 /* ---------- 按键震动 ---------- */
 function buzz(force){if(S?.haptic===false&&!force)return;try{if(window.AndroidBridge&&AndroidBridge.haptic)AndroidBridge.haptic();else if(navigator.vibrate)navigator.vibrate(8)}catch(e){}}
 document.addEventListener('pointerdown',e=>{if(e.target.closest('[data-ck],[data-pk],[data-a],.sugs [data-sv]'))buzz()},true);
@@ -1499,7 +1520,7 @@ async function boot(){
   if(S){S.trips.forEach(migrateRates);if(!S.firstUse){S.firstUse=Date.now();save(true)}}
   if(!S){S=seed('zh');S.firstUse=Date.now();save(true);putPhoto('demo-receipt',demoReceipt())}
   else if(S.trips.some(t=>t.txs.some(x=>x.photos?.includes('demo-receipt')))&&!(await getPhoto('demo-receipt')))putPhoto('demo-receipt',demoReceipt());
-  render();
+  applyTheme();render();
   if(S.lock)lockShow();
   const h=location.hash.slice(1);if(h){const x=T().txs.find(y=>y.id===h);if(x)openSheet('tx',{id:h})}
 }
