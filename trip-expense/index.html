@@ -450,6 +450,15 @@ input.in:focus,select.in:focus,textarea.in:focus{border-color:var(--ink);box-sha
 #lock .pad button:active{transform:scale(.93)}
 #lock .lk-link{color:var(--muted)}
 .sugs button{border-color:var(--line)}
+/* 弹层内容不被压缩；流水第二行可截断 */
+.sheet>*{flex-shrink:0}
+.txr .t2{display:block}
+.txr .a3{font-size:11px;color:var(--muted);font-weight:500;white-space:nowrap}
+.sheet .hero{background:var(--surface);box-shadow:var(--shadow)}
+.acc-sum{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.acc-sum div{background:var(--surface2);border-radius:14px;padding:10px 12px}
+.acc-sum span{display:block;font-size:12px;color:var(--muted)}
+.acc-sum b{font-size:17px}
 /* 数字加粗 */
 .num{font-weight:600}
 .txr .a1,.acct .v,.mrow .num,.prev .num,.d-amt .v,.kv .num,.sb .num,.xfer .v{font-weight:700}
@@ -573,7 +582,7 @@ const TK={
  '没有弹出打印窗口？请用浏览器菜单里的「打印」，或「复制为表格」':'Çap penjiresi açylmadymy? Brauzeriň menýusyndaky «Çap» ulanyň ýa-da «Tablisa hökmünde göçür».',
  '餐饮':'Nahar','交通':'Ulag','住宿':'Ýaşaýyş','门票':'Bilet','通讯':'Aragatnaşyk','购物':'Söwda','杂费':'Beýlekiler','其他':'Beýleki',
  '编号':'Belgi','金额':'Möçber','参与人/分摊':'Gatnaşyjylar / paýy','垫付人':'Tölän adam','照片数':'Surat sany','折合':'Hasabynda ',
- '语言':'Dil','外观':'Görnüş','白色':'Ak','深色':'Garaňky','跟随系统':'Ulgam boýunça','按键震动':'Düwme titremesi','按键盘、按钮时手机轻轻震一下':'Düwmä basanyňyzda telefon ýeňil titrär','币种汇总':'Walýutalar boýunça jemi','各币种按原币计算':'Her walýuta öz pulunda','期初':'Başy','换入':'Çalşyp alnan','换出':'Çalşyp berlen',
+ '语言':'Dil','币种账户（点开看流水）':'Walýuta hasaplary (ýazgylary görmek üçin basyň)','A4 账单 · 打印 / 分享':'A4 hasabat · çap et / paýlaş','这个账户还没有记录':'Bu hasapda heniz ýazgy ýok','笔相关':'degişli ýazgy','外观':'Görnüş','白色':'Ak','深色':'Garaňky','跟随系统':'Ulgam boýunça','按键震动':'Düwme titremesi','按键盘、按钮时手机轻轻震一下':'Düwmä basanyňyzda telefon ýeňil titrär','币种汇总':'Walýutalar boýunça jemi','各币种按原币计算':'Her walýuta öz pulunda','期初':'Başy','换入':'Çalşyp alnan','换出':'Çalşyp berlen',
  '各币种原币记账，换汇在两个账户里各记一笔。':'Her walýuta öz pulunda ýazylýar; walýuta çalyşmak iki hasapda hem görkezilýär. ','按换汇实际成本计算。':'hakyky çalyşma gymmaty boýunça hasaplanýar.','存入':'Goýum','换币':'Çalyşma','共同':'Umumy','存入钱袋':'Gapjyga goýum','按人汇总':'Agzalar boýunça jemi','成员 / 来源':'Agza / çeşme',
  '余额 = 投入 − 花费':'Galyndy = goýan − sarp edilen','成员账单':'Agzalaryň hasabatlary','只列每人分摊到的花费':'Diňe her kime düşen çykdajylar','本人签字':'Agzanyň goly',
  '份额（原币）':'Paýy (asyl)','（外部来源）':' (daşky çeşme)','分享 PDF':'PDF paýlaş','分享备份文件':'Ätiýaçlyk faýlyny paýlaş','分享 CSV':'CSV paýlaş','正在生成 PDF…':'PDF taýýarlanýar…',
@@ -620,6 +629,7 @@ const TKP=[
  [/^已添加 (\d+) 张$/,'$1 surat goşuldy'],
  [/^折合 (\w+) 按换汇实际成本计算。$/,'$1 hasabynda hakyky çalyşma gymmaty boýunça.'],
  [/^期末余额 (.+)$/,'Ahyrky galyndy $1'],
+ [/^余额（([A-Z]{3})）$/,'Galyndy ($1)'],[/^余额 (.+)$/,'Galyndy $1'],[/^共 (.+)$/,'Jemi $1'],[/^垫付 (.+)$/,'Tölän $1'],
  [/^入 ([A-Z]{3})$/,'Giriş $1'],[/^出 ([A-Z]{3})$/,'Çykyş $1'],
  [/^已添加 (\w+)，请核对 1 USD 汇率$/,'$1 goşuldy, 1 USD kursuny barlaň'],
  [/^已经 (\d+) 天没有备份了。/,'Eýýäm $1 gün bäri ätiýaçlyk nusga alnanok. '],
@@ -853,7 +863,7 @@ function vHome(t){
   <div class="acts"><button data-a="add" data-v="deposit"><i>${SVG(GLYPH.in)}</i>入钱</button><button data-a="add" data-v="exchange"><i>${SVG(GLYPH.swap)}</i>换汇</button></div></section>`;
   h+=`<div class="quick"><button data-a="add" data-v="personal"><span class="ic">${SVG(GLYPH.person)}</span><span>个人支出<small>只算一个人</small></span></button><button data-a="add" data-v="shared"><span class="ic gold">${SVG(GLYPH.people)}</span><span>共同支出<small>总额自动分摊</small></span></button></div>`;
   const codes=t.currencies.map(c=>c.code).filter(c=>c===t.base||Math.abs(C.acc[c]?.bal||0)>0||live(t).some(x=>x.cur===c||x.fromCur===c||x.toCur===c));
-  h+=`<div class="sec-t"><h3>币种账户（点开看账单）</h3><button class="link" data-a="stmt" data-v="all">打印总账</button></div><div class="accts">${codes.map(c=>{const a=C.acc[c]||{bal:0,cost:0};return `<button class="acct ${a.bal<0?'neg-b':''}" data-a="stmt" data-v="cur:${c}"><div class="c"><span>${cname(c)}</span><span>${c}</span></div><div class="v num ${a.bal<0?'neg':''}">${money(a.bal,c)}</div><div class="r num">${c===t.base?'本位币':`成本 1${c} ≈ ${sym(t.base)}${C.avg(c).toFixed(4)}`}</div></button>`}).join('')}</div>`;
+  h+=`<div class="sec-t"><h3>币种账户（点开看流水）</h3><button class="link" data-a="stmt" data-v="all">打印总账</button></div><div class="accts">${codes.map(c=>{const a=C.acc[c]||{bal:0,cost:0};return `<button class="acct ${a.bal<0?'neg-b':''}" data-a="acct" data-v="${c}"><div class="c"><span>${cname(c)}</span><span>${c}</span></div><div class="v num ${a.bal<0?'neg':''}">${money(a.bal,c)}</div><div class="r num">${c===t.base?'本位币':`成本 1${c} ≈ ${sym(t.base)}${C.avg(c).toFixed(4)}`}</div></button>`}).join('')}</div>`;
   if(codes.some(c=>(C.acc[c]?.bal||0)<0))h+=`<div class="banner"><b>有币种账户是负数：钱不够了，请补记入钱或换汇。</b><button data-a="add" data-v="deposit">入钱</button></div>`;
   const today=nowLocal().slice(0,10);const td=live(t).filter(x=>x.type==='expense'&&x.time.startsWith(today));
   h+=`<div class="sec-t"><h3>成员余额</h3><button class="link" data-a="settle">结算</button></div><div class="card rows" style="padding-block:4px">${t.members.map(m=>{const b=C.mem[m.id].in-C.mem[m.id].out;return `<button class="mrow" data-a="member" data-id="${m.id}">${av(t,m.id)}<span class="nm">${esc(m.name)}<div class="sub">已用 ${money(C.mem[m.id].out,t.base)}</div></span><span class="num ${b<0?'neg':'pos'}">${money(b,t.base,true)}</span></button>`}).join('')}</div>`;
@@ -1114,15 +1124,31 @@ SHEETS.member=({id})=>{
   const t=T();const m=mOf(t,id);if(!m)return head('成员不存在');
   const s=C.mem[id];const b=s.in-s.out;
   const xs=live(t).filter(x=>(x.splits||[]).some(y=>y.m===id)||x.advBy===id).sort(byTime).reverse();
-  const curs=[...new Set([...Object.keys(s.inC),...Object.keys(s.outC)])];
   let h=head(`${av(t,id)} ${esc(m.name)} 的账`);
-  h+=`<div class="hero"><div><div class="lbl">余额（${b<0?'欠钱袋':'钱袋欠他'}）</div><div class="big num">${money(b,t.base,true)}</div></div><div class="row"><span>投入 <b>${money(s.in,t.base)}</b></span><span>已用 <b>${money(s.out,t.base)}</b></span><span>${xs.length} 笔相关</span></div></div>`;
+  h+=`<div class="hero"><div><div class="lbl">余额（${b<0?'欠钱袋':'钱袋欠他'}）</div><div class="big num ${b<0?'neg':''}">${money(b,t.base,true)}</div></div>
+  <div class="acc-sum"><div><span>投入</span><b class="num pos">${money(s.in,t.base)}</b></div><div><span>花费</span><b class="num neg">${money(s.out,t.base)}</b></div></div></div>`;
   h+=`<button class="btn2" data-a="stmt" data-v="m:${id}">${esc(m.name)} 的 A4 账单 / 打印</button>`;
-  if(curs.length)h+=`<div class="card scroll-x"><table class="tbl"><thead><tr><th>币种</th><th>投入</th><th>用掉</th></tr></thead><tbody>${curs.map(c=>`<tr><td>${c}</td><td class="num">${money(s.inC[c]||0,c)}</td><td class="num">${money(s.outC[c]||0,c)}</td></tr>`).join('')}</tbody></table></div>`;
-  h+=`<div class="card rows" style="padding-block:2px">${xs.map(x=>{const mine=(x.splits||[]).find(y=>y.m===id);const i=C.info[x.id];const parts=[];
-    if(x.type==='deposit')parts.push(`<span class="pos">+${money(mine.amt,x.cur)}</span>`);
-    else{if(x.advBy===id)parts.push(`<span class="pos">垫付 +${money(x.amount,x.cur)}</span>`);if(mine)parts.push(`<span>占 −${money(mine.amt,x.cur)}</span>`)}
-    return `<button class="txr" data-a="tx" data-id="${x.id}">${txIcon(x)}<span class="mid"><span class="t1"><span class="n">${esc(txTitle(t,x))}</span></span><span class="t2">${dayLabel(x.time.slice(0,10))} ${hm(x.time)} · 总 ${money(x.amount,x.cur)}${x.type==='expense'?` / ${x.splits.length}人`:''}</span></span><span class="rt"><div class="a1 num">${parts.join('<br>')}</div>${mine&&x.cur!==t.base?`<div class="a2 num">≈${money(mine.amt*i.rate,t.base)}</div>`:''}</span></button>`}).join('')||'<div class="empty">暂无相关记录</div>'}</div>`;
+  h+=`<div class="sec-t"><h3>${xs.length} 笔相关</h3></div><div class="card rows" style="padding-block:2px">${xs.map(x=>{
+    const mine=(x.splits||[]).find(y=>y.m===id);const i=C.info[x.id]||{rate:1};let a1='',sub=[];
+    if(x.type==='deposit'){a1=`<span class="pos">+${money(mine.amt,x.cur)}</span>`;if(x.splits.length>1)sub.push(`共 ${money(x.amount,x.cur)}`)}
+    else{if(mine){a1=`<span class="neg">−${money(mine.amt,x.cur)}</span>`;if(x.splits.length>1)sub.push(`共 ${money(x.amount,x.cur)} · ${x.splits.length}人`)}
+      if(x.advBy===id){if(!mine)a1=`<span class="pos">+${money(x.amount,x.cur)}</span>`;else sub.push(`垫付 +${money(x.amount,x.cur)}`)}}
+    if(mine&&x.cur!==t.base)sub.push(`≈${money(mine.amt*i.rate,t.base)}`);
+    return `<button class="txr" data-a="tx" data-id="${x.id}">${txIcon(x)}<span class="mid"><span class="t1"><span class="n">${esc(txTitle(t,x))}</span></span><span class="t2">${dayLabel(x.time.slice(0,10))} ${hm(x.time)}</span></span><span class="rt"><div class="a1 num">${a1}</div>${sub.map(v=>`<div class="a3 num">${v}</div>`).join('')}</span></button>`}).join('')||'<div class="empty">暂无相关记录</div>'}</div>`;
+  return h;
+};
+
+/* ----- 币种账户流水 ----- */
+SHEETS.acct=({cur})=>{
+  const t=T();const sd=stmtData(t,{scope:'cur:'+cur});const rows=sd.rows.slice().reverse();
+  let h=head(`钱袋 ${cur} ${esc(cname(cur))} 账户`);
+  h+=`<div class="hero"><div><div class="lbl">余额（${cur}）</div><div class="big num ${sd.close<0?'neg':''}">${money(sd.close,cur)}</div>${cur!==t.base?`<div class="row" style="margin-top:4px"><span>≈ <b>${money(sd.close*C.avg(cur),t.base)}</b> · 成本 1${cur} ≈ ${sym(t.base)}${C.avg(cur).toFixed(4)}</span></div>`:''}</div>
+  <div class="acc-sum"><div><span>入</span><b class="num pos">${money(sd.totIn,cur)}</b></div><div><span>出</span><b class="num neg">${money(sd.totOut,cur)}</b></div></div></div>`;
+  h+=`<button class="btn" data-a="stmt" data-v="cur:${cur}">A4 账单 · 打印 / 分享</button>`;
+  h+=`<div class="sec-t"><h3>${rows.length} 笔</h3></div><div class="card rows" style="padding-block:2px">${rows.map(r=>{const x=r.x;
+    const a1=r.inn&&r.out?`<span class="pos">+${money(r.inn,cur)}</span><br><span class="neg">−${money(r.out,cur)}</span>`:r.inn?`<span class="pos">+${money(r.inn,cur)}</span>`:`<span class="neg">−${money(r.out,cur)}</span>`;
+    const sub=[];if(x.type==='exchange')sub.push(r.orig);else if(r.orig2)sub.push(r.orig2);sub.push(`余额 ${money(r.bal,cur)}`);
+    return `<button class="txr" data-a="tx" data-id="${x.id}">${txIcon(x)}<span class="mid"><span class="t1"><span class="n">${esc(txTitle(t,x))}</span></span><span class="t2">${dayLabel(x.time.slice(0,10))} ${hm(x.time)}${r.who?' · '+esc(r.who):''}</span></span><span class="rt"><div class="a1 num">${a1}</div>${sub.map(v=>`<div class="a3 num">${esc(v)}</div>`).join('')}</span></button>`}).join('')||'<div class="empty">这个账户还没有记录</div>'}</div>`;
   return h;
 };
 
@@ -1379,6 +1405,7 @@ const ACT={
   'f-none':()=>{const s=topForm();s.data.ids=new Set();renderSheet(s)},
   'f-mode':b=>{const s=topForm(),d=s.data;d.mode=b.dataset.v;if(d.mode==='custom'){const r=draftCalc({...d,mode:'equal'});(r.splits||[]).forEach(x=>{if(d.custom[x.m]==null||d.custom[x.m]==='')d.custom[x.m]=String(x.amt/100)})}renderSheet(s)},
   'f-src':b=>{const s=topForm();s.data.src=b.dataset.v;renderSheet(s)},
+  acct:b=>openSheet('acct',{cur:b.dataset.v}),
   stmt:b=>{const s=openSheet('stmt',{scope:b.dataset.v||'all'});s.body.classList.add('wide')},
   print:async()=>{const {t,ttl}=await preparePrint();
     if(window.AndroidBridge&&AndroidBridge.print){AndroidBridge.print(`${t.name}-${trText(ttl)}`);return}
